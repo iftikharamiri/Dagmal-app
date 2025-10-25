@@ -50,7 +50,7 @@ export function HomePage() {
     queryFn: async () => {
       console.log('🔍 Fetching deals from Supabase...')
       
-      // Force real Supabase mode
+      // Always use real Supabase data in production
       const isDemoMode = false
       
       if (isDemoMode) {
@@ -317,11 +317,13 @@ export function HomePage() {
     },
   })
 
+  // Get user from auth guard
+  const { user } = useAuthGuard()
+
   // Fetch user profile for favorites
   const { data: profile } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser()
       if (!user) return null
 
       // Force real Supabase mode
@@ -357,6 +359,7 @@ export function HomePage() {
       if (error && error.code !== 'PGRST116') throw error
       return data
     },
+    enabled: !!user,
   })
 
   // Get available filter options
@@ -507,7 +510,7 @@ export function HomePage() {
       return
     }
     
-    if (!profile) {
+    if (!user) {
       console.error('❌ User not logged in')
       toast.error('Du må logge inn for å hente tilbud')
       navigate('/auth')
@@ -516,12 +519,6 @@ export function HomePage() {
 
     try {
       console.log('🎯 Starting claim process...', { selectedDeal: selectedDeal.id, claimData })
-      
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        console.error('❌ User not authenticated')
-        throw new Error('Not authenticated')
-      }
 
       console.log('👤 User authenticated:', user.id)
 
