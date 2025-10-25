@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Scraper Tool</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="url"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        input[type="url"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+        .menu-preview {
+            max-height: 300px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .menu-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        .item-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .item-price {
+            color: #007bff;
+            font-weight: 600;
+        }
+        .item-description {
+            color: #666;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+        .instructions {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍽️ Menu Scraper Tool</h1>
+        
+        <div class="instructions">
+            <h3>How to use this tool:</h3>
+            <ol>
+                <li>Enter the URL of a restaurant's menu page</li>
+                <li>Click "Scrape Menu" to extract menu items</li>
+                <li>Review the extracted items below</li>
+                <li>Download the JSON file</li>
+                <li>Upload the JSON file to your restaurant dashboard</li>
+            </ol>
+            <p><strong>Supported websites:</strong> Most restaurant websites with clear pricing (e.g., 169,- or $19.99)</p>
+        </div>
+
+        <div class="form-group">
+            <label for="menuUrl">Restaurant Menu URL:</label>
+            <input 
+                type="url" 
+                id="menuUrl" 
+                placeholder="https://example-restaurant.com/menu"
+                value="https://babylonpizza.no/meny-babylon-burger/"
+            >
+        </div>
+
+        <button onclick="scrapeMenu()" id="scrapeBtn">Scrape Menu</button>
+
+        <div id="result" class="result" style="display: none;">
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        async function scrapeMenu() {
+            const url = document.getElementById('menuUrl').value;
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            const scrapeBtn = document.getElementById('scrapeBtn');
+            
+            if (!url) {
+                showResult('Please enter a menu URL', 'error');
+                return;
+            }
+
+            // Show loading state
+            scrapeBtn.disabled = true;
+            scrapeBtn.textContent = 'Scraping...';
+            showResult('🔄 Scraping menu from: ' + url, 'loading');
+
+            try {
+                // Use a CORS proxy to fetch the page
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                
+                // Parse the HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data.contents, 'text/html');
+                
+                // Extract menu items
+                const menuItems = extractMenuItems(doc);
+                
+                if (menuItems.length === 0) {
+                    showResult('❌ No menu items found. The website might not be compatible or the menu structure is different.', 'error');
+                } else {
+                    showResult(`✅ Successfully extracted ${menuItems.length} menu items!`, 'success');
+                    showMenuPreview(menuItems);
+                    downloadJSON(menuItems);
+                }
+                
+            } catch (error) {
+                console.error('Scraping error:', error);
+                showResult('❌ Error scraping menu: ' + error.message, 'error');
+            } finally {
+                scrapeBtn.disabled = false;
+                scrapeBtn.textContent = 'Scrape Menu';
+            }
+        }
+
+        function extractMenuItems(doc) {
+            const menuItems = [];
+            const priceRegex = /(\d+),-/g;
+            
+            // Find all elements that might contain menu items
+            const elements = doc.querySelectorAll('*');
+            
+            elements.forEach(element => {
+                const text = element.textContent || '';
+                
+                // Look for price patterns
+                const priceMatches = text.match(priceRegex);
+                if (priceMatches && priceMatches.length > 0) {
+                    // Get the parent element to find the full item
+                    const parent = element.closest('li, p, div');
+                    if (parent) {
+                        const fullText = parent.textContent || '';
+                        
+                        // Extract item name and price
+                        const nameMatch = fullText.match(/^([^0-9]+?)\s*(\d+),-/);
+                        if (nameMatch) {
+                            const name = nameMatch[1].trim();
+                            const price = parseInt(nameMatch[2]);
+                            
+                            // Skip if this looks like a category header or invalid item
+                            if (name.length > 3 && name.length < 50 && 
+                                !name.includes('ALLERGENER') && 
+                                !name.includes('Burger/Tallerken') &&
+                                !name.includes('MENU') &&
+                                !name.includes('BURGERS')) {
+                                
+                                // Extract description
+                                const descMatch = fullText.match(new RegExp(name + '\\s*(.+?)\\s*' + price + ',-'));
+                                const description = descMatch ? descMatch[1].trim() : '';
+                                
+                                // Determine category
+                                let category = 'MAIN';
+                                const categoryElement = parent.closest('h1, h2, h3, h4, h5, h6');
+                                if (categoryElement) {
+                                    const categoryText = categoryElement.textContent || '';
+                                    if (categoryText.includes('BURGERS')) category = 'BURGERS';
+                                    else if (categoryText.includes('VEGETARIAN')) category = 'VEGETARIAN';
+                                    else if (categoryText.includes('SIDES')) category = 'SIDES';
+                                    else if (categoryText.includes('DIPS')) category = 'DIPS';
+                                    else if (categoryText.includes('DRINKS')) category = 'DRINKS';
+                                }
+                                
+                                menuItems.push({
+                                    name: name,
+                                    description: description,
+                                    price: price,
+                                    category: category,
+                                    dietary_info: [],
+                                    image_url: null
+                                });
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Remove duplicates
+            const uniqueItems = menuItems.filter((item, index, self) => 
+                index === self.findIndex(t => t.name === item.name && t.price === item.price)
+            );
+            
+            return uniqueItems;
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.className = `result ${type}`;
+            resultContent.innerHTML = message;
+        }
+
+        function showMenuPreview(menuItems) {
+            const preview = document.createElement('div');
+            preview.className = 'menu-preview';
+            preview.innerHTML = '<h4>Menu Preview:</h4>' + 
+                menuItems.map(item => `
+                    <div class="menu-item">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">${item.price},-</div>
+                        <div class="item-description">${item.description}</div>
+                    </div>
+                `).join('');
+            
+            document.getElementById('resultContent').appendChild(preview);
+        }
+
+        function downloadJSON(menuItems) {
+            const json = JSON.stringify(menuItems, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'restaurant-menu.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
+
+
+

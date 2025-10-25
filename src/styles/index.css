@@ -1,0 +1,111 @@
+@import 'leaflet/dist/leaflet.css';
+@import './tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide scrollbar for horizontal scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+mark {
+  background-color: #fef3c7;
+  color: #92400e;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-bg text-fg font-sans antialiased;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-2xl px-6 py-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+    min-height: 44px; /* Touch target */
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-primary-fg hover:bg-primary/90 shadow-soft;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary text-white hover:bg-secondary/90 shadow-soft;
+  }
+
+  .btn-ghost {
+    @apply btn text-fg hover:bg-muted;
+  }
+
+  .btn-destructive {
+    @apply btn bg-danger text-white hover:bg-danger/90 shadow-soft;
+  }
+
+  .card {
+    @apply bg-card text-card-fg rounded-2xl border border-border shadow-soft;
+  }
+
+  .input {
+    @apply flex h-12 w-full rounded-2xl border border-border bg-bg px-4 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+}
+
+/* Leaflet map styles */
+.leaflet-container {
+  @apply rounded-2xl;
+}
+
+.leaflet-popup-content-wrapper {
+  @apply rounded-2xl;
+}
+
+.leaflet-popup-tip {
+  display: none;
+}
+
+/* Bottom navigation safe area */
+.bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,67 @@
+{
+  "restaurant_info": {
+    "name": "Test Restaurant",
+    "description": "A test restaurant for menu upload",
+    "phone": "+47 123 45 678",
+    "address": "Test Street 123",
+    "city": "Oslo",
+    "categories": ["Test Cuisine", "Fast Food"]
+  },
+  "menu_metadata": {
+    "version": "1.0",
+    "last_updated": "2024-01-15T10:00:00Z",
+    "currency": "NOK",
+    "language": "no"
+  },
+  "categories": [
+    {
+      "id": "appetizers",
+      "name": "APPETIZERS",
+      "description": "Start your meal right",
+      "display_order": 1,
+      "items": [
+        {
+          "id": "test-item-1",
+          "name": "Test Appetizer",
+          "description": "A delicious test appetizer",
+          "price": 12000,
+          "dietary_info": ["vegetarian"],
+          "image_url": "https://example.com/image.jpg",
+          "is_available": true,
+          "variants": [
+            {
+              "name": "Small",
+              "price_modifier": -2000,
+              "description": "Smaller portion"
+            },
+            {
+              "name": "Large",
+              "price_modifier": 3000,
+              "description": "Larger portion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mains",
+      "name": "MAIN COURSES",
+      "description": "Our signature dishes",
+      "display_order": 2,
+      "items": [
+        {
+          "id": "test-item-2",
+          "name": "Test Main Course",
+          "description": "A hearty test main course",
+          "price": 25000,
+          "dietary_info": ["gluten-free"],
+          "image_url": null,
+          "is_available": true,
+          "variants": []
+        }
+      ]
+    }
+  ]
+}
+
+

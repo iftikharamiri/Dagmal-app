@@ -1,0 +1,247 @@
+{
+  "restaurant_info": {
+    "name": "Babylon Burger",
+    "description": "Gourmet burger restaurant with fresh ingredients and unique flavors",
+    "phone": "+47 123 45 678",
+    "address": "Storgata 1, 0155 Oslo",
+    "city": "Oslo",
+    "categories": ["American", "Fast Food", "Burgers"]
+  },
+  "menu_metadata": {
+    "version": "2.1",
+    "last_updated": "2024-01-15T10:30:00Z",
+    "currency": "NOK",
+    "language": "no",
+    "dining_options": {
+      "dine_in": true,
+      "takeaway": true,
+      "delivery": false
+    }
+  },
+  "categories": [
+    {
+      "id": "burgers",
+      "name": "BURGERS",
+      "description": "Our signature gourmet burgers",
+      "display_order": 1,
+      "items": [
+        {
+          "id": "classic-burger",
+          "name": "Classic Burger",
+          "description": "Hamburger, ost, isbergsalat, tomat, karamellisert løk, syltet løk, dressing",
+          "price": 16900,
+          "image_url": null,
+          "dietary_info": ["soy", "egg", "milk", "mustard", "celery", "gluten"],
+          "allergens": ["Gluten", "Dairy", "Egg", "Soy", "Mustard", "Celery"],
+          "spice_level": 1,
+          "is_available": true,
+          "is_popular": true,
+          "preparation_time": 12,
+          "calories": 650,
+          "variants": [
+            {
+              "name": "Tallerken",
+              "price_modifier": 2000,
+              "description": "Served with fries"
+            }
+          ],
+          "tags": ["signature", "classic"]
+        },
+        {
+          "id": "babylon-burger",
+          "name": "Babylon Burger",
+          "description": "Hamburger, ost, karamellisert løk, kål med dressing",
+          "price": 17400,
+          "image_url": null,
+          "dietary_info": ["soy", "egg", "milk", "mustard", "celery", "gluten"],
+          "allergens": ["Gluten", "Dairy", "Egg", "Soy", "Mustard", "Celery"],
+          "spice_level": 1,
+          "is_available": true,
+          "is_popular": true,
+          "preparation_time": 12,
+          "calories": 680,
+          "variants": [
+            {
+              "name": "Tallerken",
+              "price_modifier": 2000,
+              "description": "Served with fries"
+            }
+          ],
+          "tags": ["signature", "house-special"]
+        },
+        {
+          "id": "truffle-burger",
+          "name": "Truffle Burger",
+          "description": "Hamburger, trøffel saus med champignon, cheddar ost, karamelisert løk, dressing",
+          "price": 18600,
+          "image_url": null,
+          "dietary_info": ["soy", "egg", "milk", "mustard", "celery", "gluten"],
+          "allergens": ["Gluten", "Dairy", "Egg", "Soy", "Mustard", "Celery"],
+          "spice_level": 0,
+          "is_available": true,
+          "is_popular": false,
+          "preparation_time": 15,
+          "calories": 720,
+          "variants": [
+            {
+              "name": "Tallerken",
+              "price_modifier": 2000,
+              "description": "Served with fries"
+            }
+          ],
+          "tags": ["premium", "truffle"]
+        }
+      ]
+    },
+    {
+      "id": "vegetarian",
+      "name": "VEGETARIAN",
+      "description": "Plant-based options",
+      "display_order": 2,
+      "items": [
+        {
+          "id": "falafel-burger",
+          "name": "Falafel Burger",
+          "description": "Falafel, isbergsalat, persille, tomat, mynt, pfefferoni, falafel saus",
+          "price": 15500,
+          "image_url": null,
+          "dietary_info": ["vegetarian", "soy", "mustard", "celery", "sesame", "gluten"],
+          "allergens": ["Gluten", "Soy", "Mustard", "Celery", "Sesame"],
+          "spice_level": 2,
+          "is_available": true,
+          "is_popular": false,
+          "preparation_time": 10,
+          "calories": 580,
+          "variants": [
+            {
+              "name": "Tallerken",
+              "price_modifier": 2000,
+              "description": "Served with fries"
+            }
+          ],
+          "tags": ["vegetarian", "middle-eastern"]
+        }
+      ]
+    },
+    {
+      "id": "sides",
+      "name": "SIDES",
+      "description": "Perfect accompaniments",
+      "display_order": 3,
+      "items": [
+        {
+          "id": "pommes-frites",
+          "name": "Pommes Frites",
+          "description": "Krispige pommes frites",
+          "price": 6900,
+          "image_url": null,
+          "dietary_info": ["soy", "egg", "celery", "gluten"],
+          "allergens": ["Gluten", "Egg", "Soy", "Celery"],
+          "spice_level": 0,
+          "is_available": true,
+          "is_popular": true,
+          "preparation_time": 8,
+          "calories": 320,
+          "variants": [],
+          "tags": ["classic", "fries"]
+        },
+        {
+          "id": "dirty-frites",
+          "name": "Dirty Frites",
+          "description": "Pommes frites med spesialdressing",
+          "price": 7900,
+          "image_url": null,
+          "dietary_info": ["soy", "egg", "milk", "celery", "gluten"],
+          "allergens": ["Gluten", "Dairy", "Egg", "Soy", "Celery"],
+          "spice_level": 1,
+          "is_available": true,
+          "is_popular": false,
+          "preparation_time": 8,
+          "calories": 420,
+          "variants": [],
+          "tags": ["loaded", "special"]
+        }
+      ]
+    },
+    {
+      "id": "drinks",
+      "name": "DRINKS",
+      "description": "Refreshing beverages",
+      "display_order": 4,
+      "items": [
+        {
+          "id": "soft-drinks",
+          "name": "Brus 0,5l",
+          "description": "Brus 0,5 liter",
+          "price": 3500,
+          "image_url": null,
+          "dietary_info": [],
+          "allergens": [],
+          "spice_level": 0,
+          "is_available": true,
+          "is_popular": true,
+          "preparation_time": 1,
+          "calories": 150,
+          "variants": [
+            {
+              "name": "1,5l",
+              "price_modifier": 2000,
+              "description": "Large bottle"
+            }
+          ],
+          "tags": ["beverage", "soda"]
+        },
+        {
+          "id": "shakes",
+          "name": "Sjokolade Shake",
+          "description": "Vaniljeis, melk, Monin sjokoladesaus",
+          "price": 9500,
+          "image_url": null,
+          "dietary_info": ["milk"],
+          "allergens": ["Dairy"],
+          "spice_level": 0,
+          "is_available": true,
+          "is_popular": true,
+          "preparation_time": 5,
+          "calories": 450,
+          "variants": [
+            {
+              "name": "Jordbær",
+              "price_modifier": 0,
+              "description": "Strawberry flavor"
+            },
+            {
+              "name": "Vanilje",
+              "price_modifier": 0,
+              "description": "Vanilla flavor"
+            }
+          ],
+          "tags": ["dessert", "cold", "sweet"]
+        }
+      ]
+    }
+  ],
+  "special_sections": {
+    "daily_specials": [
+      {
+        "day": "monday",
+        "items": ["classic-burger"]
+      },
+      {
+        "day": "tuesday",
+        "items": ["babylon-burger"]
+      }
+    ],
+    "seasonal_items": [
+      {
+        "name": "Summer Specials",
+        "season": "summer",
+        "available_from": "2024-06-01",
+        "available_until": "2024-08-31",
+        "items": []
+      }
+    ]
+  }
+}
+
+

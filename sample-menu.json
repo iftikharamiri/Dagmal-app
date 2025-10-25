@@ -1,0 +1,85 @@
+[
+  {
+    "name": "Bruschetta",
+    "description": "Fersk bruschetta med tomat og basilikum",
+    "price": 129,
+    "category": "Forretter",
+    "dietary_info": ["vegetarian"],
+    "image_url": "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400"
+  },
+  {
+    "name": "Pasta Carbonara",
+    "description": "Kremet pasta med bacon, egg og parmesan",
+    "price": 219,
+    "category": "Hovedretter",
+    "dietary_info": [],
+    "image_url": "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=400"
+  },
+  {
+    "name": "Pizza Margherita",
+    "description": "Klassisk pizza med tomat, mozzarella og basilikum",
+    "price": 189,
+    "category": "Pizza",
+    "dietary_info": ["vegetarian"],
+    "image_url": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400"
+  },
+  {
+    "name": "Grillet Laks",
+    "description": "Grillet laks med grønnsaker og potetmos",
+    "price": 269,
+    "category": "Hovedretter",
+    "dietary_info": ["gluten-free"],
+    "image_url": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400"
+  },
+  {
+    "name": "Vegetarburger",
+    "description": "Hjemmelaget vegetarburger med søtpotetfries",
+    "price": 199,
+    "category": "Burgere",
+    "dietary_info": ["vegetarian"],
+    "image_url": "https://images.unsplash.com/photo-1525059696034-4967a729002e?w=400"
+  },
+  {
+    "name": "Tiramisu",
+    "description": "Klassisk italiensk dessert med kaffe og mascarpone",
+    "price": 89,
+    "category": "Dessert",
+    "dietary_info": ["vegetarian"],
+    "image_url": "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400"
+  },
+  {
+    "name": "Caesar Salat",
+    "description": "Friske grønnsaker med caesar dressing og parmesan",
+    "price": 149,
+    "category": "Salater",
+    "dietary_info": ["vegetarian"],
+    "image_url": "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400"
+  },
+  {
+    "name": "Ribeye Steak",
+    "description": "Saftig ribeye steak med grønnsaker og poteter",
+    "price": 349,
+    "category": "Hovedretter",
+    "dietary_info": ["gluten-free"],
+    "image_url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400"
+  },
+  {
+    "name": "Vegansk Buddha Bowl",
+    "description": "Fargerik bowl med quinoa, grønnsaker og tahini dressing",
+    "price": 179,
+    "category": "Hovedretter",
+    "dietary_info": ["vegan", "gluten-free"],
+    "image_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400"
+  },
+  {
+    "name": "Chocolate Lava Cake",
+    "description": "Varm sjokoladekake med flytende kjerne og vaniljeis",
+    "price": 99,
+    "category": "Dessert",
+    "dietary_info": ["vegetarian"],
+    "image_url": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400"
+  }
+]
+
+
+

@@ -1,0 +1,278 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Restaurant Menu Schema",
+  "description": "A comprehensive schema for restaurant menus in JSON format",
+  "type": "object",
+  "properties": {
+    "restaurant_info": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Restaurant name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Restaurant description"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone number"
+        },
+        "address": {
+          "type": "string",
+          "description": "Restaurant address"
+        },
+        "city": {
+          "type": "string",
+          "description": "City where restaurant is located"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Cuisine categories (e.g., Italian, Asian, Fast Food)"
+        }
+      },
+      "required": ["name"]
+    },
+    "menu_metadata": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Menu version identifier"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the menu was last updated"
+        },
+        "currency": {
+          "type": "string",
+          "default": "NOK",
+          "description": "Currency used for prices"
+        },
+        "language": {
+          "type": "string",
+          "default": "no",
+          "description": "Menu language (ISO 639-1 code)"
+        },
+        "dining_options": {
+          "type": "object",
+          "properties": {
+            "dine_in": {
+              "type": "boolean",
+              "default": true
+            },
+            "takeaway": {
+              "type": "boolean",
+              "default": true
+            },
+            "delivery": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "description": "Menu categories (e.g., Appetizers, Main Courses, Desserts)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique category identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Category display name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional category description"
+          },
+          "display_order": {
+            "type": "integer",
+            "description": "Order in which category appears in menu"
+          },
+          "items": {
+            "type": "array",
+            "description": "Menu items in this category",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Unique item identifier"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Item name"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Item description"
+                },
+                "price": {
+                  "type": "integer",
+                  "description": "Price in øre (Norwegian currency subunit)"
+                },
+                "image_url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "URL to item image"
+                },
+                "dietary_info": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "vegetarian",
+                      "vegan",
+                      "gluten-free",
+                      "dairy-free",
+                      "nut-free",
+                      "soy",
+                      "egg",
+                      "milk",
+                      "mustard",
+                      "celery",
+                      "gluten",
+                      "sesame"
+                    ]
+                  },
+                  "description": "Dietary information and allergens"
+                },
+                "allergens": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Specific allergen information"
+                },
+                "spice_level": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 5,
+                  "description": "Spice level from 0 (mild) to 5 (very hot)"
+                },
+                "is_available": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Whether item is currently available"
+                },
+                "is_popular": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Whether item is marked as popular/bestseller"
+                },
+                "preparation_time": {
+                  "type": "integer",
+                  "description": "Estimated preparation time in minutes"
+                },
+                "calories": {
+                  "type": "integer",
+                  "description": "Calorie count"
+                },
+                "variants": {
+                  "type": "array",
+                  "description": "Item variants (e.g., different sizes, types)",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Variant name (e.g., 'Small', 'Large', 'With Cheese')"
+                      },
+                      "price_modifier": {
+                        "type": "integer",
+                        "description": "Price adjustment in øre (can be negative for discounts)"
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "Variant description"
+                      }
+                    },
+                    "required": ["name"]
+                  }
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Custom tags for filtering and organization"
+                }
+              },
+              "required": ["id", "name", "price"]
+            }
+          }
+        },
+        "required": ["id", "name", "items"]
+      }
+    },
+    "special_sections": {
+      "type": "object",
+      "description": "Special menu sections like daily specials, seasonal items",
+      "properties": {
+        "daily_specials": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "day": {
+                "type": "string",
+                "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Reference to item ID"
+                }
+              }
+            }
+          }
+        },
+        "seasonal_items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "season": {
+                "type": "string",
+                "enum": ["spring", "summer", "autumn", "winter"]
+              },
+              "available_from": {
+                "type": "string",
+                "format": "date"
+              },
+              "available_until": {
+                "type": "string",
+                "format": "date"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Reference to item ID"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["restaurant_info", "categories"]
+}
+
+

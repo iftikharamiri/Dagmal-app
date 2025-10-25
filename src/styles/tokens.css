@@ -1,0 +1,50 @@
+:root {
+  /* Base */
+  --bg: 0 0% 100%;
+  --fg: 222 47% 11%;
+  --muted: 215 16% 92%;
+  --muted-fg: 215 16% 35%;
+
+  /* Brand */
+  --primary: 152 61% 31%;
+  --primary-fg: 0 0% 100%;
+  --secondary: 25 95% 53%;
+  --accent: 210 100% 50%;
+
+  /* Status */
+  --success: 152 61% 31%;
+  --warning: 38 92% 50%;
+  --danger: 0 84% 60%;
+
+  /* Components */
+  --card: 0 0% 100%;
+  --card-fg: 222 47% 11%;
+  --border: 214 32% 91%;
+  --ring: var(--primary);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
