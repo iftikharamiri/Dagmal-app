@@ -565,6 +565,7 @@ export function HomePage() {
           quantity: claimData.quantity,
           service_type: claimData.serviceType,
           claim_date: claimData.claimDate,
+          special_requests: claimData.notes || null,
         }
 
         const { error: notificationError } = await supabase

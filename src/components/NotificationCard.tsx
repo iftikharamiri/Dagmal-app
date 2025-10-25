@@ -1,4 +1,4 @@
-import { Bell, User, Phone, Calendar, ShoppingBag, MapPin } from 'lucide-react'
+import { Bell, User, Phone, Calendar, ShoppingBag, MapPin, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface Notification {
@@ -9,6 +9,7 @@ interface Notification {
   quantity: number
   service_type: 'dine_in' | 'takeaway'
   claim_date: string
+  special_requests?: string
   created_at: string
   is_read: boolean
 }
@@ -104,6 +105,19 @@ export function NotificationCard({ notification, onMarkAsRead }: NotificationCar
                 <Calendar className="h-3 w-3 text-muted-fg" />
                 <span>Ønsket hentedato: {formatDate(notification.claim_date)}</span>
               </div>
+              
+              {/* Special Requests */}
+              {notification.special_requests && (
+                <div className="flex items-start gap-2">
+                  <MessageSquare className="h-3 w-3 text-muted-fg mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-muted-fg text-xs">Spesielle ønsker:</span>
+                    <p className="text-sm mt-1 p-2 bg-muted/30 rounded-md italic">
+                      "{notification.special_requests}"
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
