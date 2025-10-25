@@ -15,7 +15,8 @@ export function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard')
 
   // Check if user is admin (you can modify this logic)
-  const isAdmin = user?.email === 'iftikharamiri5@gmail.com' // Change this to your admin email
+  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'iftikharamiri5@gmail.com'
+  const isAdmin = user?.email === adminEmail
 
   // Fetch restaurants
   const { data: restaurants = [] } = useQuery({

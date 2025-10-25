@@ -145,7 +145,7 @@ export function ProfilePage() {
           </div>
 
           {/* Admin Link */}
-          {user?.email === 'iftikharamiri5@gmail.com' && (
+          {user?.email === (import.meta.env.VITE_ADMIN_EMAIL || 'iftikharamiri5@gmail.com') && (
             <div className="card p-6">
               <h2 className="text-lg font-semibold mb-4">Admin Panel</h2>
               <p className="text-muted-fg mb-4">Manage restaurants, deals, and users</p>
