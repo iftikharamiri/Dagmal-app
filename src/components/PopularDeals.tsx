@@ -113,6 +113,17 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                         </span>
                       </div>
 
+                      {/* Service Types */}
+                      <div className="flex items-center gap-2 text-xs text-muted-fg mb-2">
+                        {deal.available_for?.includes('dine_in') && deal.available_for?.includes('takeaway') ? (
+                          <span>🏠 Dine in • 📦 Takeaway</span>
+                        ) : deal.available_for?.includes('dine_in') ? (
+                          <span>🏠 Dine in</span>
+                        ) : deal.available_for?.includes('takeaway') ? (
+                          <span>📦 Takeaway</span>
+                        ) : null}
+                      </div>
+
                       {/* Time Info */}
                       <div className="flex items-center justify-between text-xs text-muted-fg mb-3">
                         <span>{deal.start_time.slice(0, 5)} - {deal.end_time.slice(0, 5)}</span>
