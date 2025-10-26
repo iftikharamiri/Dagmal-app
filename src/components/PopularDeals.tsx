@@ -70,20 +70,20 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                         </div>
                       )}
 
-                      {/* Service Type Overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 text-xs">
-                        <div className="flex items-center justify-between">
-                          <div>
-                          {deal.available_for?.includes('dine_in') && deal.available_for?.includes('takeaway') ? (
-                            <span>Spise på stedet • Takeaway</span>
-                          ) : deal.available_for?.includes('dine_in') ? (
-                            <span>Spise på stedet</span>
-                          ) : deal.available_for?.includes('takeaway') ? (
-                            <span>Takeaway</span>
-                          ) : null}
-                          </div>
-                          <div className="font-medium">{deal.start_time.slice(0, 5)} - {deal.end_time.slice(0, 5)}</div>
-                        </div>
+                      {/* Service Type Overlay - Bottom Left */}
+                      <div className="absolute bottom-0 left-0 bg-black/70 text-white px-2 py-1 text-xs">
+                        {deal.available_for?.includes('dine_in') && deal.available_for?.includes('takeaway') ? (
+                          <span>Spise på stedet • Takeaway</span>
+                        ) : deal.available_for?.includes('dine_in') ? (
+                          <span>Spise på stedet</span>
+                        ) : deal.available_for?.includes('takeaway') ? (
+                          <span>Takeaway</span>
+                        ) : null}
+                      </div>
+
+                      {/* Time Overlay - Bottom Right */}
+                      <div className="absolute bottom-0 right-0 bg-black/70 text-white px-2 py-1 text-xs font-medium">
+                        {deal.start_time.slice(0, 5)} - {deal.end_time.slice(0, 5)}
                       </div>
 
                       {/* Favorite Button */}
