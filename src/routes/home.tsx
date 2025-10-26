@@ -49,7 +49,6 @@ export function HomePage() {
   const { data: deals = [], isLoading: dealsLoading } = useQuery({
     queryKey: ['deals', searchQuery, filters],
     queryFn: async () => {
-      console.log('🔍 Fetching deals from Supabase...')
       
       // Always use real Supabase data in production
       const isDemoMode = false
@@ -237,7 +236,6 @@ export function HomePage() {
       }
 
       // Real Supabase mode
-      console.log('📡 Fetching deals from Supabase with search:', searchQuery)
       
       let query = supabase
         .from('deals')
