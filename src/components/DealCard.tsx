@@ -86,28 +86,17 @@ export function DealCard({
         {/* Gradient overlay for better text readability - Made stronger to match reference */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         
-        {/* Availability badge - Styled like reference image */}
-        {isLimitedQuantity && !isSoldOut && (
-          <div className="absolute top-4 right-4">
-            <div className="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold shadow-lg">
-              {remaining}
-            </div>
-          </div>
-        )}
-        
-        {/* Favorite button - Moved down to avoid overlap */}
+        {/* Favorite button */}
         <button
           onClick={onFavoriteToggle}
-          className={cn(
-            'absolute top-16 right-4 p-2 rounded-full backdrop-blur-sm transition-all duration-200',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-            isFavorite 
-              ? 'bg-red-500 text-white shadow-lg' 
-              : 'bg-white/90 text-gray-600 hover:bg-red-500 hover:text-white'
-          )}
+          className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors z-10"
           aria-label={isFavorite ? 'Fjern fra favoritter' : 'Legg til i favoritter'}
         >
-          <Heart className={cn('h-5 w-5', isFavorite && 'fill-current')} />
+          <Heart 
+            className={`h-4 w-4 ${
+              isFavorite ? 'fill-danger text-danger' : 'text-muted-fg hover:text-danger'
+            }`} 
+          />
         </button>
 
         {/* Discount badge - Styled to match reference exactly */}
@@ -117,7 +106,7 @@ export function DealCard({
           </span>
         </div>
 
-        {/* Service type and time badge - Styled to match reference */}
+        {/* Service type badge - Styled to match reference */}
         <div className="absolute bottom-4 left-4">
           <div className="bg-black/90 text-white px-4 py-2 rounded-lg backdrop-blur-sm shadow-lg">
             <div className="text-sm font-semibold">
@@ -131,58 +120,51 @@ export function DealCard({
       </div>
 
       {/* Content Section */}
-      <div className="p-6 space-y-4">
-        {/* Restaurant details and status - aligned horizontally */}
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <button
-              onClick={() => navigate(`/restaurant/${restaurantId}`)}
-              className="text-xl font-bold text-gray-900 leading-tight hover:text-blue-600 transition-colors duration-200 text-left"
-            >
-              {restaurantName}
-            </button>
-            <p className="text-gray-600 text-xs leading-relaxed">{title}</p>
-          </div>
-          
-          {/* Availability count - aligned with restaurant name and description */}
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-gray-400" />
-            <span className={cn(
-              'text-sm font-medium',
-              isAvailableNow ? 'text-green-600' : 'text-red-500'
-            )}>
-              {isLimitedQuantity ? (
-                isSoldOut ? (
-                  'Utsolgt'
-                ) : (
-                  `${remaining}/${totalLimit} tilgjengelig`
-                )
-              ) : (
-                isAvailableNow ? 'Tilgjengelig nå' : 'Utløpt'
-              )}
-            </span>
-          </div>
-        </div>
-
-        {/* Location */}
-        <div className="flex items-center gap-2 text-gray-600">
-          <MapPin className="h-4 w-4" />
-          <span className="text-sm">{address || 'Oslo'}</span>
-        </div>
-
-        {/* Pricing and claim section */}
+      <div className="p-6 space-y-2">
+        {/* Restaurant name with claimed count */}
         <div className="flex items-center justify-between">
+          <button
+            onClick={() => navigate(`/restaurant/${restaurantId}`)}
+            className="font-semibold text-gray-900 leading-tight hover:text-blue-600 transition-colors duration-200 text-left"
+          >
+            {restaurantName}
+          </button>
+          <div className="flex items-center gap-1 text-sm text-muted-fg">
+            <Users className="h-4 w-4" />
+            <span>{claimedCount} hentet</span>
+          </div>
+        </div>
+
+        {/* Dish name with availability */}
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-gray-600 text-xs leading-relaxed font-medium">{title}</p>
+          {totalLimit && (
+            <span className="text-green-600 text-xs font-medium whitespace-nowrap">
+              {totalLimit - claimedCount}/{totalLimit} tilgjengelig
+            </span>
+          )}
+        </div>
+
+        {/* Location and Price on same line */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-gray-600">
+            <MapPin className="h-4 w-4" />
+            <span className="text-sm">{address || 'Oslo'}</span>
+          </div>
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-sm font-bold text-gray-900">
               {finalPrice ? formatPrice(finalPrice) : 'Gratis'}
             </span>
             {originalPrice && (
-              <span className="text-lg text-gray-400 line-through">
+              <span className="text-xs text-gray-400 line-through">
                 {formatPrice(originalPrice)}
               </span>
             )}
           </div>
+        </div>
 
+        {/* Claim section */}
+        <div className="flex items-center justify-end">
           <button
             onClick={() => {
               console.log('🔘 Claim button clicked', { title, isAvailableNow, isSoldOut })

@@ -349,7 +349,7 @@ export function ClaimFlowModal({
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Allergier, spesielle ønsker, etc."
+                placeholder="Allergier, spesielle ønsker, tid for eksempel"
                 rows={3}
                 className="input w-full resize-none"
               />
