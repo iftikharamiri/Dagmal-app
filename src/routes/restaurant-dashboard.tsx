@@ -821,18 +821,9 @@ export function RestaurantDashboardPage() {
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <div>
-              <h1 className="text-xl font-bold">{restaurant.name}</h1>
-              <p className="text-sm text-muted-fg">Restaurant Dashboard</p>
-            </div>
+            <h1 className="text-xl font-bold">Restaurant Dashboard</h1>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/')}
-              className="text-muted-fg hover:text-primary px-3 py-2 rounded-lg transition-colors"
-            >
-              Til markedsplassen
-            </button>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative text-muted-fg hover:text-primary px-3 py-2 rounded-lg transition-colors"
@@ -1387,93 +1378,20 @@ export function RestaurantDashboardPage() {
             ) : (
               <div className="space-y-4">
                 {deals.map((deal) => (
-                  <div key={deal.id} className="border border-border rounded-xl p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h4 className="font-semibold">{deal.title}</h4>
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            deal.is_active 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
+                  <div key={deal.id} className="bg-white border-2 border-gray-300 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                    {/* First Row: Title and Status */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                        <h4 className="text-lg font-bold text-gray-900">{deal.title}</h4>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          deal.is_active 
+                            ? 'bg-green-100 text-green-700 ring-2 ring-green-200' 
+                            : 'bg-gray-100 text-gray-600 ring-2 ring-gray-200'
+                        }`}>
                             {deal.is_active ? 'Aktiv' : 'Inaktiv'}
-                          </span>
-                          <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">
-                            {deal.discount_percentage}% rabatt
-                          </span>
+                        </span>
                         </div>
-                        
-                        <p className="text-muted-fg text-sm mb-3">{deal.description}</p>
-                        
-                        <div className="flex items-center gap-4 text-sm text-muted-fg">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {formatTime(deal.start_time)} - {formatTime(deal.end_time)}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="h-4 w-4" />
-                            {deal.claimed_count}/{deal.total_limit || '∞'} krav
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <DollarSign className="h-4 w-4" />
-                            {formatPrice(deal.final_price)}
-                          </div>
-                        </div>
-
-                        {/* Verification Code */}
-                        {deal.verification_code && (
-                          <div className="mt-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Shield className="h-4 w-4 text-primary" />
-                                <span className="text-sm font-medium text-primary">Verifikasjonskode</span>
-                              </div>
-                              <button
-                                onClick={() => copyToClipboard(deal.verification_code)}
-                                className="flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-1 rounded hover:bg-primary/30 transition-colors"
-                              >
-                                <Copy className="h-3 w-3" />
-                                Kopier
-                              </button>
-                            </div>
-                            <div className="mt-2">
-                              <div className="text-lg font-bold tracking-widest text-primary">
-                                {deal.verification_code}
-                              </div>
-                              <p className="text-xs text-muted-fg mt-1">
-                                Kunder viser denne koden når de henter tilbudet
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <button 
-                          className="p-2 hover:bg-muted rounded-lg transition-colors"
-                          title="Forhåndsvis"
-                          onClick={() => navigate(`/restaurant/${restaurant.id}`)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </button>
-                        <button 
-                          className="p-2 hover:bg-muted rounded-lg transition-colors"
-                          title="Rediger tilbud"
-                          onClick={() => navigate(`/business/create-deal?edit=${deal.id}`)}
-                        >
-                          <Edit3 className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => toggleDealStatus(deal.id, !deal.is_active)}
-                          className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                            deal.is_active
-                              ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                              : 'bg-green-100 text-green-700 hover:bg-green-200'
-                          }`}
-                        >
-                          {deal.is_active ? 'Deaktiver' : 'Aktiver'}
-                        </button>
                         <button
                           onClick={() => deleteDeal(deal.id, deal.title)}
                           className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600 hover:text-red-700"
@@ -1482,6 +1400,64 @@ export function RestaurantDashboardPage() {
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
+                    </div>
+
+                    {/* Second Row: Discount and Deaktiver */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-sm font-semibold border-2 border-red-200">
+                        🎉 {deal.discount_percentage}% rabatt
+                      </span>
+                      <button
+                        onClick={() => toggleDealStatus(deal.id, !deal.is_active)}
+                        className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                          deal.is_active
+                            ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                            : 'bg-green-100 text-green-700 hover:bg-green-200'
+                        }`}
+                      >
+                        {deal.is_active ? 'Deaktiver' : 'Aktiver'}
+                      </button>
+                    </div>
+
+                    {/* Content Section */}
+                    <div>
+                        <p className="text-gray-600 text-sm mb-3">{deal.description}</p>
+                        
+                        <div className="flex items-center gap-4 text-sm text-muted-fg">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            {formatTime(deal.start_time)} - {formatTime(deal.end_time)}
+                          </div>
+                        </div>
+
+                        {/* Verification Code */}
+                        {deal.verification_code && (
+                          <div className="mt-4 p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl border-2 border-primary/20">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Shield className="h-4 w-4 text-primary" />
+                                <span className="text-sm font-semibold text-gray-900">Verifikasjonskode</span>
+                              </div>
+                              <button
+                                onClick={() => copyToClipboard(deal.verification_code)}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-white border-2 border-primary/30 text-primary rounded-lg hover:bg-primary hover:text-white transition-colors text-sm font-medium"
+                              >
+                                <Copy className="h-3 w-3" />
+                                Kopier
+                              </button>
+                            </div>
+                            <div className="mt-2">
+                              <div className="bg-white rounded-lg p-4 border-2 border-primary/20">
+                                <div className="text-2xl font-mono font-bold tracking-wider text-primary text-center">
+                                  {deal.verification_code}
+                                </div>
+                                <p className="text-xs text-gray-500 text-center mt-2">
+                                  Kunder viser denne koden når de henter tilbudet
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                     </div>
                   </div>
                 ))}
