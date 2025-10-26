@@ -174,7 +174,7 @@ export function ClaimFlowModal({
 
               {/* Claim Date Display */}
               <div className="text-sm text-muted-fg">
-                <span className="font-medium">Dato for henting:</span> {new Date(claimDate).toLocaleDateString('no-NO', { 
+                {new Date(claimDate).toLocaleDateString('no-NO', { 
                   weekday: 'long', 
                   year: 'numeric', 
                   month: 'long', 
