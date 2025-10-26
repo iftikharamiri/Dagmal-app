@@ -70,6 +70,21 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                         </div>
                       )}
 
+                      {/* Service Type Overlay */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 text-xs">
+                        <div className="flex items-center justify-between">
+                          <div>
+                          {deal.available_for?.includes('dine_in') && deal.available_for?.includes('takeaway') ? (
+                            <span>Spise på stedet • Takeaway</span>
+                          ) : deal.available_for?.includes('dine_in') ? (
+                            <span>Spise på stedet</span>
+                          ) : deal.available_for?.includes('takeaway') ? (
+                            <span>Takeaway</span>
+                          ) : null}
+                          </div>
+                          <div className="font-medium">{deal.start_time.slice(0, 5)} - {deal.end_time.slice(0, 5)}</div>
+                        </div>
+                      </div>
 
                       {/* Favorite Button */}
                       <button
@@ -111,17 +126,6 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                         <span className="text-sm text-muted-fg line-through">
                           {(deal.original_price / 100).toFixed(0)} kr
                         </span>
-                      </div>
-
-                      {/* Service Types */}
-                      <div className="flex items-center gap-2 text-xs text-muted-fg mb-2">
-                        {deal.available_for?.includes('dine_in') && deal.available_for?.includes('takeaway') ? (
-                          <span>🏠 Dine in • 📦 Takeaway</span>
-                        ) : deal.available_for?.includes('dine_in') ? (
-                          <span>🏠 Dine in</span>
-                        ) : deal.available_for?.includes('takeaway') ? (
-                          <span>📦 Takeaway</span>
-                        ) : null}
                       </div>
 
                       {/* Time Info */}
