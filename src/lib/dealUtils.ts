@@ -14,17 +14,6 @@ export function isDealCurrentlyAvailable(deal: DealWithRestaurant): boolean {
   const isTimeAvailable = currentTime >= startTime && currentTime <= endTime
   const isActive = deal.is_active
 
-  // Debug: Show what we're checking
-  console.log(`🔍 SIMPLIFIED check for "${deal.title}":`, {
-    currentTime,
-    currentDay,
-    startTime,
-    endTime,
-    isTimeAvailable,
-    isActive,
-    result: isTimeAvailable && isActive
-  })
-
   // Simplified logic - just check time and active status
   return isTimeAvailable && isActive
 }

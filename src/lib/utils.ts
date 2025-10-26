@@ -48,10 +48,7 @@ export function isTimeInRange(
   const currentMinute = now.getMinutes()
   const currentTimeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`
 
-  const result = currentTimeString >= startTime && currentTimeString <= endTime
-  console.log(`🕐 Time check: ${currentTimeString} between ${startTime}-${endTime} = ${result}`)
-  
-  return result
+  return currentTimeString >= startTime && currentTimeString <= endTime
 }
 
 export function isDealActiveToday(days: number[]): boolean {
@@ -59,9 +56,7 @@ export function isDealActiveToday(days: number[]): boolean {
   // Convert JavaScript day (0-6) to our day format (1-7)
   // 0=Sunday->7, 1=Monday->1, 2=Tuesday->2, 3=Wednesday->3, 4=Thursday->4, 5=Friday->5, 6=Saturday->6
   const dayIndex = today === 0 ? 7 : today
-  const result = days.includes(dayIndex)
-  console.log(`📅 Day check: today=${today} -> dayIndex=${dayIndex}, days=[${days.join(',')}], result=${result}`)
-  return result
+  return days.includes(dayIndex)
 }
 
 export function getDayName(dayNumber: number): string {
