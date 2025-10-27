@@ -10,10 +10,10 @@ export function useAuthGuard() {
   const { data: user, isLoading } = useQuery({
     queryKey: ['auth-user'],
     queryFn: async () => {
-    // Force real Supabase mode
-    const isDemoMode = false
+      // Force real Supabase mode
+      const isDemoMode = false
 
-    if (isDemoMode) {
+      if (isDemoMode) {
         // Return demo user from localStorage
         const demoUser = localStorage.getItem('demo_user')
         if (demoUser) {
@@ -22,10 +22,29 @@ export function useAuthGuard() {
         return null
       }
       
-      // Real Supabase mode
-      const { data: { user } } = await supabase.auth.getUser()
-      return user
+      // Real Supabase mode - check session first
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          // No session, clear any stale tokens
+          await supabase.auth.signOut()
+          return null
+        }
+        
+        const { data: { user }, error } = await supabase.auth.getUser()
+        if (error) {
+          // Invalid user, clear session
+          await supabase.auth.signOut()
+          return null
+        }
+        return user
+      } catch (error) {
+        // If anything fails, clear session and return null
+        await supabase.auth.signOut()
+        return null
+      }
     },
+    retry: false, // Don't retry on auth errors
   })
 
   useEffect(() => {
