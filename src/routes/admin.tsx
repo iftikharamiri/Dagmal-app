@@ -251,7 +251,7 @@ export function AdminPage() {
                 <div className="card p-6 mb-6">
                   <h3 className="text-lg font-semibold mb-4">Testing Tools</h3>
                   <p className="text-muted-fg mb-4">Quick access to test restaurant features</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <button
                       onClick={() => navigate('/business')}
                       className="btn-ghost p-4 text-left hover:bg-muted/50"
@@ -283,6 +283,14 @@ export function AdminPage() {
                       <Tag className="h-6 w-6 mb-2 text-orange-600" />
                       <div className="font-medium">Create Deal</div>
                       <div className="text-sm text-muted-fg">Test deal creation</div>
+                    </button>
+                    <button
+                      onClick={() => navigate('/test-phone-auth')}
+                      className="btn-ghost p-4 text-left hover:bg-muted/50"
+                    >
+                      <Users className="h-6 w-6 mb-2 text-red-600" />
+                      <div className="font-medium">Phone Auth Test</div>
+                      <div className="text-sm text-muted-fg">Test phone login</div>
                     </button>
                   </div>
                 </div>

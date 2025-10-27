@@ -17,6 +17,7 @@ import { RegisterRestaurantPage } from '@/routes/register-restaurant'
 import { RestaurantDashboardPage } from '@/routes/restaurant-dashboard'
 import { CreateDealPage } from '@/routes/create-deal'
 import { AdminPage } from '@/routes/admin'
+import { PhoneAuthTest } from '@/components/PhoneAuthTest'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +50,7 @@ function AppContent() {
         <Route path="/business/dashboard" element={<RestaurantDashboardPage />} />
         <Route path="/business/create-deal" element={<CreateDealPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/test-phone-auth" element={<PhoneAuthTest />} />
       </Routes>
 
       {showBottomNav && <BottomNavigation />}

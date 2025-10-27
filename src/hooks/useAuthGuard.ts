@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, startTransition } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 
 export function useAuthGuard() {
   const navigate = useNavigate()
+  const hasNavigated = useRef(false)
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['auth-user'],
@@ -28,10 +29,24 @@ export function useAuthGuard() {
   })
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      navigate('/auth')
+    if (!isLoading && !user && !hasNavigated.current) {
+      // Only navigate if not already on auth page and haven't navigated yet
+      if (window.location.pathname !== '/auth') {
+        hasNavigated.current = true
+        // Wrap navigation in startTransition to prevent throttling
+        startTransition(() => {
+          navigate('/auth', { replace: true })
+        })
+      }
     }
   }, [user, isLoading, navigate])
+
+  // Reset navigation flag when user logs in
+  useEffect(() => {
+    if (user) {
+      hasNavigated.current = false
+    }
+  }, [user])
 
   return { user, isLoading }
 }
