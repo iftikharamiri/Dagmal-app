@@ -101,10 +101,10 @@ export function BusinessPage() {
                 <Building2 className="h-16 w-16 mx-auto mb-4 text-white/90" />
               </div>
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                DAGMAL for Bedrifter
+                Spisly for Bedrifter
               </h1>
               <p className="text-xl text-white/90 mb-8">
-                Øk kundetrafikken med smarte tilbud og nå nye kunder på den raskest voksende matplattformen i Norge
+                Øk kundetrafikken med smarte tilbud og nå nye kunder på Norges raskest voksende matplattform.
               </p>
               
               {application ? (
@@ -145,7 +145,7 @@ export function BusinessPage() {
           <div className="max-w-6xl mx-auto">
             <h2 className="text-2xl font-bold text-center mb-8">Alt du trenger for å lykkes</h2>
             
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="grid md:grid-cols-2 gap-6 mb-12">
               <div className="card p-6 text-center">
                 <Target className="h-12 w-12 mx-auto mb-4 text-primary" />
                 <h3 className="font-semibold mb-2">Målrettede tilbud</h3>
@@ -153,33 +153,9 @@ export function BusinessPage() {
               </div>
               
               <div className="card p-6 text-center">
-                <PieChart className="h-12 w-12 mx-auto mb-4 text-success" />
-                <h3 className="font-semibold mb-2">Sanntidsanalyse</h3>
-                <p className="text-sm text-muted-fg">Se hvor mange kunder du kan forvente før du publiserer tilbudet</p>
-              </div>
-              
-              <div className="card p-6 text-center">
                 <Award className="h-12 w-12 mx-auto mb-4 text-secondary" />
                 <h3 className="font-semibold mb-2">Økt synlighet</h3>
-                <p className="text-sm text-muted-fg">Nå tusenvis av sultne kunder som leter etter gode tilbud</p>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="bg-muted/30 rounded-2xl p-8 text-center mb-12">
-              <div className="grid md:grid-cols-3 gap-8">
-                <div>
-                  <div className="text-3xl font-bold text-primary mb-2">2,500+</div>
-                  <div className="text-sm text-muted-fg">Aktive brukere</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-success mb-2">85%</div>
-                  <div className="text-sm text-muted-fg">Økning i kundetrafikk</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-secondary mb-2">150+</div>
-                  <div className="text-sm text-muted-fg">Partnere i Norge</div>
-                </div>
+                <p className="text-sm text-muted-fg">SEO- og AI optimalisering slik at restauranten dukker opp når folk bestiller via AI-plattformer.</p>
               </div>
             </div>
 

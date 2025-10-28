@@ -48,7 +48,7 @@ export function AIPage() {
         <div className="w-full px-4 pt-8">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight mb-6">
-              Hva du har lyst på, hvor og når?
+              Hva har du lyst på i dag?
             </h1>
             <div className="bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/50 border border-border rounded-2xl shadow-sm overflow-hidden">
               <form className="flex items-center" onSubmit={handleSubmit}>

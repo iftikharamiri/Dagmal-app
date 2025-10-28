@@ -62,7 +62,7 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                       )}
 
                       {/* Service Type and Time Overlay - Bottom Left */}
-                      <div className="absolute bottom-0 left-0 bg-black rounded-xl px-2 py-1.5 text-white">
+                      <div className="absolute bottom-0 left-0 bg-black/70 rounded-xl px-2 py-1.5 text-white backdrop-blur-sm">
                         <div className="text-xs font-medium">
                           {deal.available_for?.includes('dine_in') && deal.available_for?.includes('takeaway') ? (
                             <span>Spise på stedet • Takeaway</span>

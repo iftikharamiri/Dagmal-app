@@ -108,7 +108,7 @@ export function DealCard({
 
         {/* Service type badge - Styled to match reference */}
         <div className="absolute bottom-4 left-4">
-          <div className="bg-black/90 text-white px-4 py-2 rounded-lg backdrop-blur-sm shadow-lg">
+          <div className="bg-black/70 text-white px-4 py-2 rounded-lg backdrop-blur-sm shadow-lg">
             <div className="text-sm font-semibold">
               {dineIn ? norwegianText.deal.dineIn : norwegianText.deal.takeaway}
             </div>
