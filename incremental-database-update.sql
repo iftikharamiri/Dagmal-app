@@ -275,3 +275,4 @@ AND tablename IN ('profiles', 'restaurants', 'deals', 'claims', 'notifications')
 ORDER BY tablename;
 
 SELECT 'Incremental database update completed successfully!' as status;
+

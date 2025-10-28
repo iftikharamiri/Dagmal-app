@@ -29,3 +29,4 @@ FOR UPDATE USING (
 
 -- Test the fix
 SELECT 'Notifications RLS policies updated successfully' as status;
+

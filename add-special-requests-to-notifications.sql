@@ -9,3 +9,4 @@ COMMENT ON COLUMN notifications.special_requests IS 'Customer special requests o
 
 -- Test the update
 SELECT 'Special requests column added to notifications table successfully' as status;
+

@@ -17,3 +17,4 @@ COMMENT ON COLUMN profiles.favorite_deals IS 'Array of deal IDs that the user ha
 SELECT 'Deal favorites functionality added successfully' as status;
 
 
+

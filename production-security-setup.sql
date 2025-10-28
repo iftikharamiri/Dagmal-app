@@ -358,3 +358,4 @@ WHERE conrelid = 'public.deals'::regclass
 ORDER BY conname;
 
 SELECT 'Security setup completed successfully!' as status;
+

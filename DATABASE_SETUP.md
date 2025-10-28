@@ -63,3 +63,4 @@ You can download a sample menu JSON from the upload modal to see the expected fo
 If you continue to have issues, check the browser console for detailed error messages and contact support with the specific error details.
 
 
+

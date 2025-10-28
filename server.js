@@ -3,6 +3,7 @@ import multer from 'multer'
 import pdfParse from 'pdf-parse/lib/pdf-parse.js'
 import cors from 'cors'
 import path from 'path'
+import fetch from 'node-fetch'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -83,6 +84,69 @@ app.post('/api/extract-pdf-text', upload.single('pdf'), async (req, res) => {
       details: error.message,
       success: false
     })
+  }
+})
+
+// Simple in-memory cache with TTL for reverse geocoding
+const geoCache = new Map() // key -> { value, expiresAt }
+const GEO_TTL_MS = 1000 * 60 * 30 // 30 minutes
+
+// Simple per-IP rate limiter (1 req/sec)
+const lastRequestPerIp = new Map()
+const RATE_LIMIT_MS = 1000
+
+app.get('/api/reverse-geocode', async (req, res) => {
+  try {
+    const { lat, lon, lang = 'nb' } = req.query
+    if (!lat || !lon) {
+      return res.status(400).json({ error: 'lat and lon are required' })
+    }
+
+    // Rate limiting by IP
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress
+    const now = Date.now()
+    const last = lastRequestPerIp.get(ip) || 0
+    if (now - last < RATE_LIMIT_MS) {
+      return res.status(429).json({ error: 'Too many requests, please slow down' })
+    }
+    lastRequestPerIp.set(ip, now)
+
+    // Cache by rounded coords to reduce upstream calls
+    const key = `${Number(lat).toFixed(3)},${Number(lon).toFixed(3)},${lang}`
+    const cached = geoCache.get(key)
+    if (cached && cached.expiresAt > now) {
+      return res.json(cached.value)
+    }
+
+    // Call Nominatim from the server (avoids browser CORS)
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&addressdetails=1&accept-language=${encodeURIComponent(lang)}`
+    const upstream = await fetch(url, {
+      headers: {
+        // Identify per Nominatim policy (set a contact email via env if available)
+        'User-Agent': process.env.NOMINATIM_UA || 'DagmalApp/1.0 (contact: support@dagmal.no)',
+        'Accept': 'application/json'
+      }
+    })
+
+    if (!upstream.ok) {
+      const text = await upstream.text()
+      return res.status(upstream.status).json({ error: 'Upstream error', details: text })
+    }
+
+    const data = await upstream.json()
+    const address = data.address || {}
+    const city = address.city || address.town || address.village || address.municipality || address.county || 'Ukjent lokasjon'
+    const country = address.country || 'Norge'
+    const payload = {
+      cityName: `${city}, ${country}`,
+      raw: data
+    }
+
+    geoCache.set(key, { value: payload, expiresAt: now + GEO_TTL_MS })
+    res.json(payload)
+  } catch (err) {
+    console.error('Reverse geocode server error:', err)
+    res.status(500).json({ error: 'Reverse geocoding failed' })
   }
 })
 

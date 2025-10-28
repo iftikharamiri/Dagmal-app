@@ -51,3 +51,4 @@ SELECT
 FROM deals 
 ORDER BY created_at DESC
 LIMIT 10;
+

@@ -273,3 +273,4 @@ The system supports both the new comprehensive format and the existing simple ar
 - **Integration**: API endpoints for external menu management systems
 
 
+

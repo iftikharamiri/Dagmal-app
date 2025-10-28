@@ -404,3 +404,4 @@ AND tablename IN ('profiles', 'restaurants', 'deals', 'claims', 'notifications',
 ORDER BY tablename;
 
 SELECT 'Database setup completed successfully!' as status;
+

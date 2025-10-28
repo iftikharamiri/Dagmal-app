@@ -88,6 +88,8 @@ export function useReverseGeocoding(latitude: number | null, longitude: number |
   const [cityName, setCityName] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lastKey, setLastKey] = useState<string | null>(null)
+  const [lastFetchTs, setLastFetchTs] = useState<number>(0)
 
   useEffect(() => {
     if (!latitude || !longitude) {
@@ -98,11 +100,21 @@ export function useReverseGeocoding(latitude: number | null, longitude: number |
     setIsLoading(true)
     setError(null)
 
-    // Using Nominatim (OpenStreetMap) for reverse geocoding
+    // Debounce/rate limit: avoid more than one call per second and skip same rounded coords
+    const now = Date.now()
+    const key = `${latitude.toFixed(3)},${longitude.toFixed(3)}`
+    if (key === lastKey && now - lastFetchTs < 1000) {
+      setIsLoading(false)
+      return
+    }
+    setLastKey(key)
+    setLastFetchTs(now)
+
+    // Call our server proxy to avoid CORS and add caching
     const fetchCityName = async () => {
       try {
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1&accept-language=nb,no,en`
+          `/api/reverse-geocode?lat=${latitude}&lon=${longitude}&lang=nb`
         )
         
         if (!response.ok) {
@@ -110,19 +122,7 @@ export function useReverseGeocoding(latitude: number | null, longitude: number |
         }
 
         const data = await response.json()
-        
-        // Extract city name from address components
-        const address = data.address
-        let city = address?.city || 
-                  address?.town || 
-                  address?.village || 
-                  address?.municipality ||
-                  address?.county ||
-                  'Ukjent lokasjon'
-
-        // Add country for context
-        const country = address?.country || 'Norge'
-        setCityName(`${city}, ${country}`)
+        setCityName(data.cityName || 'Ukjent lokasjon')
       } catch (err) {
         console.error('Reverse geocoding error:', err)
         setError('Kunne ikke hente lokasjon')
@@ -137,6 +137,7 @@ export function useReverseGeocoding(latitude: number | null, longitude: number |
 
   return { cityName, isLoading, error }
 }
+
 
 
 

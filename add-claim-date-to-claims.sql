@@ -10,3 +10,4 @@ COMMENT ON COLUMN claims.claim_date IS 'Date when the customer wants to claim th
 
 -- Test the new column
 SELECT 'Claim date field added to claims table successfully' as status;
+

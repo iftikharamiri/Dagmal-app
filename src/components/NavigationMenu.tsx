@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Building2, ChevronDown, Settings, LogOut, HelpCircle, Filter } from 'lucide-react'
+import { User, Building2, ChevronDown, Settings, LogOut, HelpCircle, Filter, Heart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { norwegianText } from '@/i18n/no'
 
@@ -40,6 +40,15 @@ export function NavigationMenu({ className, onShowFilters, hasActiveFilters }: N
       description: 'Filtrer restauranter og tilbud',
       hasActive: hasActiveFilters
     }] : []),
+    {
+      label: norwegianText.nav.favorites,
+      icon: Heart,
+      onClick: () => {
+        navigate('/favorites')
+        setIsOpen(false)
+      },
+      description: 'Mine favoritter'
+    },
     {
       label: 'Profil',
       icon: User,

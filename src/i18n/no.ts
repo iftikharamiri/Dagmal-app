@@ -5,6 +5,7 @@ export const norwegianText = {
     map: 'Kart',
     favorites: 'Favoritter',
     claims: 'Mine tilbud',
+    ai: 'Sofie',
     profile: 'Profil',
   },
 
@@ -106,6 +107,7 @@ export const norwegianText = {
     comingSoon: 'Kommer snart',
   },
 } as const
+
 
 
 

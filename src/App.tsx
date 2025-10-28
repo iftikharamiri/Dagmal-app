@@ -18,6 +18,7 @@ import { RestaurantDashboardPage } from '@/routes/restaurant-dashboard'
 import { CreateDealPage } from '@/routes/create-deal'
 import { AdminPage } from '@/routes/admin'
 import { PhoneAuthTest } from '@/components/PhoneAuthTest'
+import { AIPage } from '@/routes/ai'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +44,7 @@ function AppContent() {
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/claims" element={<ClaimsPage />} />
         <Route path="/map" element={<MapPage />} />
+        <Route path="/ai" element={<AIPage />} />
         <Route path="/restaurant/:id" element={<RestaurantPage />} />
         <Route path="/restaurant/:id/menu" element={<MenuPage />} />
         <Route path="/business" element={<BusinessPage />} />

@@ -33,3 +33,4 @@ COMMENT ON COLUMN notifications.claim_date IS 'Date when the customer wants to c
 
 -- Test the new table
 SELECT 'Notifications table created successfully' as status;
+
