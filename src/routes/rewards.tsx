@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Coins, Flame, Calendar, Clock, Sparkles, Coffee, Pizza, Star, Trophy, Gift, ArrowLeft } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 
 interface ClaimHistoryItem {
@@ -10,6 +11,7 @@ interface ClaimHistoryItem {
 
 export function RewardsPage() {
   const navigate = useNavigate()
+  const [user, setUser] = React.useState<any>(null)
   const [totalCoins, setTotalCoins] = React.useState(0)
   const [visitStreak, setVisitStreak] = React.useState(0)
   const [lastClaim, setLastClaim] = React.useState<string | null>(null)
@@ -19,6 +21,14 @@ export function RewardsPage() {
   const [showConfetti, setShowConfetti] = React.useState(false)
 
   React.useEffect(() => {
+    // Check auth
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
+      if (!user) {
+        setCanClaim(false)
+      }
+    })
+
     // Load saved data
     const savedCoins = localStorage.getItem('rewards_totalCoins')
     const savedStreak = localStorage.getItem('rewards_visitStreak')
@@ -39,6 +49,11 @@ export function RewardsPage() {
   }, [])
 
   const handleClaim = () => {
+    if (!user) {
+      toast.info('Logg inn for å hente mynter')
+      navigate('/auth?reason=rewards')
+      return
+    }
     if (!canClaim || isAnimating) return
 
     setIsAnimating(true)
@@ -146,10 +161,10 @@ export function RewardsPage() {
           <div className="mt-3 flex justify-center">
             <button
               onClick={handleClaim}
-              disabled={!canClaim || isAnimating}
+              disabled={!user || !canClaim || isAnimating}
               className="px-6 py-2 rounded-lg bg-primary text-primary-fg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 text-sm"
             >
-              {canClaim ? (<><Sparkles className="w-4 h-4" />Hent dagens mynt</>) : 'Allerede hentet'}
+              {!user ? 'Logg inn for å hente' : canClaim ? (<><Sparkles className="w-4 h-4" />Hent dagens mynt</>) : 'Allerede hentet'}
             </button>
           </div>
         </div>
