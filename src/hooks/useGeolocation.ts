@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface GeolocationState {
   latitude: number | null
@@ -14,6 +14,9 @@ interface GeolocationOptions {
   maximumAge?: number
 }
 
+/**
+ * Watches the user's geolocation.
+ */
 export function useGeolocation(options: GeolocationOptions = {}) {
   const [state, setState] = useState<GeolocationState>({
     latitude: null,
@@ -23,8 +26,16 @@ export function useGeolocation(options: GeolocationOptions = {}) {
     isLoading: false,
   })
 
+  const mountedRef = useRef(true)
   useEffect(() => {
-    if (!navigator.geolocation) {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
       setState(prev => ({
         ...prev,
         error: 'Geolocation is not supported by this browser.',
@@ -36,14 +47,14 @@ export function useGeolocation(options: GeolocationOptions = {}) {
     setState(prev => ({ ...prev, isLoading: true, error: null }))
 
     const defaultOptions: PositionOptions = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 300000, // 5 minutes
-      ...options,
+      enableHighAccuracy: options.enableHighAccuracy ?? true,
+      timeout: options.timeout ?? 10000,
+      maximumAge: options.maximumAge ?? 300000, // 5 minutes
     }
 
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
+        if (!mountedRef.current) return
         setState({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -53,8 +64,8 @@ export function useGeolocation(options: GeolocationOptions = {}) {
         })
       },
       (error) => {
+        if (!mountedRef.current) return
         let errorMessage = 'An unknown error occurred.'
-        
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage = 'Location access denied by user.'
@@ -66,7 +77,6 @@ export function useGeolocation(options: GeolocationOptions = {}) {
             errorMessage = 'Location request timed out.'
             break
         }
-
         setState(prev => ({
           ...prev,
           error: errorMessage,
@@ -84,66 +94,90 @@ export function useGeolocation(options: GeolocationOptions = {}) {
   return state
 }
 
+/**
+ * Reverse geocodes latitude/longitude into a city name using BigDataCloud's
+ * CORS-friendly endpoint (no API key needed).
+ * - Handles 0 latitude/longitude correctly.
+ * - Defensive JSON parsing to avoid "Unexpected token '<'".
+ * - Debounced to at most 1 request/second and deduped by rounded coords.
+ */
 export function useReverseGeocoding(latitude: number | null, longitude: number | null) {
   const [cityName, setCityName] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [lastKey, setLastKey] = useState<string | null>(null)
-  const [lastFetchTs, setLastFetchTs] = useState<number>(0)
+
+  const lastKeyRef = useRef<string | null>(null)
+  const lastFetchTsRef = useRef<number>(0)
 
   useEffect(() => {
-    if (!latitude || !longitude) {
+    // allow 0 values; only bail if null/undefined
+    if (latitude == null || longitude == null) {
       setCityName(null)
+      setError(null)
       return
     }
 
+    const key = `${latitude.toFixed(3)},${longitude.toFixed(3)}`
+    const now = Date.now()
+    if (key === lastKeyRef.current && now - lastFetchTsRef.current < 1000) {
+      // rate-limit: skip if same rounded coords within 1s
+      return
+    }
+    lastKeyRef.current = key
+    lastFetchTsRef.current = now
+
+    let cancelled = false
     setIsLoading(true)
     setError(null)
 
-    // Debounce/rate limit: avoid more than one call per second and skip same rounded coords
-    const now = Date.now()
-    const key = `${latitude.toFixed(3)},${longitude.toFixed(3)}`
-    if (key === lastKey && now - lastFetchTs < 1000) {
-      setIsLoading(false)
-      return
-    }
-    setLastKey(key)
-    setLastFetchTs(now)
-
-    // Call our server proxy to avoid CORS and add caching
-    const fetchCityName = async () => {
+    const fetchCity = async () => {
       try {
-        const response = await fetch(
-          `/api/reverse-geocode?lat=${latitude}&lon=${longitude}&lang=nb`
-        )
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch location data')
-        }
+        const lang =
+          (typeof navigator !== 'undefined' && navigator.language) ? navigator.language : 'en'
 
-        const data = await response.json()
-        setCityName(data.cityName || 'Ukjent lokasjon')
-      } catch (err) {
-        console.error('Reverse geocoding error:', err)
-        setError('Kunne ikke hente lokasjon')
-        setCityName('Ukjent lokasjon')
-      } finally {
-        setIsLoading(false)
+        const url =
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?` +
+          `latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}` +
+          `&localityLanguage=${encodeURIComponent(lang)}`
+
+        const res = await fetch(url, { headers: { Accept: 'application/json' } })
+        const text = await res.text()
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} ${res.statusText}: ${text.slice(0, 200)}`)
+        }
+        const ct = res.headers.get('content-type') || ''
+        if (!ct.includes('application/json')) {
+          throw new Error(`Expected JSON, got ${ct}. Body: ${text.slice(0, 200)}`)
+        }
+        const data = JSON.parse(text)
+
+        const resolvedCity =
+          data.city ||
+          data.locality ||
+          data.localityInfo?.administrative?.[0]?.name ||
+          data.principalSubdivision ||
+          data.countryName ||
+          'Ukjent lokasjon'
+
+        if (!cancelled) {
+          setCityName(resolvedCity)
+          setIsLoading(false)
+        }
+      } catch (e) {
+        if (!cancelled) {
+          console.error('Reverse geocoding error:', e)
+          setError('Kunne ikke hente lokasjon')
+          setCityName('Ukjent lokasjon')
+          setIsLoading(false)
+        }
       }
     }
 
-    fetchCityName()
+    fetchCity()
+    return () => {
+      cancelled = true
+    }
   }, [latitude, longitude])
 
   return { cityName, isLoading, error }
 }
-
-
-
-
-
-
-
-
-
-

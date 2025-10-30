@@ -54,7 +54,7 @@ export function useAuthGuard() {
         hasNavigated.current = true
         // Wrap navigation in startTransition to prevent throttling
         startTransition(() => {
-          navigate('/auth', { replace: true })
+          navigate('/auth?reason=protected', { replace: true })
         })
       }
     }

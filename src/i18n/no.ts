@@ -106,6 +106,22 @@ export const norwegianText = {
     description: 'Administrer dine restauranttilbud',
     comingSoon: 'Kommer snart',
   },
+
+  welcome: {
+    badge: 'Nye tilbud hver dag',
+    title: 'Finn gode mattilbud nær deg',
+    subtitle: 'Oppdag populære restauranter, smarte rabatter og Sofie AI som hjelper deg å finne det du har lyst på – når som helst.',
+    primaryCta: 'Fortsett til appen',
+    secondaryCta: 'Logg inn',
+    benefit1Title: 'I nærheten',
+    benefit1Text: 'Se tilbud fra restauranter i nærheten av deg.',
+    benefit2Title: 'Riktige tidspunkt',
+    benefit2Text: 'Spar mest når det passer deg best.',
+    benefit3Title: 'Sofie AI',
+    benefit3Text: 'La Sofie hjelpe deg med å finne, filtrere og reservere.',
+    footerTitle: 'Klar til å komme i gang?',
+    footerText: 'Du kan alltid finne dette igjen fra menyen.',
+  },
 } as const
 
 

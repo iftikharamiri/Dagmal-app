@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { MapPin, TrendingUp, Search, AlertCircle } from 'lucide-react'
+import { MapPin, TrendingUp, Search, AlertCircle, Building2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { DealsList } from '@/components/DealsList'
 import { PopularDeals } from '@/components/PopularDeals'
@@ -9,7 +9,7 @@ import { FilterSheet } from '@/components/FilterSheet'
 import { ClaimFlowModal } from '@/components/ClaimFlowModal'
 import { NavigationMenu } from '@/components/NavigationMenu'
 import { useGeolocation, useReverseGeocoding } from '@/hooks/useGeolocation'
-import { useAuthGuard } from '@/hooks/useAuthGuard'
+// import { useAuthGuard } from '@/hooks/useAuthGuard'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { debounce } from '@/lib/utils'
@@ -316,8 +316,15 @@ export function HomePage() {
     },
   })
 
-  // Get user from auth guard
-  const { user } = useAuthGuard()
+  // Get user (optional) without redirecting
+  const [user, setUser] = useState<any>(null)
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    fetchUser()
+  }, [])
 
   // Fetch user profile for favorites
   const { data: profile } = useQuery({
@@ -512,7 +519,7 @@ export function HomePage() {
     if (!user) {
       console.error('❌ User not logged in')
       toast.error('Du må logge inn for å hente tilbud')
-      navigate('/auth')
+      navigate('/auth?reason=claim')
       return
     }
 
@@ -647,7 +654,7 @@ export function HomePage() {
       {/* Header */}
       <div className="bg-white px-4 py-4 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2 text-muted-fg">
+          <div className="flex items-center gap-3 text-muted-fg">
             <MapPin className="h-4 w-4" />
             {locationLoading || cityLoading ? (
               <div className="flex items-center gap-2">
@@ -663,10 +670,41 @@ export function HomePage() {
               <span className="text-sm">{cityName || 'Ukjent lokasjon'}</span>
             )}
           </div>
-          <NavigationMenu 
-            onShowFilters={() => setShowFilters(true)}
-            hasActiveFilters={filters.cuisines.length > 0 || filters.dietary.length > 0 || !!filters.priceRange || !!filters.distance || !!filters.sort}
-          />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/business')}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted/50 transition-colors text-sm font-medium text-fg"
+              aria-label="For bedrifter"
+              title="For bedrifter"
+            >
+              <Building2 className="h-4 w-4" />
+              For bedrifter
+            </button>
+            <button
+              onClick={() => navigate('/rewards')}
+              className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+              aria-label="Belønninger"
+              title="Belønninger"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                {/* Gift body - a bit taller */}
+                <rect x="3" y="7" width="18" height="14" rx="2" fill="#F4C042" />
+                {/* Lid shading */}
+                <rect x="3" y="7" width="18" height="6" rx="2" fill="#E6B237" />
+                {/* Vertical ribbon */}
+                <rect x="10.5" y="7" width="3" height="14" fill="#D22E6A" />
+                {/* Horizontal ribbon */}
+                <rect x="3" y="12" width="18" height="2.2" fill="#D22E6A" />
+                {/* Bigger bow (two circles) */}
+                <circle cx="8.2" cy="5.2" r="2.4" fill="#E04B5A" />
+                <circle cx="15.8" cy="5.2" r="2.4" fill="#E04B5A" />
+              </svg>
+            </button>
+            <NavigationMenu 
+              onShowFilters={() => setShowFilters(true)}
+              hasActiveFilters={filters.cuisines.length > 0 || filters.dietary.length > 0 || !!filters.priceRange || !!filters.distance || !!filters.sort}
+            />
+          </div>
         </div>
 
 

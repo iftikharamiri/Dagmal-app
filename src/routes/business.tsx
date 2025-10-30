@@ -103,9 +103,7 @@ export function BusinessPage() {
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
                 Spisly for Bedrifter
               </h1>
-              <p className="text-xl text-white/90 mb-8">
-                Øk kundetrafikken med smarte tilbud og nå nye kunder på Norges raskest voksende matplattform.
-              </p>
+              {/* Removed marketing subtitle per request */}
               
               {application ? (
                 // Show pending application status
@@ -129,8 +127,10 @@ export function BusinessPage() {
                     Registrer restaurant
                   </button>
                   <button
-                    onClick={() => setCurrentView('dashboard')}
-                    className="border-2 border-white text-white px-8 py-4 rounded-2xl font-semibold hover:bg-white/10 transition-colors"
+                    onClick={() => { /* deaktivert */ }}
+                    className="border-2 border-white text-white px-8 py-4 rounded-2xl font-semibold opacity-90 hover:opacity-90 cursor-default"
+                    aria-disabled="true"
+                    title="Kommer snart"
                   >
                     Lær mer
                   </button>
@@ -211,15 +211,6 @@ export function BusinessPage() {
         <div className="max-w-6xl mx-auto px-4 py-6">
           {/* Quick Actions */}
           <div className="grid md:grid-cols-4 gap-4 mb-8">
-            <button
-              onClick={() => setCurrentView('offers')}
-              className="card p-4 hover:shadow-md transition-shadow text-left"
-            >
-              <Plus className="h-8 w-8 mb-2 text-primary" />
-              <h3 className="font-semibold mb-1">Nytt tilbud</h3>
-              <p className="text-sm text-muted-fg">Lag rabatt for et menyelement</p>
-            </button>
-
             <button
               onClick={() => setCurrentView('menu')}
               className="card p-4 hover:shadow-md transition-shadow text-left"

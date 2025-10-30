@@ -834,13 +834,6 @@ export function RestaurantDashboardPage() {
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-danger rounded-full"></div>
               )}
             </button>
-            <button
-              onClick={() => navigate('/business/create-deal')}
-              className="bg-primary text-primary-fg px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Nytt tilbud
-            </button>
           </div>
         </div>
       </div>

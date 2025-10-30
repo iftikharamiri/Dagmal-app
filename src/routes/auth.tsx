@@ -1,13 +1,15 @@
+
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
 export function AuthPage() {
-  const [isSignUp, setIsSignUp] = useState(false)
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  const isSignUp = mode === 'signup'
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
@@ -145,19 +147,23 @@ export function AuthPage() {
     }
   }
 
+  // No landing here; welcome is handled by /welcome
+
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-bg flex items-center justify-center p-4 relative">
+      <button
+        onClick={() => navigate('/')}
+        className="absolute top-4 left-4 inline-flex items-center text-muted-fg hover:text-primary"
+        aria-label="Til markedsplassen"
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </button>
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">Dagmål</h1>
-          <p className="text-muted-fg">Finn de beste tilbudene i Norge</p>
-          
-          {/* Demo Banner */}
-        {/* Demo banner removed - using real Supabase */}
+          <h1 className="text-2xl font-bold text-primary mb-1">Spisly</h1>
+          <p className="text-muted-fg">Lag en gratis konto for å hente tilbud</p>
         </div>
 
-        {/* Auth Form */}
         <div className="card p-6">
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">
@@ -270,12 +276,10 @@ export function AuthPage() {
 
           {/* Toggle Auth Mode */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-muted-fg">
-              {isSignUp ? norwegianText.auth.hasAccount : norwegianText.auth.noAccount}
-            </p>
+            <p className="text-sm text-muted-fg">{isSignUp ? norwegianText.auth.hasAccount : norwegianText.auth.noAccount}</p>
             <button
               onClick={() => {
-                setIsSignUp(!isSignUp)
+                setMode(isSignUp ? 'signin' : 'signup')
                 setFormData({ email: '', password: '', confirmPassword: '' })
                 setErrors({})
               }}
@@ -286,7 +290,7 @@ export function AuthPage() {
           </div>
 
           {/* Forgot Password */}
-          {!isSignUp && (
+          {mode === 'signin' && (
             <div className="mt-4 text-center">
               <button
                 onClick={() => {

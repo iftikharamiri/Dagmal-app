@@ -59,15 +59,6 @@ export function NavigationMenu({ className, onShowFilters, hasActiveFilters }: N
       description: 'Se og rediger profil'
     },
     {
-      label: 'For bedrifter',
-      icon: Building2,
-      onClick: () => {
-        navigate('/business')
-        setIsOpen(false)
-      },
-      description: 'Registrer restaurant'
-    },
-    {
       label: 'Innstillinger',
       icon: Settings,
       onClick: () => {
@@ -92,15 +83,11 @@ export function NavigationMenu({ className, onShowFilters, hasActiveFilters }: N
       {/* Menu Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted/50 transition-colors text-sm font-medium text-fg"
-        aria-label="Åpne meny"
+        className="p-2 rounded-lg hover:bg-muted/50 transition-colors text-fg"
+        aria-label="Meny"
+        title="Meny"
       >
         <User className="h-4 w-4" />
-        <span>Meny</span>
-        <ChevronDown className={cn(
-          'h-3 w-3 transition-transform',
-          isOpen && 'rotate-180'
-        )} />
       </button>
 
       {/* Dropdown Menu */}

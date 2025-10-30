@@ -57,3 +57,4 @@ CREATE POLICY "Restaurant owners can manage their restaurants" ON restaurants FO
 
 
 
+
