@@ -1,0 +1,421 @@
+{
+  "restaurant_info": {
+    "name": "Nordlys",
+    "description": "",
+    "categories": []
+  },
+  "menu_metadata": {
+    "version": "1.0",
+    "currency": "NOK",
+    "language": "no",
+    "last_updated": "2025-10-31T00:00:00.000Z"
+  },
+  "categories": [
+    {
+      "id": "forretter-smaaretter",
+      "name": "Forretter / Småretter",
+      "display_order": 1,
+      "items": [
+        {
+          "id": "bao-buns-med-pulled-pork-2-stk",
+          "name": "Bao buns med pulled pork (2 stk)",
+          "description": "Mini luftige dampede bao med langtidsbraisert svinenakke, syltet rødkål, hoisinmayo og frisk koriander.",
+          "price": 19500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "tataki-andebryst",
+          "name": "Tataki andebryst",
+          "description": "Saftig andebryst servert med granateplefrø og aromatisk ponzu.",
+          "price": 21500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "laks-sashimi-med-ponzusaus",
+          "name": "Laks sashimi med ponzusaus",
+          "description": null,
+          "price": 16500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "liten-kremet-fiskesuppe",
+          "name": "Liten kremet fiskesuppe",
+          "description": "Lett kremet med torsk/kveite, laks, blåskjell og grønnsaker. Serveres med surdeigsbrød og aioli.",
+          "price": 19500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "fried-scampi",
+          "name": "Fried scampi",
+          "description": "Sprøstekt scampi med tropical spicy fusion-saus.",
+          "price": 12500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "hvitlokstekte-reker-med-lime",
+          "name": "Hvitløkstekte reker med lime",
+          "description": "Toppes med urteolje og koriander.",
+          "price": 16500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "flambert-nigiri-6-pcs",
+          "name": "Flambert nigiri (6 pcs)",
+          "description": "Flambert laks nigiri med trøffel-teriyaki saus og vårløk.",
+          "price": 16000,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "pommes-frites",
+          "name": "Pommes frites",
+          "description": "Med aioli.",
+          "price": 7000,
+          "dietary_info": ["veg"],
+          "is_available": true
+        },
+        {
+          "id": "soetpotet-fries",
+          "name": "Søtpotet fries",
+          "description": "Med chili mayo.",
+          "price": 8000,
+          "dietary_info": ["veg"],
+          "is_available": true
+        },
+        {
+          "id": "crispy-wings",
+          "name": "Crispy wings",
+          "description": "Perfekt fritert til gyllen sprøhet, servert med sursøt saus.",
+          "price": 13500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "varruller",
+          "name": "Vårruller",
+          "description": "2 stk hjemmelagde vårruller med kylling, søt chilisaus og mangosalat.",
+          "price": 13500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "veggie-varruller",
+          "name": "Veggie vårruller",
+          "description": "2 stk hjemmelagde vegetar vårruller med søt chilisaus og mangosalat.",
+          "price": 13500,
+          "dietary_info": ["veg"],
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "id": "barnas-favoritter",
+      "name": "Barnas favoritter",
+      "display_order": 2,
+      "items": [
+        {
+          "id": "fiskeboller-med-solskinnssaus",
+          "name": "Fiskeboller med solskinnssaus",
+          "description": "Hjemmelagde fiskeboller på spyd, servert med søtpotet fries og mild appelsinsaus.",
+          "price": 13500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "fish-chips",
+          "name": "Fish & chips",
+          "description": null,
+          "price": 13500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "chicken-wings-chips",
+          "name": "Chicken wings & chips",
+          "description": null,
+          "price": 13500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "lakseliten",
+          "name": "Lakseliten",
+          "description": "6 biter laks nigiri plate.",
+          "price": 14500,
+          "dietary_info": [],
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "id": "sesongens-favoritter",
+      "name": "Sesongens favoritter",
+      "display_order": 3,
+      "items": [
+        {
+          "id": "hostsol-kveite",
+          "name": "Høstsol kveite",
+          "description": "Stekt kveitefilet med kremet gresskarpuré, brunet smørsaus med sitron og kapers, servert med høstens sopp.",
+          "price": 37900,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "lamme-karre-med-rodvinssaus",
+          "name": "Lamme karré med rødvinssaus",
+          "description": "Saftig lammekarré med ovnsstekte poteter, urtebakte rotgrønnsaker, hvitløk og rødvinssaus.",
+          "price": 49500,
+          "dietary_info": [],
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "id": "bistro-klassiker",
+      "name": "Bistro klassiker",
+      "display_order": 4,
+      "items": [
+        {
+          "id": "grillet-indrefilet-200-gr",
+          "name": "Grillet indrefilet 200 gr",
+          "description": "Norsk indrefilet ungfe, potetmos på planke, bearnaisesaus, hvitløkstekte grønnsaker.",
+          "price": 44500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "entrecote-200-gr",
+          "name": "Entrecôte 200 gr",
+          "description": "Norsk entrecôte ungfe, crispy små poteter, salatmix, cherrytomater og bearnaisesaus.",
+          "price": 39900,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "karaage",
+          "name": "Karaage",
+          "description": "Fritert kyllinglår koreansk style. Ris, chili majones, trøffel teriyaki, kimchi, syltet rødkål.",
+          "price": 29900,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "kremet-fiskesuppe",
+          "name": "Kremet fiskesuppe",
+          "description": "Lett kremet med torsk/kveite, laks, grønnskjell og grønnsaker. Serveres med surdeigsbrød og aioli. Brød inneholder hvete. Be evt. om glutenfritt brød.",
+          "price": 27900,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "kokoscurry-med-scampi",
+          "name": "Kokoscurry med scampi",
+          "description": "Panengcurry med kokosmelk, grønnsaker og basilikum. Toppet med peanøtterstrø og servert med ris.",
+          "price": 28900,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "sizzling-biff-wok",
+          "name": "Sizzling biff wok",
+          "description": "Saftig biffwok med ferske, sprø grønnsaker servert på sizzlende støpejernsplate.",
+          "price": 29900,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "sizzling-tofu-vegetarisk",
+          "name": "Sizzling tofu (vegetarisk)",
+          "description": "Kan velges i stedet for biffwok.",
+          "price": 26900,
+          "dietary_info": ["veg"],
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "id": "dessert",
+      "name": "Dessert",
+      "display_order": 5,
+      "items": [
+        {
+          "id": "pavlova-med-sitronkrem-og-baer",
+          "name": "Pavlova med sitronkrem og bær",
+          "description": null,
+          "price": 12500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "sjokoladepai-med-troeffelkrem",
+          "name": "Sjokoladepai med trøffelkrem",
+          "description": "Peanøttsaus, jordbærcoulis, vaniljeis, bær.",
+          "price": 16000,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "bananwraps-med-kokoskrem",
+          "name": "Bananwraps med kokoskrem",
+          "description": "Sprøstekt wraps med kokosfyll, karamellsaus, vaniljeis og ristet nøtteblanding.",
+          "price": 14000,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "sorbet-med-friske-baer",
+          "name": "Sorbet med friske bær",
+          "description": "Velg mellom mango eller jordbær.",
+          "price": 13500,
+          "dietary_info": ["veg","vegan","gf"],
+          "is_available": true
+        },
+        {
+          "id": "vaniljeis-med-jordbaersaus",
+          "name": "Vaniljeis med jordbærsaus",
+          "description": null,
+          "price": 12500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "pasjonsfruktmousse",
+          "name": "Pasjonsfruktmousse",
+          "description": "Lett dessert med eksotiske smaker.",
+          "price": 11500,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "dessert-tapas-for-to",
+          "name": "Dessert-tapas for to",
+          "description": "Sjokoladepai, vaniljeis, jordbærsorbet, bær og pasjonsfruktmousse.",
+          "price": 19900,
+          "dietary_info": [],
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "id": "kaffe-te",
+      "name": "Kaffe/Te",
+      "display_order": 6,
+      "items": [
+        { "id": "cappuccino", "name": "Cappuccino", "description": null, "price": 4500, "dietary_info": [], "is_available": true },
+        { "id": "kaffe-latte", "name": "Kaffe latte", "description": null, "price": 5500, "dietary_info": [], "is_available": true },
+        { "id": "kaffe-mocca", "name": "Kaffe mocca", "description": null, "price": 5500, "dietary_info": [], "is_available": true },
+        { "id": "varm-sjokolade", "name": "Varm sjokolade", "description": null, "price": 5500, "dietary_info": [], "is_available": true },
+        { "id": "cortado", "name": "Cortado", "description": null, "price": 4000, "dietary_info": [], "is_available": true },
+        { "id": "espresso", "name": "Espresso", "description": null, "price": 4000, "dietary_info": [], "is_available": true },
+        { "id": "kaffe-te", "name": "Kaffe/te", "description": null, "price": 3500, "dietary_info": [], "is_available": true }
+      ]
+    },
+    {
+      "id": "sushi-kombinasjon-meny",
+      "name": "Sushi – Kombinasjon meny",
+      "display_order": 7,
+      "items": [
+        {
+          "id": "nigiri-platte-8-biter",
+          "name": "Nigiri platte (8 biter)",
+          "description": "8 biter assortert nigiri.",
+          "price": 17900,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "fuji-14-biter",
+          "name": "Fuji (14 biter)",
+          "description": "8 biter tempura maki og 6 laks nigiri.",
+          "price": 19900,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "combo-22-biter",
+          "name": "Combo (22 biter)",
+          "description": "8 biter assortert nigiri, 8 biter tempura maki, 6 biter sashimi.",
+          "price": 34900,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "sushi-love-deling-for-2-32-biter",
+          "name": "Sushi Love deling for 2 (32 biter)",
+          "description": "10 biter assortert nigiri, Classic California maki, Scampi Boom maki og 8 biter fersk sashimi.",
+          "price": 55900,
+          "dietary_info": [],
+          "is_available": true
+        },
+        {
+          "id": "sumo-60-biter",
+          "name": "Sumo (60 biter)",
+          "description": "Signatur-combo med sashimi, nigiri, spesialmaki og delikate smaksbomber. For 3–4 personer.",
+          "price": 99500,
+          "dietary_info": [],
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "id": "sushi-maki-8-biter",
+      "name": "Sushi – Maki (8 biter)",
+      "display_order": 8,
+      "items": [
+        { "id": "sakura-maki", "name": "Sakura maki", "description": "Laks og avokado.", "price": 12900, "dietary_info": [], "is_available": true },
+        { "id": "tempura-scampi", "name": "Tempura scampi", "description": "Fritert scampi, avokado.", "price": 13900, "dietary_info": [], "is_available": true },
+        { "id": "classic-california", "name": "Classic California", "description": "Crabsticks, agurk, avokado. Dekkes med rogn.", "price": 13900, "dietary_info": [], "is_available": true },
+        { "id": "dirty-mango", "name": "Dirty Mango", "description": "Fritert scampi, avokado. Toppes med flambert laks, chilimayo, trøffel-teriyaki, mangosalsa, mangosaus og rogn.", "price": 17500, "dietary_info": [], "is_available": true },
+        { "id": "fire-ice-maki", "name": "Fire & Ice maki", "description": "Kremet krabbe og fritert scampi med avokado. Toppes med laks, chili og vårløk.", "price": 18500, "dietary_info": [], "is_available": true },
+        { "id": "popcorn-shrimp", "name": "Popcorn shrimp", "description": "Crabsticks, daikon kimchi, avokado, sriracha. Toppes med popcorn scampi, chilimayo, trøffel-teriyaki, rogn og nori chips.", "price": 17900, "dietary_info": [], "is_available": true },
+        { "id": "wild-dragon", "name": "Wild Dragon", "description": "Fritert scampi, chilimayo, agurk, avokado. Toppes med laks, rogn, chilimayo og trøffel-teriyaki.", "price": 18500, "dietary_info": [], "is_available": true },
+        { "id": "tokyo", "name": "Tokyo", "description": "Kokt scampi, avokado og sriracha. Toppes med flambert kamskjell, sesam, chilimayo, trøffel-teriyaki og koriander.", "price": 17500, "dietary_info": [], "is_available": true },
+        { "id": "flambert-salmon", "name": "Flambert salmon", "description": "Fritert scampi, chilimayo og agurk. Toppes med flambert laks, wasabimayo, trøffel-teriyaki, vårløk.", "price": 17500, "dietary_info": [], "is_available": true },
+        { "id": "scampi-ringo", "name": "Scampi Ringo", "description": "Fritert scampi, kremost og eple. Toppes med jordbær, chilimayo, peanøtter og spicy mangosaus.", "price": 17500, "dietary_info": [], "is_available": true },
+        { "id": "avokado-royal", "name": "Avokado Royal", "description": "Fritert scampi og agurk. Toppes med avokado, chilimayo, rogn og trøffel-teriyaki.", "price": 17500, "dietary_info": [], "is_available": true }
+      ]
+    },
+    {
+      "id": "sushi-futo-maki-6-biter",
+      "name": "Sushi – Futo maki (6 biter)",
+      "display_order": 9,
+      "items": [
+        { "id": "tempura-futo", "name": "Tempura futo", "description": "Fritert scampi, avokado, agurk, chilimayo.", "price": 14500, "dietary_info": [], "is_available": true },
+        { "id": "lion-maki", "name": "Lion maki", "description": "Fritert scampi, crispy søtpotet, agurk, rogn, trøffel-teriyaki og chilimayo.", "price": 15500, "dietary_info": [], "is_available": true },
+        { "id": "havets-futo", "name": "Havets futo", "description": "Fritert scampi, laks, crabstick, avokado. Dekkes med rogn.", "price": 15500, "dietary_info": [], "is_available": true }
+      ]
+    },
+    {
+      "id": "sushi-fritert-maki",
+      "name": "Sushi – Fritert maki",
+      "display_order": 10,
+      "items": [
+        { "id": "hot-philly-8-biter", "name": "Hot Philly (8 biter)", "description": "Fritert uramaki med laks og kremost. Toppes med vårløk og trøffel-teriyaki.", "price": 14900, "dietary_info": [], "is_available": true },
+        { "id": "spicy-maki-8-biter", "name": "Spicy maki (8 biter)", "description": "Crabsticks, laks, agurk, sriracha. Toppes med chilimayo, rogn og trøffel-teriyaki.", "price": 16900, "dietary_info": [], "is_available": true },
+        { "id": "volcano-6-biter", "name": "Volcano (6 biter)", "description": "Helfritert futo maki med laks, jalapeño, kremost og agurk. Toppes med tunfisk/laks tartar, trøffel-teriyaki, chilimayo, crispy søtpotet, rogn og vårløk.", "price": 19900, "dietary_info": [], "is_available": true },
+        { "id": "scampi-boom-6-biter", "name": "Scampi Boom (6 biter)", "description": "Helfritert futo maki med fritert scampi og avokado. Toppes med chilimayo, trøffel-teriyaki.", "price": 15900, "dietary_info": [], "is_available": true },
+        { "id": "crispy-california-8-biter", "name": "Crispy California (8 biter)", "description": "Crabsticks, avokado, rogn. Toppes med chilimayo, trøffel-teriyaki, vårløk og rogn.", "price": 15900, "dietary_info": [], "is_available": true }
+      ]
+    },
+    {
+      "id": "bistro-veggies",
+      "name": "Bistro Veggies",
+      "display_order": 11,
+      "items": [
+        { "id": "spicy-shiitakes-8-biter", "name": "Spicy shiitakes (8 biter)", "description": "Shiitake, agurk, avokado og crispy søtpotet. Toppes med vegan chilimayo, wasabinøtter og trøffelsaus.", "price": 12500, "dietary_info": ["veg"], "is_available": true },
+        { "id": "veggie-maki-8-biter", "name": "Veggie maki (8 biter)", "description": "Avokado, agurk, mango.", "price": 10900, "dietary_info": ["veg"], "is_available": true },
+        { "id": "crispy-mango-veggie-8-biter", "name": "Crispy mango veggie (8 biter)", "description": "Helfritert makirull med avokado. Toppes med mangosalsa og trøffel-teriyaki.", "price": 14900, "dietary_info": ["veg"], "is_available": true },
+        { "id": "hot-veggie-8-biter", "name": "Hot veggie (8 biter)", "description": "Helfritert makirull med tofu, avokado, agurk og kremost. Toppes med veganmayo, sriracha, nori chips og trøffel-teriyaki.", "price": 15900, "dietary_info": ["veg"], "is_available": true },
+        { "id": "inari-maki-8-biter", "name": "Inari maki (8 biter)", "description": "Kimchi, avokado, agurk. Toppes med inari tofu, vegan chilimayo, sriracha, nori chips og trøffelsaus.", "price": 12500, "dietary_info": ["veg"], "is_available": true },
+        { "id": "veggie-dragon-8-biter", "name": "Veggie dragon (8 biter)", "description": "Fritert brokkolini og agurk. Toppes med avokado, vegan chilimayo, trøffel-teriyaki.", "price": 14900, "dietary_info": ["veg"], "is_available": true },
+        { "id": "veggie-nigiri-platte-6-biter", "name": "Veggie nigiri platte (6 biter)", "description": "2 avokado nigiri, 2 agurk nigiri, 2 inari nigiri.", "price": 9500, "dietary_info": ["veg"], "is_available": true }
+      ]
+    }
+  ]
+}

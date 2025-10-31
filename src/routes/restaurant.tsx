@@ -402,7 +402,7 @@ export function RestaurantPage() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <MapPin className="h-4 w-4 text-gray-500" />
-              <span className="text-gray-900 font-medium text-sm">1 128,3 km</span>
+              <span className="text-gray-900 font-medium text-sm">Adresse</span>
             </div>
             <p className="text-gray-600 text-sm">
               {restaurant.address}

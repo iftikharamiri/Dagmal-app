@@ -82,3 +82,24 @@ export function debounce<T extends (...args: any[]) => any>(
     timeout = setTimeout(() => func(...args), wait)
   }) as T
 }
+
+// Complete a claim: set status to completed and stamp redeemed_at (idempotent)
+export async function completeClaim(claimId: string) {
+  const { supabase } = await import('./supabase')
+  const now = new Date().toISOString()
+  // Prefer RPC for atomic validation on the server
+  const rpc = await supabase.rpc('redeem_claim', { claim_id: claimId })
+  if (rpc.error) {
+    // Fallback to guarded update
+    const { data, error } = await supabase
+      .from('claims')
+      .update({ status: 'completed', redeemed_at: now })
+      .eq('id', claimId)
+      .is('redeemed_at', null)
+      .select('*')
+      .maybeSingle()
+    if (error) throw error
+    return data
+  }
+  return (rpc.data as any)?.[0] ?? null
+}

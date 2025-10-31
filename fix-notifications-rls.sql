@@ -31,3 +31,6 @@ FOR UPDATE USING (
 SELECT 'Notifications RLS policies updated successfully' as status;
 
 
+
+
+

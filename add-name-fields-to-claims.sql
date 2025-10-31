@@ -14,3 +14,6 @@ COMMENT ON COLUMN claims.last_name IS 'Customer last name for claim processing';
 SELECT 'Name fields added to claims table successfully' as status;
 
 
+
+
+

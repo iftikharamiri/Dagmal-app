@@ -1,4 +1,4 @@
-import { Heart, MapPin, Users } from 'lucide-react'
+import { Heart, MapPin, Users, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { norwegianText } from '@/i18n/no'
 import { formatPrice, formatTime, isTimeInRange, isDealActiveToday, cn } from '@/lib/utils'
@@ -125,9 +125,10 @@ export function DealCard({
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate(`/restaurant/${restaurantId}`)}
-            className="font-semibold text-gray-900 leading-tight hover:text-blue-600 transition-colors duration-200 text-left"
+            className="inline-flex items-center gap-0.5 font-semibold text-gray-900 leading-tight transition-colors duration-200 text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
           >
-            {restaurantName}
+            <span>{restaurantName}</span>
+            <ChevronRight className="h-4 w-4 text-gray-900" />
           </button>
           <div className="flex items-center gap-1 text-sm text-muted-fg">
             <Users className="h-4 w-4" />

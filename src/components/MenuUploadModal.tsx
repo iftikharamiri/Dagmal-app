@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react'
-import { Upload, FileText, AlertCircle, CheckCircle, X, Eye, Download } from 'lucide-react'
+import { Upload, FileText, AlertCircle, CheckCircle, X, Eye, Download, Globe, Link as LinkIcon, FileImage } from 'lucide-react'
 import { toast } from 'sonner'
 import { CompleteMenu, validateMenuJson, getMenuStats } from '@/lib/menuUtils'
+import { convertPdfToMenuItems } from '@/lib/pdfUtils'
 
 interface MenuUploadModalProps {
   isOpen: boolean
@@ -10,13 +11,22 @@ interface MenuUploadModalProps {
   restaurantId: string
 }
 
+type UploadMode = 'upload' | 'url' | 'pdf'
+
+// AI integration removed
+
 export function MenuUploadModal({ isOpen, onClose, onMenuUploaded }: MenuUploadModalProps) {
+  const [uploadMode, setUploadMode] = useState<UploadMode>('upload')
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [menuData, setMenuData] = useState<CompleteMenu | null>(null)
   const [validationErrors, setValidationErrors] = useState<string[]>([])
   const [isValidating, setIsValidating] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+  const [isScraping, setIsScraping] = useState(false)
+  const [isConvertingPdf, setIsConvertingPdf] = useState(false)
+  
   const [previewMode, setPreviewMode] = useState(false)
+  const [menuUrl, setMenuUrl] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +86,8 @@ export function MenuUploadModal({ isOpen, onClose, onMenuUploaded }: MenuUploadM
     setMenuData(null)
     setValidationErrors([])
     setPreviewMode(false)
+    setMenuUrl('')
+    setUploadMode('upload')
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -129,6 +141,221 @@ export function MenuUploadModal({ isOpen, onClose, onMenuUploaded }: MenuUploadM
     URL.revokeObjectURL(url)
   }
 
+  // Extract menu items from HTML document
+  const extractMenuItems = (doc: Document) => {
+    const menuItems: any[] = []
+    const priceRegex = /(\d+),-/g
+    
+    const elements = doc.querySelectorAll('*')
+    
+    elements.forEach(element => {
+      const text = element.textContent || ''
+      
+      const priceMatches = text.match(priceRegex)
+      if (priceMatches && priceMatches.length > 0) {
+        const parent = element.closest('li, p, div')
+        if (parent) {
+          const fullText = parent.textContent || ''
+          const nameMatch = fullText.match(/^([^0-9]+?)\s*(\d+),-/)
+          
+          if (nameMatch) {
+            const name = nameMatch[1].trim()
+            const price = parseInt(nameMatch[2])
+            
+            if (name.length > 3 && name.length < 50 && 
+                !name.includes('ALLERGENER') && 
+                !name.includes('Burger/Tallerken') &&
+                !name.includes('MENU') &&
+                !name.includes('BURGERS')) {
+              
+              const descMatch = fullText.match(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*(.+?)\\s*' + price + ',-'))
+              const description = descMatch ? descMatch[1].trim() : ''
+              
+              let category = 'MAIN'
+              const categoryElement = parent.closest('h1, h2, h3, h4, h5, h6')
+              if (categoryElement) {
+                const categoryText = categoryElement.textContent || ''
+                if (categoryText.includes('BURGERS')) category = 'BURGERS'
+                else if (categoryText.includes('VEGETARIAN')) category = 'VEGETARIAN'
+                else if (categoryText.includes('SIDES')) category = 'SIDES'
+                else if (categoryText.includes('DIPS')) category = 'DIPS'
+                else if (categoryText.includes('DRINKS')) category = 'DRINKS'
+              }
+              
+              menuItems.push({
+                name,
+                description,
+                price: price * 100, // Convert to øre
+                category,
+                dietary_info: []
+              })
+            }
+          }
+        }
+      }
+    })
+    
+    // Remove duplicates
+    return menuItems.filter((item, index, self) => 
+      index === self.findIndex(t => t.name === item.name && t.price === item.price)
+    )
+  }
+
+  // Convert simple array format to CompleteMenu format
+  const convertArrayToCompleteMenu = (items: any[], url?: string): CompleteMenu => {
+    // Group by category
+    const categoryMap = new Map<string, any[]>()
+    
+    items.forEach((item, index) => {
+      const category = item.category || 'MAIN'
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, [])
+      }
+      categoryMap.get(category)!.push({
+        id: `item-${index}`,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        dietary_info: item.dietary_info || [],
+        is_available: true
+      })
+    })
+    
+    // Convert to categories array
+    const categories = Array.from(categoryMap.entries()).map(([name, items], index) => ({
+      id: name.toLowerCase().replace(/\s+/g, '-'),
+      name,
+      display_order: index + 1,
+      items
+    }))
+    
+    // Extract domain name for restaurant info or use default
+    let restaurantName = 'Restaurant'
+    if (url) {
+      try {
+        const domain = new URL(url).hostname.replace('www.', '')
+        restaurantName = domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1)
+      } catch (e) {
+        // Invalid URL, use default
+      }
+    }
+    
+    return {
+      restaurant_info: {
+        name: restaurantName,
+        description: '',
+        categories: []
+      },
+      menu_metadata: {
+        version: '1.0',
+        last_updated: new Date().toISOString(),
+        currency: 'NOK',
+        language: 'no'
+      },
+      categories
+    }
+  }
+
+  // Handle PDF file upload
+  const handlePdfUpload = async (file: File) => {
+    setIsConvertingPdf(true)
+    setValidationErrors([])
+    setUploadedFile(file)
+
+    try {
+      toast.info('Converting PDF to menu...')
+      
+      // Convert PDF to menu items
+      const menuItems = await convertPdfToMenuItems(file)
+      
+      if (menuItems.length === 0) {
+        throw new Error('No menu items found in PDF. Make sure the PDF contains text (not just images).')
+      }
+      
+      // Convert to CompleteMenu format
+      const completeMenu = convertArrayToCompleteMenu(menuItems)
+      
+      // Validate
+      const validation = validateMenuJson(completeMenu)
+      
+      if (validation.valid) {
+        setMenuData(completeMenu)
+        toast.success(`Successfully extracted ${menuItems.length} menu items from PDF!`)
+      } else {
+        setValidationErrors(validation.errors)
+        toast.error('Extracted menu has validation errors')
+      }
+      
+    } catch (error: any) {
+      console.error('PDF conversion error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to convert PDF'
+      setValidationErrors([errorMessage])
+      toast.error(errorMessage)
+      setUploadedFile(null)
+    } finally {
+      setIsConvertingPdf(false)
+    }
+  }
+
+  // Handle URL scraping
+  const handleUrlScrape = async () => {
+    if (!menuUrl) {
+      toast.error('Please enter a menu URL')
+      return
+    }
+
+    setIsScraping(true)
+    setValidationErrors([])
+
+    try {
+      toast.info('Scraping menu from URL...')
+      
+      // Use CORS proxy to fetch the page
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(menuUrl)}`
+      const response = await fetch(proxyUrl)
+      const data = await response.json()
+      
+      if (!response.ok || !data.contents) {
+        throw new Error('Failed to fetch menu page')
+      }
+      
+      // Parse the HTML
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(data.contents, 'text/html')
+      
+      // Extract menu items
+      const menuItems = extractMenuItems(doc)
+      
+      if (menuItems.length === 0) {
+        throw new Error('No menu items found. The website might not be compatible or the menu structure is different.')
+      }
+      
+      // Convert to CompleteMenu format
+      const completeMenu = convertArrayToCompleteMenu(menuItems, menuUrl)
+      
+      // Validate
+      const validation = validateMenuJson(completeMenu)
+      
+      if (validation.valid) {
+        setMenuData(completeMenu)
+        toast.success(`Successfully extracted ${menuItems.length} menu items!`)
+      } else {
+        setValidationErrors(validation.errors)
+        toast.error('Extracted menu has validation errors')
+      }
+      
+    } catch (error: any) {
+      console.error('Scraping error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to scrape menu'
+      setValidationErrors([errorMessage])
+      toast.error(errorMessage)
+    } finally {
+      setIsScraping(false)
+    }
+  }
+
+  // AI extraction removed
+
   if (!isOpen) return null
 
   const menuStats = menuData ? getMenuStats(menuData) : null
@@ -144,7 +371,13 @@ export function MenuUploadModal({ isOpen, onClose, onMenuUploaded }: MenuUploadM
             </div>
             <div>
               <h2 className="text-xl font-semibold">Upload Menu</h2>
-              <p className="text-sm text-muted-fg">Upload your complete menu in JSON format</p>
+              <p className="text-sm text-muted-fg">
+                {uploadMode === 'pdf' 
+                  ? 'Upload PDF menu to automatically extract items'
+                  : uploadMode === 'url'
+                  ? 'Import menu from restaurant website'
+                  : 'Upload your complete menu in JSON format'}
+              </p>
             </div>
           </div>
           <button
@@ -156,31 +389,169 @@ export function MenuUploadModal({ isOpen, onClose, onMenuUploaded }: MenuUploadM
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-          {!uploadedFile ? (
+          {!uploadedFile && !menuData ? (
             <div className="space-y-6">
-              {/* Upload Area */}
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary/50 transition-colors">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".json"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Upload className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-lg font-medium mb-2">Upload Menu JSON File</h3>
-                <p className="text-muted-fg mb-4">
-                  Select a JSON file containing your complete menu
-                </p>
+              {/* Mode Toggle */}
+              <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
                 <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors font-medium"
+                  onClick={() => setUploadMode('upload')}
+                  className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm ${
+                    uploadMode === 'upload'
+                      ? 'bg-white text-primary shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
                 >
-                  Choose File
+                  <div className="flex items-center justify-center gap-2">
+                    <Upload className="w-4 h-4" />
+                    JSON
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setUploadMode('pdf')}
+                  className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm ${
+                    uploadMode === 'pdf'
+                      ? 'bg-white text-primary shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <FileImage className="w-4 h-4" />
+                    PDF
+                  </div>
+                </button>
+                <button
+                  onClick={() => setUploadMode('url')}
+                  className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm ${
+                    uploadMode === 'url'
+                      ? 'bg-white text-primary shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Globe className="w-4 h-4" />
+                    URL
+                  </div>
                 </button>
               </div>
+
+              {uploadMode === 'upload' ? (
+                /* Upload JSON Area */
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary/50 transition-colors">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".json"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Upload className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">Upload Menu JSON File</h3>
+                  <p className="text-muted-fg mb-4">
+                    Select a JSON file containing your complete menu
+                  </p>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors font-medium"
+                  >
+                    Choose File
+                  </button>
+                </div>
+              ) : uploadMode === 'pdf' ? (
+                /* Upload PDF Area */
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary/50 transition-colors">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        handlePdfUpload(file)
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FileImage className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">Upload Menu PDF</h3>
+                  <p className="text-muted-fg mb-4">
+                    Upload your PDF menu and we'll automatically extract the items
+                  </p>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isConvertingPdf}
+                    className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isConvertingPdf ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                        Converting...
+                      </span>
+                    ) : (
+                      'Choose PDF File'
+                    )}
+                  </button>
+                  {validationErrors.length > 0 && (
+                    <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <ul className="text-sm text-red-800 space-y-1">
+                        {validationErrors.map((error, index) => (
+                          <li key={index}>• {error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* URL Input */
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary/50 transition-colors">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Globe className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">Import Menu from URL</h3>
+                  <p className="text-muted-fg mb-4">
+                    Paste a link to your restaurant's online menu
+                  </p>
+                  <div className="max-w-md mx-auto space-y-3">
+                    <input
+                      type="url"
+                      value={menuUrl}
+                      onChange={(e) => setMenuUrl(e.target.value)}
+                      placeholder="https://example-restaurant.com/menu"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                    <button
+                      onClick={handleUrlScrape}
+                      disabled={isScraping || !menuUrl}
+                      className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed w-full"
+                    >
+                      {isScraping ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                          Scraping...
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-2">
+                          <LinkIcon className="w-5 h-5" />
+                          Extract Menu
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                  {validationErrors.length > 0 && (
+                    <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <ul className="text-sm text-red-800 space-y-1">
+                        {validationErrors.map((error, index) => (
+                          <li key={index}>• {error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Sample Menu */}
               <div className="bg-gray-50 rounded-xl p-6">
@@ -218,30 +589,35 @@ export function MenuUploadModal({ isOpen, onClose, onMenuUploaded }: MenuUploadM
           ) : (
             <div className="space-y-6">
               {/* File Info */}
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-gray-600" />
-                  <div>
-                    <p className="font-medium">{uploadedFile.name}</p>
-                    <p className="text-sm text-muted-fg">
-                      {(uploadedFile.size / 1024).toFixed(1)} KB
-                    </p>
+              {(uploadedFile || menuData) && (
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-gray-600" />
+                    <div>
+                      <p className="font-medium">
+                        {uploadedFile ? uploadedFile.name : 'Menu from URL'}
+                      </p>
+                      <p className="text-sm text-muted-fg">
+                        {uploadedFile ? `${(uploadedFile.size / 1024).toFixed(1)} KB` : `${menuStats?.totalItems || 0} items`}
+                      </p>
+                    </div>
                   </div>
+                  <button
+                    onClick={() => {
+                      setUploadedFile(null)
+                      setMenuData(null)
+                      setValidationErrors([])
+                      setMenuUrl('')
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = ''
+                      }
+                    }}
+                    className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => {
-                    setUploadedFile(null)
-                    setMenuData(null)
-                    setValidationErrors([])
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = ''
-                    }
-                  }}
-                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+              )}
 
               {/* Validation Results */}
               {isValidating ? (

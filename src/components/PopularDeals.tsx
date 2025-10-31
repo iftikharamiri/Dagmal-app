@@ -1,4 +1,4 @@
-import { Heart, Clock, TrendingUp, Users, MapPin } from 'lucide-react'
+import { Heart, Clock, TrendingUp, Users, MapPin, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { DealCard } from '@/components/DealCard'
 import { isDealCurrentlyAvailable, calculatePopularityScore } from '@/lib/dealUtils'
@@ -94,9 +94,10 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                       <div className="flex items-center justify-between mb-2">
                         <button
                           onClick={() => navigate(`/restaurant/${deal.restaurant_id}`)}
-                          className="font-semibold text-fg truncate hover:text-primary transition-colors duration-200 text-left"
+                          className="inline-flex items-center gap-0.5 font-semibold text-fg truncate transition-colors duration-200 text-left"
                         >
-                          {deal.restaurant.name}
+                          <span className="truncate max-w-[12rem]">{deal.restaurant.name}</span>
+                          <ChevronRight className="h-4 w-4 text-fg" />
                         </button>
                         <div className="flex items-center gap-1 text-xs text-muted-fg">
                           <Users className="h-3 w-3" />

@@ -153,7 +153,7 @@ export function MenuPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-bg pb-[calc(72px+env(safe-area-inset-bottom))] md:pb-6">
       {/* Header */}
       <div className="bg-white border-b px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center gap-4">
@@ -179,6 +179,9 @@ export function MenuPage() {
           showFilters={true}
         />
       </div>
+
+      {/* Bottom spacer to ensure last item is not hidden by bottom nav on small screens */}
+      <div className="h-4 md:h-0" />
 
       {/* Item Detail Modal */}
       {selectedItem && (

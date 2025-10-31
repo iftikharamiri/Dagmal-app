@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Calendar, Users, Phone, MapPin, Clock, Shield, QrCode } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
@@ -7,7 +7,7 @@ import { Header } from '@/components/Header'
 import { useAuthGuard } from '@/hooks/useAuthGuard'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
-import { formatPrice, formatTime, cn } from '@/lib/utils'
+import { formatPrice, formatTime, cn, completeClaim } from '@/lib/utils'
 import type { ClaimWithDealAndRestaurant } from '@/lib/database.types'
 
 // QR Code Modal Component
@@ -59,7 +59,9 @@ function QRCodeModal({ code, onClose }: { code: string; onClose: () => void }) {
 export function ClaimsPage() {
   const { user, isLoading: authLoading } = useAuthGuard()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [selectedQRCode, setSelectedQRCode] = useState<string | null>(null)
+  const [view, setView] = useState<'active' | 'history'>('active')
 
   const { data: claims = [], isLoading: claimsLoading } = useQuery({
     queryKey: ['user-claims'],
@@ -93,6 +95,44 @@ export function ClaimsPage() {
     enabled: !!user,
   })
 
+  // Derived: active, non-expired claims only
+  const activeClaims = (claims || []).filter((claim) => {
+    const now = new Date()
+    if (claim.status === 'completed' || claim.status === 'cancelled' || (claim as any).redeemed_at) return false
+    // keep only allowed statuses (query already filtered) and time window is valid if deal present
+    if (!claim.deal) return false
+    try {
+      const start = claim.deal.start_time ? new Date(`1970-01-01T${claim.deal.start_time}Z`) : null
+      const end = claim.deal.end_time ? new Date(`1970-01-01T${claim.deal.end_time}Z`) : null
+      // If times are provided as HH:mm, we treat validity as within same day; UI-level guard: just ensure end is in the future relative to local time window
+      if (end) {
+        const nowTime = now.getUTCHours() * 60 + now.getUTCMinutes()
+        const endTime = end.getUTCHours() * 60 + end.getUTCMinutes()
+        return nowTime <= endTime
+      }
+      return true
+    } catch {
+      return true
+    }
+  })
+
+  // Derived: history claims (completed/cancelled)
+  const historyClaims = (claims || []).filter((claim) => 
+    claim.status === 'completed' || claim.status === 'cancelled' || (claim as any).redeemed_at
+  )
+
+  // Realtime subscription to claim changes for this user
+  useEffect(() => {
+    if (!user) return
+    const channel = supabase
+      .channel(`claims-user-${user.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'claims', filter: `user_id=eq.${user.id}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ['user-claims'] })
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [user, queryClient])
+
   if (authLoading || !user) {
     return (
       <div className="min-h-screen bg-bg">
@@ -113,16 +153,26 @@ export function ClaimsPage() {
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2">{norwegianText.nav.claims}</h1>
-            <p className="text-muted-fg">
-              {claims.length > 0
-                ? `${claims.length} hentet${claims.length === 1 ? '' : 'e'} tilbud`
-                : 'Ingen hentede tilbud enda'
-              }
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-muted-fg">
+                {view === 'active'
+                  ? (activeClaims.length > 0
+                      ? `${activeClaims.length} aktiv${activeClaims.length === 1 ? 't' : 'e'} tilbud`
+                      : 'Ingen aktive tilbud')
+                  : (historyClaims.length > 0
+                      ? `${historyClaims.length} i historikk`
+                      : 'Ingen historikk')
+                }
+              </p>
+              <div className="bg-muted rounded-xl p-1 flex gap-1">
+                <button onClick={() => setView('active')} className={cn('px-3 py-1 rounded-lg text-sm', view==='active' ? 'bg-white' : 'opacity-70')}>Aktive</button>
+                <button onClick={() => setView('history')} className={cn('px-3 py-1 rounded-lg text-sm', view==='history' ? 'bg-white' : 'opacity-70')}>Historikk</button>
+              </div>
+            </div>
           </div>
 
           {/* Empty State */}
-          {claims.length === 0 && !claimsLoading && (
+          {view==='active' && activeClaims.length === 0 && !claimsLoading && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="text-6xl mb-4">🎫</div>
               <h3 className="text-lg font-semibold mb-2">{norwegianText.empty.noClaims}</h3>
@@ -163,9 +213,9 @@ export function ClaimsPage() {
           )}
 
           {/* Claims List */}
-          {claims.length > 0 && (
+          {view==='active' && activeClaims.length > 0 && (
             <div className="space-y-4">
-              {claims.map((claim) => {
+              {activeClaims.map((claim) => {
                 const deal = claim.deal
                 const restaurant = deal.restaurant
                 const claimDate = new Date(claim.created_at)
@@ -290,6 +340,20 @@ export function ClaimsPage() {
                       >
                         Se restaurant
                       </button>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await completeClaim(claim.id)
+                            await queryClient.invalidateQueries({ queryKey: ['user-claims'] })
+                          } catch (e) {
+                            console.error(e)
+                            alert('Kunne ikke markere som brukt')
+                          }
+                        }}
+                        className="btn-primary flex-1 text-sm"
+                      >
+                        Marker som brukt
+                      </button>
                       {restaurant.phone && (
                         <button
                           onClick={() => window.open(`tel:${restaurant.phone}`)}
@@ -305,20 +369,59 @@ export function ClaimsPage() {
             </div>
           )}
 
+          {/* History List */}
+          {view==='history' && historyClaims.length > 0 && (
+            <div className="space-y-4">
+              {historyClaims.map((claim) => {
+                const deal = claim.deal
+                const restaurant = deal.restaurant
+                const claimDate = new Date(claim.created_at)
+                return (
+                  <div key={claim.id} className="card p-4 space-y-3 opacity-80">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-lg leading-tight">{deal.title}</h3>
+                        <div className="flex items-center gap-1 text-sm text-muted-fg mt-1">
+                          <MapPin className="h-3 w-3" />
+                          <span>{restaurant.name}</span>
+                        </div>
+                      </div>
+                      <span className={cn('text-xs px-2 py-1 rounded-full', claim.status==='completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700')}>
+                        {claim.status==='completed' ? 'Brukt' : 'Kansellert'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        <span>{claimDate.toLocaleDateString('no-NO')}</span>
+                      </div>
+                      {(claim as any).redeemed_at && (
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          <span>Brukt {new Date((claim as any).redeemed_at).toLocaleString('no-NO')}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
           {/* Summary Card */}
-          {claims.length > 0 && (
+          {view==='active' && activeClaims.length > 0 && (
             <div className="mt-8 card p-4 bg-gradient-to-r from-success/10 to-primary/10">
               <h3 className="font-semibold mb-2">Dine besparelser</h3>
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-success">
-                    {claims.reduce((sum, claim) => sum + claim.quantity, 0)}
+                    {activeClaims.reduce((sum, claim) => sum + claim.quantity, 0)}
                   </div>
                   <div className="text-sm text-muted-fg">Totalt hentet</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-primary">
-                    {claims.filter(claim => {
+                    {activeClaims.filter(claim => {
                       const claimDate = new Date(claim.created_at)
                       const now = new Date()
                       return claimDate.getMonth() === now.getMonth() && 

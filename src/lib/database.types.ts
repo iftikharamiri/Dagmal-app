@@ -204,6 +204,7 @@ export interface Database {
           phone: string | null
           special_requests: string | null
           status: 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
+          redeemed_at: string | null
           created_at: string
         }
         Insert: {
@@ -216,6 +217,7 @@ export interface Database {
           phone?: string | null
           special_requests?: string | null
           status?: 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
+          redeemed_at?: string | null
           created_at?: string
         }
         Update: {
@@ -228,6 +230,7 @@ export interface Database {
           phone?: string | null
           special_requests?: string | null
           status?: 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
+          redeemed_at?: string | null
           created_at?: string
         }
       }
