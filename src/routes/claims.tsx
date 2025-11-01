@@ -58,8 +58,9 @@ function QRCodeModal({ code, onClose }: { code: string; onClose: () => void }) {
 }
 
 // Swipe to Reveal Component
-function SwipeToReveal({ code, onReveal, onShowQR, onExpire }: { 
+function SwipeToReveal({ code, claimId, onReveal, onShowQR, onExpire }: { 
   code: string
+  claimId: string
   onReveal?: () => void
   onShowQR?: () => void
   onExpire?: () => void
@@ -74,6 +75,8 @@ function SwipeToReveal({ code, onReveal, onShowQR, onExpire }: {
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   
   const threshold = 0.65 // 65% swipe required (lowered for easier reveal)
+  const STORAGE_KEY = `claim-revealed-${claimId}`
+  const EXPIRY_TIME = 5 * 60 * 1000 // 5 minutes in milliseconds
 
   const updateSliderWidth = () => {
     if (sliderRef.current) {
@@ -87,10 +90,69 @@ function SwipeToReveal({ code, onReveal, onShowQR, onExpire }: {
     return () => window.removeEventListener('resize', updateSliderWidth)
   }, [])
 
-  // Timer: countdown from 5 minutes when code is revealed
+  // Load revealed state from localStorage on mount and check if still valid
+  useEffect(() => {
+    const checkRevealedState = () => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY)
+        if (stored) {
+          const { revealedAt } = JSON.parse(stored)
+          const now = Date.now()
+          const elapsed = now - revealedAt
+          const remaining = Math.max(0, EXPIRY_TIME - elapsed)
+          const remainingSeconds = Math.floor(remaining / 1000)
+
+          if (remainingSeconds > 0) {
+            // Still valid - restore revealed state
+            setIsRevealed(true)
+            setTimeRemaining(remainingSeconds)
+          } else {
+            // Expired - clean up storage and mark as used
+            localStorage.removeItem(STORAGE_KEY)
+            setIsRevealed(false)
+            // Call onExpire to mark as used (idempotent, so safe to call)
+            onExpire?.()
+          }
+        }
+      } catch (error) {
+        console.error('Error loading revealed state:', error)
+      }
+    }
+
+    checkRevealedState()
+
+    // Also check when window regains focus (user navigates back)
+    const handleFocus = () => {
+      checkRevealedState()
+    }
+    
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [STORAGE_KEY, EXPIRY_TIME, onExpire])
+
+  // Save revealed state to localStorage when revealed for the first time
+  useEffect(() => {
+    if (isRevealed) {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY)
+        // Only save if not already stored (first time reveal)
+        if (!stored) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            revealedAt: Date.now()
+          }))
+        }
+      } catch (error) {
+        console.error('Error saving revealed state:', error)
+      }
+    } else {
+      // Clean up if manually hidden (but keep if expired - onExpire handles that)
+      // Don't remove here - let onExpire handle cleanup
+    }
+  }, [isRevealed, STORAGE_KEY])
+
+  // Timer: countdown based on actual elapsed time (works across navigation)
   useEffect(() => {
     if (!isRevealed) {
-      setTimeRemaining(300) // Reset to 5 minutes when not revealed
       if (timerRef.current) {
         clearInterval(timerRef.current)
         timerRef.current = null
@@ -98,22 +160,41 @@ function SwipeToReveal({ code, onReveal, onShowQR, onExpire }: {
       return
     }
 
-    // Start countdown timer
-    timerRef.current = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          // Timer expired - mark as used and hide code
-          if (timerRef.current) {
-            clearInterval(timerRef.current)
-            timerRef.current = null
+    // Calculate remaining time based on stored timestamp
+    const updateRemainingTime = () => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY)
+        if (stored) {
+          const { revealedAt } = JSON.parse(stored)
+          const now = Date.now()
+          const elapsed = now - revealedAt
+          const remaining = Math.max(0, EXPIRY_TIME - elapsed)
+          const remainingSeconds = Math.floor(remaining / 1000)
+
+          if (remainingSeconds <= 0) {
+            // Timer expired - mark as used and hide code
+            if (timerRef.current) {
+              clearInterval(timerRef.current)
+              timerRef.current = null
+            }
+            setIsRevealed(false)
+            localStorage.removeItem(STORAGE_KEY)
+            onExpire?.()
+            return
           }
-          setIsRevealed(false) // Hide the code
-          onExpire?.() // Mark claim as completed
-          return 0
+
+          setTimeRemaining(remainingSeconds)
         }
-        return prev - 1
-      })
-    }, 1000)
+      } catch (error) {
+        console.error('Error updating timer:', error)
+      }
+    }
+
+    // Update immediately
+    updateRemainingTime()
+
+    // Update every second
+    timerRef.current = setInterval(updateRemainingTime, 1000)
 
     return () => {
       if (timerRef.current) {
@@ -121,7 +202,7 @@ function SwipeToReveal({ code, onReveal, onShowQR, onExpire }: {
         timerRef.current = null
       }
     }
-  }, [isRevealed, onExpire])
+  }, [isRevealed, onExpire, STORAGE_KEY, EXPIRY_TIME])
 
   const handleStart = (clientX: number) => {
     if (isRevealed) return
@@ -606,7 +687,8 @@ export function ClaimsPage() {
                     {/* Verification Code - Swipe to Reveal */}
                     {deal.verification_code && (
                       <SwipeToReveal 
-                        code={deal.verification_code} 
+                        code={deal.verification_code}
+                        claimId={claim.id}
                         onReveal={() => setSelectedQRCode(deal.verification_code)}
                         onShowQR={() => setSelectedQRCode(deal.verification_code)}
                         onExpire={async () => {
