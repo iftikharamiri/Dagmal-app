@@ -87,19 +87,35 @@ export function debounce<T extends (...args: any[]) => any>(
 export async function completeClaim(claimId: string) {
   const { supabase } = await import('./supabase')
   const now = new Date().toISOString()
-  // Prefer RPC for atomic validation on the server
-  const rpc = await supabase.rpc('redeem_claim', { claim_id: claimId })
-  if (rpc.error) {
-    // Fallback to guarded update
-    const { data, error } = await supabase
-      .from('claims')
-      .update({ status: 'completed', redeemed_at: now })
-      .eq('id', claimId)
-      .is('redeemed_at', null)
-      .select('*')
-      .maybeSingle()
-    if (error) throw error
-    return data
+  
+  // Try RPC first (if it exists in DB)
+  try {
+    const rpc = await supabase.rpc('redeem_claim', { claim_id: claimId })
+    if (!rpc.error && rpc.data && Array.isArray(rpc.data) && rpc.data.length > 0) {
+      return rpc.data[0]
+    }
+    // If RPC returns empty (already redeemed) or doesn't exist, fall through to update
+  } catch (rpcError) {
+    // RPC function might not exist, fall through to direct update
+    console.warn('RPC redeem_claim not available, using direct update:', rpcError)
   }
-  return (rpc.data as any)?.[0] ?? null
+  
+  // Fallback: direct update with guard (idempotent)
+  const { data, error } = await supabase
+    .from('claims')
+    .update({ status: 'completed', redeemed_at: now })
+    .eq('id', claimId)
+    .is('redeemed_at', null)
+    .select('*')
+    .maybeSingle()
+  
+  if (error) {
+    throw new Error(`Failed to complete claim: ${error.message}`)
+  }
+  
+  if (!data) {
+    throw new Error('Claim already redeemed or not found')
+  }
+  
+  return data
 }

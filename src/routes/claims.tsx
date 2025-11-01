@@ -1,8 +1,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Calendar, Users, Phone, MapPin, Clock, Shield, QrCode } from 'lucide-react'
+import { Calendar, Users, Phone, MapPin, Clock, Shield, QrCode, Ticket, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import QRCode from 'qrcode'
+import { toast } from 'sonner'
 import { Header } from '@/components/Header'
 import { useAuthGuard } from '@/hooks/useAuthGuard'
 import { supabase } from '@/lib/supabase'
@@ -56,6 +57,275 @@ function QRCodeModal({ code, onClose }: { code: string; onClose: () => void }) {
   )
 }
 
+// Swipe to Reveal Component
+function SwipeToReveal({ code, onReveal, onShowQR, onExpire }: { 
+  code: string
+  onReveal?: () => void
+  onShowQR?: () => void
+  onExpire?: () => void
+}) {
+  const [dragOffset, setDragOffset] = useState(0)
+  const [isRevealed, setIsRevealed] = useState(false)
+  const [timeRemaining, setTimeRemaining] = useState(300) // 5 minutes in seconds
+  const sliderRef = useRef<HTMLDivElement>(null)
+  const startXRef = useRef<number>(0)
+  const sliderWidthRef = useRef<number>(0)
+  const isDraggingRef = useRef(false)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  
+  const threshold = 0.65 // 65% swipe required (lowered for easier reveal)
+
+  const updateSliderWidth = () => {
+    if (sliderRef.current) {
+      sliderWidthRef.current = sliderRef.current.offsetWidth
+    }
+  }
+
+  useEffect(() => {
+    updateSliderWidth()
+    window.addEventListener('resize', updateSliderWidth)
+    return () => window.removeEventListener('resize', updateSliderWidth)
+  }, [])
+
+  // Timer: countdown from 5 minutes when code is revealed
+  useEffect(() => {
+    if (!isRevealed) {
+      setTimeRemaining(300) // Reset to 5 minutes when not revealed
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+        timerRef.current = null
+      }
+      return
+    }
+
+    // Start countdown timer
+    timerRef.current = setInterval(() => {
+      setTimeRemaining((prev) => {
+        if (prev <= 1) {
+          // Timer expired - mark as used and hide code
+          if (timerRef.current) {
+            clearInterval(timerRef.current)
+            timerRef.current = null
+          }
+          setIsRevealed(false) // Hide the code
+          onExpire?.() // Mark claim as completed
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+        timerRef.current = null
+      }
+    }
+  }, [isRevealed, onExpire])
+
+  const handleStart = (clientX: number) => {
+    if (isRevealed) return
+    updateSliderWidth() // Recalculate width
+    startXRef.current = clientX
+    isDraggingRef.current = true
+  }
+
+  const handleMove = (clientX: number) => {
+    if (!isDraggingRef.current || isRevealed) return
+    const diff = clientX - startXRef.current
+    const maxOffset = sliderWidthRef.current * 0.85 // Allow drag up to 85% of width
+    setDragOffset(Math.max(0, Math.min(diff, maxOffset)))
+  }
+
+  const handleEnd = () => {
+    if (!isDraggingRef.current || isRevealed) {
+      isDraggingRef.current = false
+      return
+    }
+    
+    isDraggingRef.current = false
+    const sliderWidth = sliderWidthRef.current
+    
+    // Use state updater to get current offset value
+    setDragOffset((currentOffset) => {
+      if (sliderWidth === 0) return 0
+      
+      const percentage = currentOffset / sliderWidth
+      
+      if (percentage >= threshold) {
+        setIsRevealed(true)
+        onReveal?.()
+        return sliderWidth * 0.85
+      } else {
+        return 0
+      }
+    })
+  }
+
+  // Setup touch event listeners with passive: false to allow preventDefault
+  useEffect(() => {
+    const slider = sliderRef.current
+    if (!slider || isRevealed) return
+
+    const touchStartHandler = (e: TouchEvent) => {
+      e.preventDefault()
+      if (isRevealed) return
+      updateSliderWidth()
+      startXRef.current = e.touches[0].clientX
+      isDraggingRef.current = true
+    }
+
+    const touchMoveHandler = (e: TouchEvent) => {
+      if (!isDraggingRef.current || isRevealed) return
+      e.preventDefault()
+      const diff = e.touches[0].clientX - startXRef.current
+      const maxOffset = sliderWidthRef.current * 0.85
+      setDragOffset(Math.max(0, Math.min(diff, maxOffset)))
+    }
+
+    const touchEndHandler = (e: TouchEvent) => {
+      e.preventDefault()
+      if (!isDraggingRef.current || isRevealed) {
+        isDraggingRef.current = false
+        return
+      }
+      
+      isDraggingRef.current = false
+      const sliderWidth = sliderWidthRef.current
+      
+      setDragOffset((currentOffset) => {
+        if (sliderWidth === 0) return 0
+        
+        const percentage = currentOffset / sliderWidth
+        
+        if (percentage >= threshold) {
+          setIsRevealed(true)
+          onReveal?.()
+          return sliderWidth * 0.85
+        } else {
+          return 0
+        }
+      })
+    }
+
+    // Add listeners with passive: false to allow preventDefault
+    slider.addEventListener('touchstart', touchStartHandler, { passive: false })
+    slider.addEventListener('touchmove', touchMoveHandler, { passive: false })
+    slider.addEventListener('touchend', touchEndHandler, { passive: false })
+
+    return () => {
+      slider.removeEventListener('touchstart', touchStartHandler)
+      slider.removeEventListener('touchmove', touchMoveHandler)
+      slider.removeEventListener('touchend', touchEndHandler)
+    }
+  }, [isRevealed, onReveal, threshold])
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    handleStart(e.clientX)
+    const handleMouseMove = (e: MouseEvent) => {
+      e.preventDefault()
+      handleMove(e.clientX)
+    }
+    const handleMouseUp = (e: MouseEvent) => {
+      e.preventDefault()
+      handleEnd()
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="relative bg-muted rounded-xl overflow-hidden touch-none">
+        <div
+          ref={sliderRef}
+          className="relative h-14 bg-gradient-to-r from-primary/10 to-primary/5 touch-none select-none"
+          style={{ touchAction: 'none' }}
+        >
+          {/* Slider Track - pointer-events none so it doesn't block touches */}
+          <div className="absolute inset-0 flex items-center justify-end px-4 pointer-events-none">
+            {!isRevealed && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-fg whitespace-nowrap">
+                  Sveip til høyre for å vise koden
+                </span>
+                <div className="flex gap-1 pointer-events-none">
+                  <ChevronRight className="w-4 h-4 text-muted-fg/50" />
+                  <ChevronRight className="w-4 h-4 text-muted-fg/50" />
+                  <ChevronRight className="w-4 h-4 text-muted-fg/50" />
+                </div>
+              </div>
+            )}
+            {isRevealed && (
+              <span className="text-sm font-medium text-muted-fg whitespace-nowrap">
+                Verifikasjonskode
+              </span>
+            )}
+          </div>
+
+          {/* Draggable Handle */}
+          <div
+            className={cn(
+              'absolute left-0 top-0 h-full flex items-center justify-center z-20 cursor-grab active:cursor-grabbing touch-none',
+              isRevealed && 'pointer-events-none'
+            )}
+            style={{
+              transform: `translateX(${dragOffset}px)`,
+              width: '60px',
+              touchAction: 'none'
+            }}
+            onMouseDown={handleMouseDown}
+          >
+            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center shadow-lg pointer-events-none">
+              <ChevronRight className="w-6 h-6 text-white" />
+            </div>
+          </div>
+        </div>
+
+        {/* Revealed Code */}
+        {isRevealed && (
+          <div className="bg-primary/10 rounded-xl p-4 border-2 border-dashed border-primary/30 mt-2">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium text-primary">Verifikasjonskode</span>
+              </div>
+              {onShowQR && (
+                <button
+                  onClick={onShowQR}
+                  className="flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-1 rounded-lg hover:bg-primary/30 transition-colors"
+                >
+                  <QrCode className="w-3 h-3" />
+                  QR-kode
+                </button>
+              )}
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold tracking-widest text-primary mb-1">
+                {code}
+              </div>
+              <p className="text-xs text-muted-fg mb-2">
+                Vis denne koden til restauranten når du henter tilbudet
+              </p>
+              {/* Countdown Timer */}
+              <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-primary/20">
+                <Clock className="w-3 h-3 text-muted-fg" />
+                <span className="text-xs font-medium text-muted-fg">
+                  Koden forsvinner om: {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function ClaimsPage() {
   const { user, isLoading: authLoading } = useAuthGuard()
   const navigate = useNavigate()
@@ -63,7 +333,7 @@ export function ClaimsPage() {
   const [selectedQRCode, setSelectedQRCode] = useState<string | null>(null)
   const [view, setView] = useState<'active' | 'history'>('active')
 
-  const { data: claims = [], isLoading: claimsLoading } = useQuery({
+  const { data: claims = [], isLoading: claimsLoading, error: queryError } = useQuery({
     queryKey: ['user-claims'],
     queryFn: async () => {
       if (!user) return []
@@ -86,6 +356,11 @@ export function ClaimsPage() {
 
       if (error) {
         console.error('❌ Error fetching claims:', error)
+        // If it's a column error (like redeemed_at doesn't exist), return empty array instead of throwing
+        if (error.message?.includes('column') || error.code === 'PGRST204') {
+          console.warn('⚠️ Database schema may be outdated, returning empty claims')
+          return []
+        }
         throw error
       }
 
@@ -93,12 +368,15 @@ export function ClaimsPage() {
       return data as ClaimWithDealAndRestaurant[]
     },
     enabled: !!user,
+    retry: 1,
+    retryOnMount: false,
   })
 
   // Derived: active, non-expired claims only
   const activeClaims = (claims || []).filter((claim) => {
     const now = new Date()
-    if (claim.status === 'completed' || claim.status === 'cancelled' || (claim as any).redeemed_at) return false
+    const claimAny = claim as any
+    if (claim.status === 'completed' || claim.status === 'cancelled' || claimAny.redeemed_at) return false
     // keep only allowed statuses (query already filtered) and time window is valid if deal present
     if (!claim.deal) return false
     try {
@@ -117,9 +395,10 @@ export function ClaimsPage() {
   })
 
   // Derived: history claims (completed/cancelled)
-  const historyClaims = (claims || []).filter((claim) => 
-    claim.status === 'completed' || claim.status === 'cancelled' || (claim as any).redeemed_at
-  )
+  const historyClaims = (claims || []).filter((claim) => {
+    const claimAny = claim as any
+    return claim.status === 'completed' || claim.status === 'cancelled' || claimAny.redeemed_at
+  })
 
   // Realtime subscription to claim changes for this user
   useEffect(() => {
@@ -171,10 +450,29 @@ export function ClaimsPage() {
             </div>
           </div>
 
-          {/* Empty State */}
-          {view==='active' && activeClaims.length === 0 && !claimsLoading && (
+          {/* Error State */}
+          {queryError && !claimsLoading && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="text-6xl mb-4">🎫</div>
+              <div className="text-6xl mb-4">⚠️</div>
+              <h3 className="text-lg font-semibold mb-2">Kunne ikke laste tilbud</h3>
+              <p className="text-muted-fg mb-6">
+                {queryError instanceof Error ? queryError.message : 'Det oppstod en feil'}
+              </p>
+              <button
+                onClick={() => queryClient.invalidateQueries({ queryKey: ['user-claims'] })}
+                className="btn-primary"
+              >
+                Prøv igjen
+              </button>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!queryError && view==='active' && activeClaims.length === 0 && !claimsLoading && (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="mb-4">
+                <Ticket className="w-24 h-24 text-muted-fg/40 mx-auto" strokeWidth={1.5} />
+              </div>
               <h3 className="text-lg font-semibold mb-2">{norwegianText.empty.noClaims}</h3>
               <p className="text-muted-fg mb-6">
                 Utforsk tilbud og hent dine første besparelser
@@ -305,8 +603,27 @@ export function ClaimsPage() {
                       </div>
                     </div>
 
-                    {/* Verification Code */}
+                    {/* Verification Code - Swipe to Reveal */}
                     {deal.verification_code && (
+                      <SwipeToReveal 
+                        code={deal.verification_code} 
+                        onReveal={() => setSelectedQRCode(deal.verification_code)}
+                        onShowQR={() => setSelectedQRCode(deal.verification_code)}
+                        onExpire={async () => {
+                          try {
+                            await completeClaim(claim.id)
+                            toast.success('Tilbudet er automatisk markert som brukt')
+                            await queryClient.invalidateQueries({ queryKey: ['user-claims'] })
+                          } catch (e: any) {
+                            console.error('Error auto-completing claim:', e)
+                            toast.error(e?.message || 'Kunne ikke markere tilbudet som brukt')
+                          }
+                        }}
+                      />
+                    )}
+
+                    {/* Old verification code display - removed */}
+                    {false && deal.verification_code && (
                       <div className="bg-primary/10 rounded-2xl p-4 border-2 border-dashed border-primary/30">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
@@ -339,20 +656,6 @@ export function ClaimsPage() {
                         className="btn-ghost flex-1 text-sm"
                       >
                         Se restaurant
-                      </button>
-                      <button
-                        onClick={async () => {
-                          try {
-                            await completeClaim(claim.id)
-                            await queryClient.invalidateQueries({ queryKey: ['user-claims'] })
-                          } catch (e) {
-                            console.error(e)
-                            alert('Kunne ikke markere som brukt')
-                          }
-                        }}
-                        className="btn-primary flex-1 text-sm"
-                      >
-                        Marker som brukt
                       </button>
                       {restaurant.phone && (
                         <button
@@ -395,12 +698,15 @@ export function ClaimsPage() {
                         <Calendar className="h-4 w-4" />
                         <span>{claimDate.toLocaleDateString('no-NO')}</span>
                       </div>
-                      {(claim as any).redeemed_at && (
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          <span>Brukt {new Date((claim as any).redeemed_at).toLocaleString('no-NO')}</span>
-                        </div>
-                      )}
+                      {(() => {
+                        const claimAny = claim as any
+                        return claimAny.redeemed_at && (
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            <span>Brukt {new Date(claimAny.redeemed_at).toLocaleString('no-NO')}</span>
+                          </div>
+                        )
+                      })()}
                     </div>
                   </div>
                 )
