@@ -49,7 +49,7 @@ export function GoogleRestaurantMap({
   return (
     <div className={cn('relative h-full w-full', className)}>
       <GoogleMap
-        onLoad={(map) => (mapRef.current = map)}
+        onLoad={(map) => { mapRef.current = map }}
         center={mapCenter}
         zoom={zoom}
         mapContainerStyle={{ width: '100%', height: '100%', borderRadius: '1rem' }}
