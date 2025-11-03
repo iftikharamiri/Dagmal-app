@@ -51,10 +51,12 @@ A production-ready, mobile-first web app for discovering restaurant deals in Nor
    cp env.example .env.local
    ```
    
-   Update `.env.local` with your Supabase credentials:
+   Update `.env.local` with your Supabase credentials (and optional Google Maps key):
    ```
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   # Optional: Enable Google Maps on the Map page
+   VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key
    ```
 
 3. **Database Setup**
@@ -269,6 +271,7 @@ The app uses a consistent design system with:
 ## License
 
 MIT License - see LICENSE file for details.
+
 
 
 

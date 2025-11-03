@@ -1,0 +1,59 @@
+{
+  "restaurant_info": {
+    "name": "Bikkuben",
+    "categories": ["Hovedretter", "Vegetarretter", "Supper", "Pizza"]
+  },
+  "menu_metadata": {
+    "currency": "NOK",
+    "language": "no"
+  },
+  "categories": [
+    {
+      "id": "hovedretter",
+      "name": "Hovedretter",
+      "display_order": 1,
+      "items": [
+        { "id": "oksegryte-med-ris", "name": "Oksegryte med ris", "description": null, "price": 0, "dietary_info": [], "image_url": null, "is_available": true },
+        { "id": "thai-curry-med-kylling", "name": "Thai curry med kylling", "description": null, "price": 0, "dietary_info": [], "image_url": null, "is_available": true },
+        { "id": "laks-med-chimichurri", "name": "Laks med chimichurri", "description": null, "price": 0, "dietary_info": [], "image_url": null, "is_available": true },
+        { "id": "adobo-msvinekjott-og-ris", "name": "Adobo m/svinekjøtt og ris", "description": null, "price": 0, "dietary_info": [], "image_url": null, "is_available": true }
+      ]
+    },
+    {
+      "id": "vegetarretter",
+      "name": "Vegetarretter",
+      "display_order": 2,
+      "items": [
+        { "id": "mac-and-cheese", "name": "Mac and cheese", "description": "vegetar", "price": 0, "dietary_info": ["vegetar"], "image_url": null, "is_available": true },
+        { "id": "thai-curry-vegetar", "name": "Thai curry", "description": "vegetar", "price": 0, "dietary_info": ["vegetar"], "image_url": null, "is_available": true },
+        { "id": "blomkalgrateng", "name": "Blomkålgrateng", "description": "vegetar", "price": 0, "dietary_info": ["vegetar"], "image_url": null, "is_available": true },
+        { "id": "wok-vegetar", "name": "Wok", "description": "vegetar", "price": 0, "dietary_info": ["vegetar"], "image_url": null, "is_available": true }
+      ]
+    },
+    {
+      "id": "supper",
+      "name": "Supper",
+      "display_order": 3,
+      "items": [
+        { "id": "gresskarsuppe", "name": "Gresskarsuppe", "description": "vegetar", "price": 0, "dietary_info": ["vegetar", "suppe"], "image_url": null, "is_available": true },
+        { "id": "corn-chowder", "name": "Corn chowder", "description": "suppe", "price": 0, "dietary_info": ["suppe"], "image_url": null, "is_available": true },
+        { "id": "tomatsuppe", "name": "Tomatsuppe", "description": null, "price": 0, "dietary_info": ["suppe", "vegetar"], "image_url": null, "is_available": true },
+        { "id": "varloksuppe", "name": "Vårløksuppe", "description": null, "price": 0, "dietary_info": ["suppe", "vegetar"], "image_url": null, "is_available": true }
+      ]
+    },
+    {
+      "id": "pizza",
+      "name": "Pizza",
+      "display_order": 4,
+      "items": [
+        { "id": "tennessee-bbq-chicken", "name": "Tennessee BBQ Chicken", "description": null, "price": 0, "dietary_info": ["pizza"], "image_url": null, "is_available": true },
+        { "id": "manhattan-pepperoni", "name": "Manhattan (Pepperoni)", "description": null, "price": 0, "dietary_info": ["pizza"], "image_url": null, "is_available": true },
+        { "id": "cheese-bacon", "name": "Cheese Bacon", "description": null, "price": 0, "dietary_info": ["pizza"], "image_url": null, "is_available": true },
+        { "id": "chicago-bull-oksekjott", "name": "Chicago Bull (oksekjøtt)", "description": null, "price": 0, "dietary_info": ["pizza"], "image_url": null, "is_available": true },
+        { "id": "margherita", "name": "Margherita", "description": "vegetar", "price": 0, "dietary_info": ["pizza", "vegetar"], "image_url": null, "is_available": true }
+      ]
+    }
+  ]
+}
+
+

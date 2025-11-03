@@ -116,17 +116,17 @@ interface RestaurantMapProps {
   userLocation?: [number, number]
 }
 
-function FitBounds({ restaurants }: { restaurants: Restaurant[] }) {
+function FitBounds({ restaurants, userLocation }: { restaurants: Restaurant[]; userLocation?: [number, number] | null }) {
   const map = useMap()
 
   useEffect(() => {
     if (restaurants.length > 0) {
-      const bounds = new LatLngBounds(
-        restaurants.map(r => [r.lat, r.lng])
-      )
+      const points: [number, number][] = restaurants.map(r => [r.lat, r.lng])
+      if (userLocation) points.push(userLocation)
+      const bounds = new LatLngBounds(points)
       map.fitBounds(bounds, { padding: [20, 20] })
     }
-  }, [map, restaurants])
+  }, [map, restaurants, userLocation])
 
   return null
 }
@@ -154,7 +154,7 @@ export function RestaurantMap({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
-        {restaurants.length > 0 && <FitBounds restaurants={restaurants} />}
+        {restaurants.length > 0 && <FitBounds restaurants={restaurants} userLocation={userLocation || null} />}
         
         {/* User Location Marker */}
         {userLocation && (

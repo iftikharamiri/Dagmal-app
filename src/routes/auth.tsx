@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 export function AuthPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const isSignUp = mode === 'signup'
+  const [accountType, setAccountType] = useState<'user' | 'company'>('user')
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
@@ -120,6 +121,58 @@ export function AuthPage() {
 
         if (error) throw error
 
+        // Extra gate for company login: must be a registered restaurant owner
+        if (accountType === 'company') {
+          const { data: userResult } = await supabase.auth.getUser()
+          const userId = userResult.user?.id
+
+          if (userId) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', userId)
+              .single()
+
+            const isOwnerRole = profile?.role === 'restaurant_owner' || profile?.role === 'admin'
+
+            let ownsRestaurant = false
+            if (!isOwnerRole) {
+              const { data: restaurants } = await supabase
+                .from('restaurants')
+                .select('id')
+                .eq('owner_id', userId)
+                .limit(1)
+              ownsRestaurant = !!(restaurants && restaurants.length > 0)
+            }
+
+            if (!isOwnerRole && !ownsRestaurant) {
+              await supabase.auth.signOut()
+              setErrors({ submit: 'Denne e-posten er ikke registrert som bedriftseier. Velg Bruker, eller registrer bedrift.' })
+              return
+            }
+          }
+
+          // After company login, decide destination based on number of owned restaurants
+          const { data: owned } = await supabase
+            .from('restaurants')
+            .select('id,name')
+            .eq('owner_id', userId)
+
+          if (owned && owned.length > 1) {
+            toast.success('Logget inn! Velg restaurant')
+            navigate('/business/select')
+            return
+          }
+
+          if (owned && owned.length === 1) {
+            localStorage.setItem('activeRestaurantId', owned[0].id)
+          }
+
+          toast.success('Logget inn!')
+          navigate('/business/dashboard')
+          return
+        }
+
         toast.success('Logget inn!')
         navigate('/')
       }
@@ -160,21 +213,37 @@ export function AuthPage() {
       </button>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-primary mb-1">Spisly</h1>
-          <p className="text-muted-fg">Lag en gratis konto for å hente tilbud</p>
+          <h1 className="text-3xl font-bold text-fg mb-1">Velkommen tilbake</h1>
+          <p className="text-muted-fg">Logg inn for å fortsette</p>
         </div>
 
         <div className="card p-6">
+          {/* Account type tabs */}
           <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">
-              {isSignUp ? norwegianText.auth.signUp : norwegianText.auth.signIn}
-            </h2>
-            <p className="text-sm text-muted-fg">
-              {isSignUp 
-                ? 'Opprett en konto for å begynne å spare penger'
-                : 'Logg inn for å se dine tilbud'
-              }
-            </p>
+            <div className="bg-muted rounded-2xl p-1 flex">
+              <button
+                type="button"
+                className={cn(
+                  'flex-1 py-2.5 rounded-xl text-sm font-medium transition',
+                  accountType === 'company' ? 'bg-transparent text-muted-fg' : 'bg-primary text-primary-fg shadow'
+                )}
+                onClick={() => setAccountType('user')}
+                aria-pressed={accountType === 'user'}
+              >
+                Bruker
+              </button>
+              <button
+                type="button"
+                className={cn(
+                  'flex-1 py-2.5 rounded-xl text-sm font-medium transition',
+                  accountType === 'company' ? 'bg-primary text-primary-fg shadow' : 'bg-transparent text-muted-fg'
+                )}
+                onClick={() => setAccountType('company')}
+                aria-pressed={accountType === 'company'}
+              >
+                Bedrift
+              </button>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -269,12 +338,15 @@ export function AuthPage() {
                   <span>{isSignUp ? 'Oppretter konto...' : 'Logger inn...'}</span>
                 </div>
               ) : (
-                isSignUp ? norwegianText.auth.signUp : norwegianText.auth.signIn
+                isSignUp
+                  ? (accountType === 'company' ? 'Registrer som bedrift' : norwegianText.auth.signUp)
+                  : (accountType === 'company' ? 'Logg inn som bedrift' : 'Logg inn som bruker')
               )}
             </button>
           </form>
 
-          {/* Toggle Auth Mode */}
+          {/* Toggle Auth Mode */
+          }
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-fg">{isSignUp ? norwegianText.auth.hasAccount : norwegianText.auth.noAccount}</p>
             <button

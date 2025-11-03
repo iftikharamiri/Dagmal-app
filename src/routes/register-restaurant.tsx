@@ -4,7 +4,7 @@ import { ArrowLeft, MapPin, Clock, Building2, Phone, Mail, Globe, Loader } from 
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 
-// Geocoding function using OpenStreetMap Nominatim
+// Geocoding function using OpenStreetMap Nominatim with optional Google fallback
 const geocodeAddress = async (address: string, city: string, postalCode?: string): Promise<{lat: number, lng: number} | null> => {
   try {
     const fullAddress = `${address}, ${city}${postalCode ? `, ${postalCode}` : ''}, Norway`
@@ -35,7 +35,22 @@ const geocodeAddress = async (address: string, city: string, postalCode?: string
       console.log('✅ Geocoded location:', location)
       return location
     } else {
-      console.log('❌ No geocoding results found')
+      console.log('❌ No geocoding results found from OSM')
+      // Try Google Geocoding API if key is provided
+      const googleKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined
+      if (googleKey) {
+        try {
+          const gRes = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${googleKey}`)
+          const gData = await gRes.json()
+          if (gData.status === 'OK' && gData.results && gData.results[0]) {
+            const loc = gData.results[0].geometry.location
+            console.log('✅ Google geocoded location:', loc)
+            return { lat: loc.lat, lng: loc.lng }
+          }
+        } catch (e) {
+          console.warn('Google geocoding fallback failed:', e)
+        }
+      }
       return null
     }
   } catch (error) {
@@ -74,6 +89,32 @@ interface RestaurantFormData {
   }
 }
 
+// Helpers
+const defaultOpeningHours = () => ({
+  monday: { open: '09:00', close: '22:00', closed: false },
+  tuesday: { open: '09:00', close: '22:00', closed: false },
+  wednesday: { open: '09:00', close: '22:00', closed: false },
+  thursday: { open: '09:00', close: '22:00', closed: false },
+  friday: { open: '09:00', close: '22:00', closed: false },
+  saturday: { open: '10:00', close: '23:00', closed: false },
+  sunday: { open: '10:00', close: '21:00', closed: false }
+})
+
+const createDefaultFormData = (): RestaurantFormData => ({
+  restaurantName: '',
+  ownerName: '',
+  email: '',
+  phone: '',
+  description: '',
+  address: '',
+  city: '',
+  postalCode: '',
+  cuisineTypes: [],
+  orgNumber: '',
+  websiteUrl: '',
+  openingHours: defaultOpeningHours()
+})
+
 const cuisineOptions = [
   'Norsk', 'Italiensk', 'Kinesisk', 'Indisk', 'Fransk', 'Amerikansk',
   'Japansk', 'Thailandsk', 'Meksikansk', 'Gresk', 'Tyrkisk', 'Vegetarisk',
@@ -95,28 +136,9 @@ export function RegisterRestaurantPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isGeocoding, setIsGeocoding] = useState(false)
-  const [formData, setFormData] = useState<RestaurantFormData>({
-    restaurantName: '',
-    ownerName: '',
-    email: '',
-    phone: '',
-    description: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    cuisineTypes: [],
-    orgNumber: '',
-    websiteUrl: '',
-    openingHours: {
-      monday: { open: '09:00', close: '22:00', closed: false },
-      tuesday: { open: '09:00', close: '22:00', closed: false },
-      wednesday: { open: '09:00', close: '22:00', closed: false },
-      thursday: { open: '09:00', close: '22:00', closed: false },
-      friday: { open: '09:00', close: '22:00', closed: false },
-      saturday: { open: '10:00', close: '23:00', closed: false },
-      sunday: { open: '10:00', close: '21:00', closed: false }
-    }
-  })
+  const [formData, setFormData] = useState<RestaurantFormData>(createDefaultFormData())
+  const [multiMode, setMultiMode] = useState(false)
+  const [queuedRestaurants, setQueuedRestaurants] = useState<RestaurantFormData[]>([])
 
   const updateFormData = (field: keyof RestaurantFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -161,6 +183,20 @@ export function RegisterRestaurantPage() {
     }
   }
 
+  const queueCurrentAndReset = () => {
+    // Validate all steps before queueing
+    for (let step = 1; step <= 5; step++) {
+      if (!validateStep(step)) {
+        toast.error('Fullfør alle steg før du legger til en ny lokasjon')
+        return
+      }
+    }
+    setQueuedRestaurants(prev => ([...prev, formData]))
+    setFormData(createDefaultFormData())
+    setCurrentStep(1)
+    toast.success('Lagt til i kø. Fortsett med neste lokasjon.')
+  }
+
   const nextStep = () => {
     if (validateStep(currentStep)) {
       setCurrentStep(prev => Math.min(prev + 1, 5))
@@ -184,25 +220,9 @@ export function RegisterRestaurantPage() {
     try {
       console.log('🔄 Starting restaurant application submission...')
       
-      // First, try to get coordinates from address
-      setIsGeocoding(true)
-      let coordinates = null
-      
-      if (formData.address && formData.city) {
-        console.log('🗺️ Attempting to geocode address...')
-        coordinates = await geocodeAddress(formData.address, formData.city, formData.postalCode)
-        
-        if (coordinates) {
-          console.log('✅ Geocoding successful:', coordinates)
-          toast.success('Adresse funnet på kart!')
-        } else {
-          console.log('⚠️ Geocoding failed, proceeding without coordinates')
-          toast.warning('Kunne ikke finne nøyaktig plassering på kart. Du kan oppdatere dette senere.')
-        }
-      }
-      
-      setIsGeocoding(false)
-      
+      // Build list of restaurants to submit (queued + current)
+      const allRestaurants: RestaurantFormData[] = [...queuedRestaurants, formData]
+
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         toast.error('Du må være logget inn for å registrere en restaurant')
@@ -211,41 +231,48 @@ export function RegisterRestaurantPage() {
 
       console.log('👤 User authenticated:', user.id)
 
-      // Prepare the application data
-      const applicationData = {
-        user_id: user.id,
-        restaurant_name: formData.restaurantName,
-        owner_name: formData.ownerName,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        city: formData.city,
-        postal_code: formData.postalCode,
-        lat: coordinates?.lat || null,
-        lng: coordinates?.lng || null,
-        description: formData.description,
-        cuisine_types: formData.cuisineTypes,
-        org_number: formData.orgNumber,
-        website_url: formData.websiteUrl,
-        opening_hours: formData.openingHours
+      setIsGeocoding(true)
+      for (const [i, r] of allRestaurants.entries()) {
+        let coordinates = null
+        if (r.address && r.city) {
+          coordinates = await geocodeAddress(r.address, r.city, r.postalCode)
+        }
+
+        const applicationData = {
+          user_id: user.id,
+          restaurant_name: r.restaurantName,
+          owner_name: r.ownerName,
+          email: r.email,
+          phone: r.phone,
+          address: r.address,
+          city: r.city,
+          postal_code: r.postalCode,
+          lat: coordinates?.lat || null,
+          lng: coordinates?.lng || null,
+          description: r.description,
+          cuisine_types: r.cuisineTypes,
+          org_number: r.orgNumber,
+          website_url: r.websiteUrl,
+          opening_hours: r.openingHours
+        }
+
+        console.log('📝 Application data:', applicationData)
+
+        const { error } = await supabase
+          .from('restaurant_applications')
+          .insert(applicationData)
+
+        if (error) {
+          console.error('❌ Supabase error details:', error)
+          throw error
+        }
+        console.log(`✅ Application submitted for restaurant #${i + 1}`)
       }
-
-      console.log('📝 Application data:', applicationData)
-
-      const { data, error } = await supabase
-        .from('restaurant_applications')
-        .insert(applicationData)
-        .select()
-
-      console.log('📊 Supabase response:', { data, error })
-
-      if (error) {
-        console.error('❌ Supabase error details:', error)
-        throw error
-      }
+      setIsGeocoding(false)
 
       console.log('✅ Application submitted successfully!')
       toast.success('Søknad sendt! Vi vil kontakte deg innen 2-3 virkedager.')
+      setQueuedRestaurants([])
       navigate('/business')
       
     } catch (error: any) {
@@ -306,9 +333,24 @@ export function RegisterRestaurantPage() {
         {/* Step 1: Basic Information */}
         {currentStep === 1 && (
           <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Grunnleggende informasjon</h2>
-              <p className="text-muted-fg">Fortell oss om deg og restauranten din</p>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-2xl font-bold mb-1">Grunnleggende informasjon</h2>
+                <p className="text-muted-fg">Fortell oss om deg og restauranten din</p>
+              </div>
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => setMultiMode((v) => !v)}
+                  className={`px-3 py-2 rounded-lg text-sm ${multiMode ? 'bg-primary text-primary-fg' : 'bg-muted text-muted-fg hover:bg-muted/80'}`}
+                  title="Registrer flere restauranter"
+                >
+                  {multiMode ? 'Flermodus på' : 'Legg til lokasjoner'}
+                </button>
+                {queuedRestaurants.length > 0 && (
+                  <div className="text-xs text-muted-fg mt-1">I kø: {queuedRestaurants.length}</div>
+                )}
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -425,6 +467,7 @@ export function RegisterRestaurantPage() {
                   Vi henter koordinater automatisk basert på adressen din
                 </p>
               </div>
+
             </div>
           </div>
         )}
@@ -554,10 +597,29 @@ export function RegisterRestaurantPage() {
             <div className="bg-muted/50 rounded-xl p-6">
               <h3 className="font-semibold mb-4">Oppsummering</h3>
               <div className="space-y-2 text-sm">
-                <p><span className="font-medium">Restaurant:</span> {formData.restaurantName}</p>
-                <p><span className="font-medium">Eier:</span> {formData.ownerName}</p>
-                <p><span className="font-medium">Adresse:</span> {formData.address}, {formData.city}</p>
-                <p><span className="font-medium">Kjøkken:</span> {formData.cuisineTypes.join(', ')}</p>
+                <p><span className="font-medium">Kjede/Restaurantnavn:</span> {formData.restaurantName || (queuedRestaurants[0]?.restaurantName || '')}</p>
+                <p><span className="font-medium">Eier:</span> {formData.ownerName || (queuedRestaurants[0]?.ownerName || '')}</p>
+                <p><span className="font-medium">Kjøkken:</span> {formData.cuisineTypes.length > 0 ? formData.cuisineTypes.join(', ') : (queuedRestaurants[0]?.cuisineTypes?.join(', ') || '')}</p>
+              </div>
+
+              {/* Locations List */}
+              <div className="mt-4">
+                <h4 className="font-medium mb-2">Lokasjoner som sendes</h4>
+                <div className="space-y-2">
+                  {[...queuedRestaurants, formData].map((r, idx) => (
+                    <div key={idx} className="bg-white border border-border rounded-xl p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium">{r.restaurantName || `Lokasjon ${idx + 1}`}</div>
+                          <div className="text-sm text-muted-fg">{r.address}, {r.city}{r.postalCode ? `, ${r.postalCode}` : ''}</div>
+                        </div>
+                        <div className="text-xs text-muted-fg">
+                          {Object.values(r.openingHours).every((d: any) => d.closed) ? 'Stengt hele uken' : 'Åpningstider lagt til'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -592,14 +654,25 @@ export function RegisterRestaurantPage() {
               Neste
             </button>
           ) : (
-            <button
-              onClick={submitApplication}
-              disabled={isSubmitting || isGeocoding}
-              className="px-6 py-3 bg-success text-white rounded-xl hover:bg-success/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {isGeocoding && <Loader className="h-4 w-4 animate-spin" />}
-              {isGeocoding ? 'Finner plassering...' : isSubmitting ? 'Sender søknad...' : 'Send søknad'}
-            </button>
+            <div className="flex items-center gap-3">
+              {multiMode && (
+                <button
+                  onClick={queueCurrentAndReset}
+                  disabled={isSubmitting || isGeocoding}
+                  className="px-6 py-3 bg-muted text-fg rounded-xl hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Lagre og legg til ny
+                </button>
+              )}
+              <button
+                onClick={submitApplication}
+                disabled={isSubmitting || isGeocoding}
+                className="px-6 py-3 bg-success text-white rounded-xl hover:bg-success/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isGeocoding && <Loader className="h-4 w-4 animate-spin" />}
+                {isGeocoding ? 'Finner plassering...' : isSubmitting ? 'Sender søknad...' : (multiMode && queuedRestaurants.length > 0 ? 'Send alle' : 'Send søknad')}
+              </button>
+            </div>
           )}
         </div>
       </div>

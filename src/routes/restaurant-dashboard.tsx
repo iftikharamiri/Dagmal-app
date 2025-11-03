@@ -8,6 +8,9 @@ import { formatTime, formatPrice } from '@/lib/utils'
 import { MenuUploadModal } from '@/components/MenuUploadModal'
 import { NotificationCard } from '@/components/NotificationCard'
 import { CompleteMenu, parseMenuToDatabase } from '@/lib/menuUtils'
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 
 interface RestaurantDeal {
   id: string
@@ -54,6 +57,7 @@ export function RestaurantDashboardPage() {
     image_url: '',
     categories: [] as string[]
   })
+  const [editPosition, setEditPosition] = useState<{ lat: number; lng: number } | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [isUploadingBackground, setIsUploadingBackground] = useState(false)
   const [isUploadingMenu, setIsUploadingMenu] = useState(false)
@@ -84,6 +88,9 @@ export function RestaurantDashboardPage() {
         image_url: restaurant.image_url || '',
         categories: restaurant.categories || []
       })
+      if (restaurant.lat && restaurant.lng) {
+        setEditPosition({ lat: Number(restaurant.lat), lng: Number(restaurant.lng) })
+      }
       setIsEditingProfile(true)
     }
   }
@@ -588,8 +595,8 @@ export function RestaurantDashboardPage() {
         categories: editFormData.categories
       }
 
-      // If address changed, try to geocode it
-      if (editFormData.address !== restaurant.address || editFormData.city !== restaurant.city) {
+      // If address changed, try to geocode it (unless user set pin)
+      if (!editPosition && (editFormData.address !== restaurant.address || editFormData.city !== restaurant.city)) {
         const coordinates = await geocodeAddress(editFormData.address, editFormData.city)
         if (coordinates) {
           updateData = { ...updateData, lat: coordinates.lat, lng: coordinates.lng }
@@ -597,6 +604,11 @@ export function RestaurantDashboardPage() {
         } else {
           toast.warning('Adresse oppdatert, men kunne ikke finne nøyaktig plassering på kart.')
         }
+      }
+
+      // If user chose a pin position, prefer that
+      if (editPosition) {
+        updateData = { ...updateData, lat: editPosition.lat, lng: editPosition.lng }
       }
 
       const { error } = await supabase
@@ -608,6 +620,7 @@ export function RestaurantDashboardPage() {
 
       queryClient.invalidateQueries({ queryKey: ['owned-restaurant'] })
       setIsEditingProfile(false)
+      setEditPosition(null)
       toast.success('Profil oppdatert!')
     } catch (error) {
       console.error('Error updating profile:', error)
@@ -629,35 +642,59 @@ export function RestaurantDashboardPage() {
     })
   }
 
-  // Fetch restaurant owned by current user
+  // Sync activeRestaurantId from localStorage to state so queryKey updates
+  const [activeId, setActiveId] = React.useState<string | null>(null)
+  React.useEffect(() => {
+    const id = typeof window !== 'undefined' ? localStorage.getItem('activeRestaurantId') : null
+    setActiveId(id)
+    const handleStorage = () => {
+      const newId = typeof window !== 'undefined' ? localStorage.getItem('activeRestaurantId') : null
+      setActiveId(newId)
+    }
+    window.addEventListener('storage', handleStorage)
+    // Also listen for same-tab updates via custom event
+    window.addEventListener('restaurant-selected', handleStorage)
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener('restaurant-selected', handleStorage)
+    }
+  }, [])
+
+  // Fetch restaurant owned by current user (supports explicit selection)
   const { data: restaurant, isLoading: restaurantLoading, refetch: refetchRestaurant } = useQuery({
-    queryKey: ['owned-restaurant'],
+    queryKey: ['owned-restaurant', activeId],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
-      // Try to find restaurant by owner_id first, then fall back to any restaurant
-      let { data, error } = await supabase
+      // If an active restaurant is chosen, fetch that one
+      if (activeId) {
+        const { data, error } = await supabase
+          .from('restaurants')
+          .select('*')
+          .eq('id', activeId)
+          .eq('owner_id', user.id) // Security: ensure user owns it
+          .single()
+        if (error) {
+          // If not found or not owned, clear selection and fall through
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('activeRestaurantId')
+            setActiveId(null)
+          }
+          throw error
+        }
+        return data as any
+      }
+
+      // Otherwise, try to find by owner_id
+      const { data, error } = await supabase
         .from('restaurants')
         .select('*')
         .eq('owner_id', user.id)
-        .single()
+        .limit(1)
+        .maybeSingle()
 
-      // If no restaurant found with owner_id, try to find any restaurant
-      // This is a fallback for existing setups
-      if (error && error.code === 'PGRST116') {
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from('restaurants')
-          .select('*')
-          .limit(1)
-          .single()
-        
-        if (fallbackError) throw fallbackError
-        data = fallbackData
-      } else if (error) {
-        throw error
-      }
-
+      if (error) throw error
       return data as any // Temporary fix for type issues
     },
   })
@@ -1276,6 +1313,20 @@ export function RestaurantDashboardPage() {
                   />
                 </div>
 
+              {/* Set position on map */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">Sett posisjon på kartet</label>
+                <div className="rounded-xl overflow-hidden border border-border">
+                  <PinPickerMap
+                    position={editPosition || (restaurant?.lat && restaurant?.lng ? { lat: Number(restaurant.lat), lng: Number(restaurant.lng) } : { lat: 59.663, lng: 10.792 })}
+                    onPick={(pos) => setEditPosition(pos)}
+                  />
+                </div>
+                {editPosition && (
+                  <p className="text-xs text-muted-fg mt-2">Valgt: {editPosition.lat.toFixed(6)}, {editPosition.lng.toFixed(6)}</p>
+                )}
+              </div>
+
                 {/* Description */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium mb-2">Beskrivelse</label>
@@ -1470,5 +1521,32 @@ export function RestaurantDashboardPage() {
         />
       )}
     </div>
+  )
+}
+
+// Small Leaflet map that lets user click to choose a coordinate
+function PinPickerMap({ position, onPick }: { position: { lat: number; lng: number }; onPick: (pos: { lat: number; lng: number }) => void }) {
+  const markerIcon = L.icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+  })
+
+  function ClickHandler() {
+    useMapEvents({
+      click(e) {
+        onPick({ lat: e.latlng.lat, lng: e.latlng.lng })
+      },
+    })
+    return null
+  }
+
+  return (
+    <MapContainer center={[position.lat, position.lng]} zoom={16} style={{ height: 260, width: '100%' }} scrollWheelZoom={false}>
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
+      <Marker position={[position.lat, position.lng]} icon={markerIcon} />
+      <ClickHandler />
+    </MapContainer>
   )
 }

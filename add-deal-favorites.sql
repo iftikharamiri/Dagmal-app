@@ -22,3 +22,4 @@ SELECT 'Deal favorites functionality added successfully' as status;
 
 
 
+

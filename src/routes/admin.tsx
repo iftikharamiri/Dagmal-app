@@ -6,8 +6,9 @@ import { useAuthGuard } from '@/hooks/useAuthGuard'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
-type AdminTab = 'dashboard' | 'restaurants' | 'deals' | 'users'
+type AdminTab = 'dashboard' | 'restaurants' | 'deals' | 'users' | 'applications'
 
 export function AdminPage() {
   const { user, isLoading: authLoading } = useAuthGuard()
@@ -26,6 +27,22 @@ export function AdminPage() {
         .from('restaurants')
         .select('*')
         .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data
+    },
+    enabled: isAdmin,
+  })
+
+  // Fetch pending restaurant applications
+  const { data: applications = [], refetch: refetchApplications } = useQuery({
+    queryKey: ['admin-restaurant-applications'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('restaurant_applications')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: true })
 
       if (error) throw error
       return data
@@ -114,6 +131,7 @@ export function AdminPage() {
     { id: 'dashboard' as const, label: 'Dashboard', icon: BarChart3 },
     { id: 'restaurants' as const, label: 'Restaurants', icon: Store },
     { id: 'deals' as const, label: 'Deals', icon: Tag },
+    { id: 'applications' as const, label: 'Applications', icon: Plus },
     { id: 'users' as const, label: 'Users', icon: Users },
   ]
 
@@ -142,7 +160,46 @@ export function AdminPage() {
       icon: Eye,
       color: 'text-orange-600',
     },
+    {
+      title: 'Pending Applications',
+      value: applications.length,
+      icon: Plus,
+      color: 'text-amber-600',
+    },
   ]
+
+  const handleDeleteRestaurant = async (restaurant: any) => {
+    if (!confirm(`Delete restaurant "${restaurant.name}"? This will remove related data.`)) return
+
+    try {
+      // Delete dependent data first to avoid FK constraints
+      await supabase.from('notifications').delete().eq('restaurant_id', restaurant.id)
+
+      // Delete claims linked to this restaurant's deals
+      const { data: dealIds } = await supabase
+        .from('deals')
+        .select('id')
+        .eq('restaurant_id', restaurant.id)
+
+      if (dealIds && dealIds.length > 0) {
+        const ids = dealIds.map((d: any) => d.id)
+        await supabase.from('claims').delete().in('deal_id', ids)
+      }
+
+      await supabase.from('deals').delete().eq('restaurant_id', restaurant.id)
+
+      // Optional tables (ignore if missing)
+      try { await supabase.from('menu_items').delete().eq('restaurant_id', restaurant.id) } catch {}
+
+      const { error } = await supabase.from('restaurants').delete().eq('id', restaurant.id)
+      if (error) throw error
+
+      toast.success('Restaurant deleted')
+    } catch (err: any) {
+      console.error('Delete restaurant failed:', err)
+      toast.error(err?.message || 'Could not delete restaurant. Check RLS policies.')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-bg">
@@ -388,8 +445,120 @@ export function AdminPage() {
                                 <button className="btn-ghost p-2">
                                   <Edit className="h-4 w-4" />
                                 </button>
-                                <button className="btn-ghost p-2 text-danger">
+                                <button className="btn-ghost p-2 text-danger" onClick={() => handleDeleteRestaurant(restaurant)}>
                                   <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'applications' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold">Restaurant Applications</h2>
+                </div>
+
+                <div className="card">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left p-4 font-medium">Restaurant</th>
+                          <th className="text-left p-4 font-medium">Owner</th>
+                          <th className="text-left p-4 font-medium">Address</th>
+                          <th className="text-left p-4 font-medium">City</th>
+                          <th className="text-left p-4 font-medium">Submitted</th>
+                          <th className="text-left p-4 font-medium">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {applications.length === 0 ? (
+                          <tr>
+                            <td className="p-6 text-center text-muted-fg" colSpan={6}>No pending applications</td>
+                          </tr>
+                        ) : applications.map((app: any) => (
+                          <tr key={app.id} className="border-b border-border">
+                            <td className="p-4">
+                              <div className="font-medium">{app.restaurant_name}</div>
+                              <div className="text-sm text-muted-fg">org: {app.org_number || '-'}</div>
+                            </td>
+                            <td className="p-4">{app.owner_name}</td>
+                            <td className="p-4">{app.address}</td>
+                            <td className="p-4">{app.city}</td>
+                            <td className="p-4 text-sm text-muted-fg">{new Date(app.created_at).toLocaleDateString()}</td>
+                            <td className="p-4">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  className="btn-primary text-sm"
+                                  onClick={async () => {
+                                    // Try RPC approve function first
+                                    let rpcError
+                                    try {
+                                      const { error } = await supabase
+                                        .rpc('approve_restaurant_application', { application_id: app.id })
+                                      rpcError = error || null
+                                    } catch (e: any) {
+                                      rpcError = e
+                                    }
+
+                                    if (rpcError) {
+                                      // Fallback: manually create restaurant and update role
+                                      const insert = await supabase
+                                        .from('restaurants')
+                                        .insert({
+                                          owner_id: app.user_id,
+                                          name: app.restaurant_name,
+                                          description: app.description,
+                                          phone: app.phone,
+                                          address: app.address,
+                                          city: app.city,
+                                          lat: app.lat,
+                                          lng: app.lng,
+                                          categories: app.cuisine_types || [],
+                                        })
+                                        .select('id')
+                                        .single()
+
+                                      if (insert.error) {
+                                        alert('Could not approve: ' + (insert.error.message || 'Unknown error'))
+                                        return
+                                      }
+
+                                      await supabase
+                                        .from('profiles')
+                                        .update({ role: 'restaurant_owner' })
+                                        .eq('id', app.user_id)
+
+                                      await supabase
+                                        .from('restaurant_applications')
+                                        .update({ status: 'approved' })
+                                        .eq('id', app.id)
+                                    }
+
+                                    refetchApplications()
+                                    alert('Application approved')
+                                  }}
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  className="btn-ghost text-danger text-sm"
+                                  onClick={async () => {
+                                    await supabase
+                                      .from('restaurant_applications')
+                                      .update({ status: 'rejected' })
+                                      .eq('id', app.id)
+                                    refetchApplications()
+                                  }}
+                                >
+                                  Reject
                                 </button>
                               </div>
                             </td>

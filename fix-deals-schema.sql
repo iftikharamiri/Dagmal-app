@@ -55,3 +55,4 @@ WHERE table_name = 'deals' AND column_name = 'final_price';
 
 
 
+

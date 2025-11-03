@@ -91,6 +91,9 @@ export function parseMenuToDatabase(menuJson: CompleteMenu, restaurantId: string
     console.log('Restaurant categories:', categories)
   }
 
+  // Helper to create safe, globally-unique IDs per restaurant
+  const slugify = (value: string) => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+
   // Process each category and its items
   menuJson.categories.forEach(category => {
     // Add category to categories list if not already present
@@ -102,9 +105,9 @@ export function parseMenuToDatabase(menuJson: CompleteMenu, restaurantId: string
     console.log(`Processing category: ${category.name} with ${category.items.length} items`)
     category.items.forEach((item, index) => {
       console.log(`Processing item ${index + 1}:`, item.name, 'Price:', item.price)
-      
+      const baseId = `${restaurantId}-${slugify(item.name)}-${index}`
       const menuItem: MenuItem = {
-        id: item.id,
+        id: baseId,
         restaurant_id: restaurantId,
         name: item.name,
         description: item.description || null,
@@ -124,7 +127,7 @@ export function parseMenuToDatabase(menuJson: CompleteMenu, restaurantId: string
       if (item.variants && item.variants.length > 0) {
         item.variants.forEach((variant) => {
           const variantItem: MenuItem = {
-            id: `${item.id}-${variant.name.toLowerCase().replace(/\s+/g, '-')}`,
+            id: `${baseId}-${slugify(variant.name)}`,
             restaurant_id: restaurantId,
             name: `${item.name} (${variant.name})`,
             description: variant.description || item.description || null,

@@ -14,21 +14,21 @@ export function BusinessPage() {
   const navigate = useNavigate()
   const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'restaurant-setup' | 'menu' | 'offers'>('landing')
 
-  // Check if user has a restaurant
-  const { data: restaurant, isLoading } = useQuery({
-    queryKey: ['owned-restaurant'],
+  // Check restaurants owned by user (list)
+  const { data: ownedRestaurants = [], isLoading } = useQuery({
+    queryKey: ['owned-restaurants-list'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return null
+      if (!user) return []
 
       const { data, error } = await supabase
         .from('restaurants')
         .select('*')
         .eq('owner_id', user.id)
-        .single()
+        .order('created_at', { ascending: true })
 
-      if (error && error.code !== 'PGRST116') throw error
-      return data
+      if (error) throw error
+      return data || []
     },
   })
 
@@ -51,12 +51,18 @@ export function BusinessPage() {
     },
   })
 
-  // If user has approved restaurant, redirect to dashboard (but not immediately to avoid white page)
+  // Redirects based on owned restaurants
   React.useEffect(() => {
-    if (restaurant) {
+    if (!ownedRestaurants) return
+    if (ownedRestaurants.length === 1) {
+      // Ensure selection is stored
+      const only = ownedRestaurants[0]
+      try { localStorage.setItem('activeRestaurantId', only.id) } catch {}
       navigate('/business/dashboard')
+    } else if (ownedRestaurants.length > 1) {
+      navigate('/business/select')
     }
-  }, [restaurant, navigate])
+  }, [ownedRestaurants, navigate])
 
   // Handle loading state
   if (isLoading) {
@@ -70,8 +76,8 @@ export function BusinessPage() {
     )
   }
 
-  // Show redirect loading if they have a restaurant (while redirect is happening)
-  if (restaurant) {
+  // Show redirect loading if they have restaurants (while redirect is happening)
+  if (ownedRestaurants && ownedRestaurants.length > 0) {
     return (
       <div className="min-h-screen bg-bg flex items-center justify-center">
         <div className="text-center">

@@ -8,6 +8,7 @@ import { FilterSheet } from '@/components/FilterSheet'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { cn } from '@/lib/utils'
+import { useGeolocation } from '@/hooks/useGeolocation'
 
 interface FilterState {
   cuisines: string[]
@@ -18,6 +19,7 @@ interface FilterState {
 export function MapPage() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null)
   const [locationError, setLocationError] = useState<string | null>(null)
+  const geo = useGeolocation({ enableHighAccuracy: true, maximumAge: 0, timeout: 20000 })
   const [filters, setFilters] = useState<FilterState>({
     cuisines: [],
     dietary: [],
@@ -30,27 +32,15 @@ export function MapPage() {
     navigate(`/restaurant/${restaurant.id}`)
   }
 
-  // Get user location
+  // Get user location via high-accuracy watcher
   useEffect(() => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation([position.coords.latitude, position.coords.longitude])
-          setLocationError(null)
-        },
-        (error) => {
-          console.error('Error getting location:', error)
-          setLocationError('Kunne ikke hente posisjon')
-          // Default to Oslo
-          setUserLocation([59.9139, 10.7522])
-        },
-        { timeout: 10000, enableHighAccuracy: true }
-      )
-    } else {
-      setLocationError('Geolokasjon ikke støttet')
-      setUserLocation([59.9139, 10.7522])
+    if (geo.latitude != null && geo.longitude != null) {
+      setUserLocation([geo.latitude, geo.longitude])
+      setLocationError(null)
+    } else if (geo.error) {
+      setLocationError(geo.error)
     }
-  }, [])
+  }, [geo.latitude, geo.longitude, geo.error])
 
   // Fetch restaurants with their deals
   const { data: restaurants = [], isLoading } = useQuery({
@@ -160,17 +150,8 @@ export function MapPage() {
   })
 
   const handleLocateUser = () => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation([position.coords.latitude, position.coords.longitude])
-          setLocationError(null)
-        },
-        (error) => {
-          console.error('Error getting location:', error)
-          setLocationError('Kunne ikke hente posisjon')
-        }
-      )
+    if (geo.latitude != null && geo.longitude != null) {
+      setUserLocation([geo.latitude, geo.longitude])
     }
   }
 

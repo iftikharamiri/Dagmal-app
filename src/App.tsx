@@ -16,6 +16,7 @@ import { MenuPage } from '@/routes/menu'
 import { BusinessPage } from '@/routes/business'
 import { RegisterRestaurantPage } from '@/routes/register-restaurant'
 import { RestaurantDashboardPage } from '@/routes/restaurant-dashboard'
+import { SelectRestaurantPage } from '@/routes/select-restaurant'
 import { CreateDealPage } from '@/routes/create-deal'
 import { AdminPage } from '@/routes/admin'
 import { PhoneAuthTest } from '@/components/PhoneAuthTest'
@@ -69,6 +70,7 @@ function AppContent() {
         <Route path="/restaurant/:id/menu" element={<MenuPage />} />
         <Route path="/business" element={<BusinessPage />} />
         <Route path="/business/register-restaurant" element={<RegisterRestaurantPage />} />
+        <Route path="/business/select" element={<SelectRestaurantPage />} />
         <Route path="/business/dashboard" element={<RestaurantDashboardPage />} />
         <Route path="/business/create-deal" element={<CreateDealPage />} />
         <Route path="/admin" element={<AdminPage />} />

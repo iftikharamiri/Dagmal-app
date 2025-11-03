@@ -87,35 +87,33 @@ export function CreateDealPage() {
     totalLimit: null
   })
 
-  // Fetch restaurant owned by current user
+  // Fetch restaurant owned by current user (respect activeRestaurantId selection)
   const { data: restaurant, refetch: refetchRestaurant } = useQuery({
     queryKey: ['owned-restaurant'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
-      // Try to find restaurant by owner_id first, then fall back to any restaurant
+      // If a specific restaurant was selected earlier, use that
+      const activeId = localStorage.getItem('activeRestaurantId')
+      if (activeId) {
+        const { data, error } = await supabase
+          .from('restaurants')
+          .select('*')
+          .eq('id', activeId)
+          .single()
+        if (error) throw error
+        return data
+      }
+
+      // Otherwise, find by owner_id
       let { data, error } = await supabase
         .from('restaurants')
         .select('*')
         .eq('owner_id', user.id)
         .single()
 
-      // If no restaurant found with owner_id, try to find any restaurant
-      // This is a fallback for existing setups
-      if (error && error.code === 'PGRST116') {
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from('restaurants')
-          .select('*')
-          .limit(1)
-          .single()
-        
-        if (fallbackError) throw fallbackError
-        data = fallbackData
-      } else if (error) {
-        throw error
-      }
-      
+      if (error) throw error
       return data
     },
   })
@@ -134,7 +132,8 @@ export function CreateDealPage() {
       selectedMenuItem: dish,
       title: dish.name,
       description: dish.description || '',
-      originalPrice: Math.round(dish.price / 100), // Convert from øre to kr
+      // If the menu item doesn't have a price, let the user set it below
+      originalPrice: dish.price && dish.price > 0 ? Math.round(dish.price / 100) : 0,
       dietaryInfo: dish.dietary_info || []
     }))
   }
@@ -464,7 +463,9 @@ export function CreateDealPage() {
                       <h4 className="font-medium">{formData.selectedMenuItem.name}</h4>
                       <p className="text-sm text-muted-fg">{formData.selectedMenuItem.description}</p>
                       <span className="text-sm font-semibold">
-                        {formatPrice(formData.selectedMenuItem.price)}
+                        {formData.selectedMenuItem.price && formData.selectedMenuItem.price > 0
+                          ? formatPrice(formData.selectedMenuItem.price)
+                          : 'Mangler pris – sett under'}
                       </span>
                     </div>
                     <div className="flex gap-2">
@@ -587,10 +588,13 @@ export function CreateDealPage() {
                   type="number"
                   value={formData.originalPrice || ''}
                   onChange={(e) => updateFormData('originalPrice', parseFloat(e.target.value) || 0)}
-                  placeholder="299"
+                  placeholder={formData.selectedMenuItem && formData.selectedMenuItem.price > 0 ? `${Math.round(formData.selectedMenuItem.price/100)}` : 'Skriv inn pris'}
                   min="1"
                   className="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
+                {formData.selectedMenuItem && (!formData.selectedMenuItem.price || formData.selectedMenuItem.price === 0) && (
+                  <p className="text-xs text-muted-fg mt-1">Denne retten har ikke pris i menyen. Skriv inn prisen her.</p>
+                )}
               </div>
 
               <div>
