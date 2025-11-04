@@ -31,7 +31,7 @@ const AIIcon = ({ className }: { className?: string }) => (
       <line x1="18" y1="9" x2="21" y2="9" />
       <line x1="18" y1="15" x2="21" y2="15" />
     </svg>
-    <span className="absolute left-[57%] top-[57%] -translate-x-1/2 -translate-y-1/2 text-[8px] font-extrabold leading-none pointer-events-none tracking-tight">
+    <span className="absolute left-[62%] top-[57%] -translate-x-1/2 -translate-y-1/2 text-[8px] font-extrabold leading-none pointer-events-none tracking-tight">
       AI
     </span>
   </div>
