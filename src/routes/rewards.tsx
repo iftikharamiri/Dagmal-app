@@ -200,9 +200,9 @@ export function RewardsPage() {
                 className="relative text-left p-5 rounded-2xl bg-card/80 hover:bg-muted/40 border border-border transition-colors group"
               >
                 {label === 'Gavekort' && (
-                  <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
+                  <div className="absolute top-3 left-3 flex flex-col items-start gap-1">
                     {['200 kr', 'Egon', 'Rema 1000'].map((opt) => (
-                      <span key={opt} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] leading-none">
+                      <span key={opt} className="px-0 py-0.5 text-[11px] leading-none text-black">
                         {opt}
                       </span>
                     ))}
