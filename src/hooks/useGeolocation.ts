@@ -49,45 +49,56 @@ export function useGeolocation(options: GeolocationOptions = {}) {
     const defaultOptions: PositionOptions = {
       enableHighAccuracy: options.enableHighAccuracy ?? true,
       timeout: options.timeout ?? 10000,
-      maximumAge: options.maximumAge ?? 300000, // 5 minutes
+      maximumAge: options.maximumAge ?? 0, // Always get fresh position
     }
 
-    const watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        if (!mountedRef.current) return
-        setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-          error: null,
-          isLoading: false,
-        })
-      },
-      (error) => {
-        if (!mountedRef.current) return
-        let errorMessage = 'An unknown error occurred.'
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'Location access denied by user.'
-            break
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information is unavailable.'
-            break
-          case error.TIMEOUT:
-            errorMessage = 'Location request timed out.'
-            break
-        }
-        setState(prev => ({
-          ...prev,
-          error: errorMessage,
-          isLoading: false,
-        }))
-      },
-      defaultOptions
-    )
+    // Get initial position
+    const updatePosition = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          if (!mountedRef.current) return
+          setState({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            error: null,
+            isLoading: false,
+          })
+        },
+        (error) => {
+          if (!mountedRef.current) return
+          let errorMessage = 'An unknown error occurred.'
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'Location access denied by user.'
+              break
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'Location information is unavailable.'
+              break
+            case error.TIMEOUT:
+              errorMessage = 'Location request timed out.'
+              break
+          }
+          setState(prev => ({
+            ...prev,
+            error: errorMessage,
+            isLoading: false,
+          }))
+        },
+        defaultOptions
+      )
+    }
+
+    // Get initial position
+    updatePosition()
+
+    // Set up 1-minute refresh interval
+    const intervalId = setInterval(() => {
+      updatePosition()
+    }, 60000) // 1 minute = 60,000ms
 
     return () => {
-      navigator.geolocation.clearWatch(watchId)
+      clearInterval(intervalId)
     }
   }, [options.enableHighAccuracy, options.timeout, options.maximumAge])
 
