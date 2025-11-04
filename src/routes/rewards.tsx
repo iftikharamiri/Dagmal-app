@@ -181,9 +181,9 @@ export function RewardsPage() {
           <div className="grid md:grid-cols-4 gap-4">
             {[
               { label: 'Kaffe', cost: 7, Icon: Coffee },
-              { label: 'Kakao', cost: 13, Icon: Coffee },
               { label: 'Lunsj', cost: 30, Icon: Pizza },
-              { label: 'Gavekort', cost: 100, Icon: Gift },
+              { label: 'Gavekort 100 kr', cost: 50, Icon: Gift },
+              { label: 'Gavekort 200 kr', cost: 100, Icon: Gift },
             ].map(({ label, cost, Icon }) => (
               <button
                 key={label}
@@ -199,9 +199,18 @@ export function RewardsPage() {
                 }}
                 className="relative text-left p-5 rounded-2xl bg-card/80 hover:bg-muted/40 border border-border transition-colors group"
               >
-                {label === 'Gavekort' && (
+                {label === 'Gavekort 200 kr' && (
                   <div className="absolute top-3 left-3 flex flex-col items-start gap-1">
-                    {['200 kr', 'Egon', 'Rema 1000'].map((opt) => (
+                    {['200 kr', 'Egon'].map((opt) => (
+                      <span key={opt} className="px-0 py-0.5 text-[11px] leading-none text-black">
+                        {opt}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {label === 'Gavekort 100 kr' && (
+                  <div className="absolute top-3 left-3 flex flex-col items-start gap-1">
+                    {['100 kr', 'Rema 1000'].map((opt) => (
                       <span key={opt} className="px-0 py-0.5 text-[11px] leading-none text-black">
                         {opt}
                       </span>
