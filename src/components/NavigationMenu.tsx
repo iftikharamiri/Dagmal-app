@@ -101,7 +101,7 @@ export function NavigationMenu({ className, onShowFilters, hasActiveFilters }: N
 
           {/* Menu Items */}
           <div className="py-2">
-            {menuItems.map((item, index) => (
+            {menuItems.map((item) => (
               <button
                 key={item.label}
                 onClick={item.onClick}
@@ -144,65 +144,6 @@ export function NavigationMenu({ className, onShowFilters, hasActiveFilters }: N
           onClick={() => setIsOpen(false)}
         />
       )}
-    </div>
-  )
-}
-
-// Alternative: Horizontal Navigation Bar
-export function NavigationBar({ className }: NavigationMenuProps) {
-  const navigate = useNavigate()
-
-  const navItems = [
-    {
-      label: 'Profil',
-      icon: User,
-      onClick: () => navigate('/profile'),
-      path: '/profile'
-    },
-    {
-      label: 'For bedrifter',
-      icon: Building2,
-      onClick: () => navigate('/business'),
-      path: '/business'
-    }
-  ]
-
-  return (
-    <div className={cn('flex items-center gap-1 bg-muted/30 rounded-xl p-1', className)}>
-      {navItems.map((item) => (
-        <button
-          key={item.label}
-          onClick={item.onClick}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-card hover:shadow-sm transition-all text-sm font-medium text-fg hover:text-primary"
-        >
-          <item.icon className="h-4 w-4" />
-          <span>{item.label}</span>
-        </button>
-      ))}
-    </div>
-  )
-}
-
-// Simple Icon-based Navigation
-export function IconNavigation({ className }: NavigationMenuProps) {
-  const navigate = useNavigate()
-
-  return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <button
-        onClick={() => navigate('/business')}
-        className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
-        title="For bedrifter"
-      >
-        <Building2 className="h-4 w-4 text-muted-fg hover:text-primary" />
-      </button>
-      <button
-        onClick={() => navigate('/profile')}
-        className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
-        title="Profil"
-      >
-        <User className="h-4 w-4 text-muted-fg hover:text-primary" />
-      </button>
     </div>
   )
 }

@@ -51,8 +51,8 @@ function AppContent() {
     }
   }, [location.pathname])
 
-  // Hide bottom navigation on auth, welcome, business, and admin pages
-  const showBottomNav = !location.pathname.startsWith('/auth') && !location.pathname.startsWith('/welcome') && !location.pathname.startsWith('/business') && !location.pathname.startsWith('/admin')
+  // Hide bottom navigation on auth, welcome, business, admin, and AI pages
+  const showBottomNav = !location.pathname.startsWith('/auth') && !location.pathname.startsWith('/welcome') && !location.pathname.startsWith('/business') && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/ai')
 
   return (
     <div className="min-h-screen bg-bg">

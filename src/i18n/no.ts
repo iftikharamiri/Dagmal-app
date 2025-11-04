@@ -64,7 +64,7 @@ export const norwegianText = {
   errors: {
     dailyLimitReached: 'Du har nådd maks antall for dette tilbudet i dag.',
     dealNotAvailable: 'Dette tilbudet er ikke tilgjengelig nå.',
-    phoneRequired: 'Telefonnummer er påkrevd for takeaway.',
+    phoneRequired: 'Telefonnummer er påkrevd.',
     loginRequired: 'Du må logge inn for å hente tilbud.',
     networkError: 'Nettverksfeil. Prøv igjen.',
     unknownError: 'Noe gikk galt. Prøv igjen.',

@@ -39,3 +39,4 @@ SELECT 'Notifications table created successfully' as status;
 
 
 
+
