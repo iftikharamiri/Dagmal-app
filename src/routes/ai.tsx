@@ -56,7 +56,7 @@ export function AIPage() {
       <div className="px-4 pt-12 pb-4 flex-shrink-0">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
-            <div className="inline-flex items-center gap-2 text-sm text-muted-fg">
+            <div className="inline-flex items-center gap-2 text-sm text-black">
               <span className="font-semibold">Sofie 1</span>
               <ChevronDown className="h-4 w-4" />
             </div>
