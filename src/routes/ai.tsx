@@ -62,7 +62,7 @@ export function AIPage() {
             </div>
           </div>
           <div className="mt-3 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs flex-shrink-0">🤖</div>
+            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">S</div>
             <div className="inline-block bg-muted px-4 py-3 rounded-2xl rounded-tl-sm text-sm leading-relaxed text-left">
               Hei, jeg er Sofie. Jeg finner tilbud, reserverer bord og hjelper med allergier.
             </div>
@@ -113,7 +113,7 @@ export function AIPage() {
                 <div key={i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
                   {m.role === 'sofie' ? (
                     <div className="inline-flex items-start gap-3">
-                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] flex-shrink-0">🤖</div>
+                      <div className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0">S</div>
                       <div className="inline-block bg-muted px-4 py-3 rounded-2xl rounded-tl-sm text-base leading-relaxed text-left max-w-[85%]">
                         {m.text}
                       </div>
