@@ -181,9 +181,9 @@ export function RewardsPage() {
           <div className="grid md:grid-cols-4 gap-4">
             {[
               { label: 'Kaffe', cost: 7, Icon: Coffee },
-              { label: 'Snack', cost: 15, Icon: Pizza },
-              { label: 'Lunsj', cost: 30, Icon: Star },
-              { label: 'Premium', cost: 100, Icon: Trophy },
+              { label: 'Kakao', cost: 13, Icon: Coffee },
+              { label: 'Lunsj', cost: 30, Icon: Pizza },
+              { label: 'Gavekort', cost: 100, Icon: Gift },
             ].map(({ label, cost, Icon }) => (
               <button
                 key={label}
@@ -197,8 +197,17 @@ export function RewardsPage() {
                   localStorage.setItem('rewards_totalCoins', newTotal.toString())
                   toast.success(`${label} innløst! -${cost} mynter`)
                 }}
-                className="text-left p-5 rounded-2xl bg-card/80 hover:bg-muted/40 border border-border transition-colors group"
+                className="relative text-left p-5 rounded-2xl bg-card/80 hover:bg-muted/40 border border-border transition-colors group"
               >
+                {label === 'Gavekort' && (
+                  <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
+                    {['200 kr', 'Egon', 'Rema 1000'].map((opt) => (
+                      <span key={opt} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] leading-none">
+                        {opt}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div className="flex flex-col items-center justify-center py-4">
                   <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center mb-3">
                     <Icon className="w-6 h-6 text-primary" />
