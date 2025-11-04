@@ -11,30 +11,85 @@ export function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isValidating, setIsValidating] = useState(true)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
   useEffect(() => {
-    // Check if we have the reset token in the URL
-    const accessToken = searchParams.get('access_token')
-    const type = searchParams.get('type')
+    let mounted = true
 
-    if (!accessToken || type !== 'recovery') {
-      toast.error('Ugyldig eller utløpt tilbakestillingslenke')
-      navigate('/auth')
-      return
+    // Check URL for hash fragment (Supabase puts tokens in hash)
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const accessToken = hashParams.get('access_token') || searchParams.get('access_token')
+    const type = hashParams.get('type') || searchParams.get('type')
+    const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token')
+
+    // Listen for auth state changes (Supabase processes hash automatically)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return
+
+      // Check if this is a password recovery event
+      const currentHash = new URLSearchParams(window.location.hash.substring(1))
+      const currentType = currentHash.get('type') || searchParams.get('type')
+
+      if (event === 'PASSWORD_RECOVERY' || (session && currentType === 'recovery')) {
+        setIsValidating(false)
+        // Clear the hash from URL for cleaner experience
+        window.history.replaceState(null, '', '/reset-password')
+      } else if (event === 'SIGNED_OUT' || (!session && !accessToken && !currentHash.get('access_token'))) {
+        setIsValidating(false)
+        // Only show error if we're sure there's no valid session
+        if (!accessToken && !currentHash.get('access_token')) {
+          toast.error('Ugyldig eller utløpt tilbakestillingslenke')
+          setTimeout(() => navigate('/auth'), 2000)
+        }
+      }
+    })
+
+    if (accessToken && type === 'recovery') {
+      // Set the session from the token
+      setIsValidating(true)
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken || '',
+      }).then(({ data: { session }, error }) => {
+        if (!mounted) return
+        setIsValidating(false)
+        if (error || !session) {
+          console.error('Error setting session:', error)
+          toast.error('Kunne ikke validere lenken')
+          setTimeout(() => navigate('/auth'), 2000)
+        } else {
+          // Clear the hash from URL for cleaner experience
+          window.history.replaceState(null, '', '/reset-password')
+        }
+      })
+    } else {
+      // Check if user already has a valid recovery session
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!mounted) return
+        setIsValidating(false)
+        if (!session) {
+          // Give a moment for Supabase to process the hash if it exists
+          setTimeout(() => {
+            if (!mounted) return
+            supabase.auth.getSession().then(({ data: { session: retrySession } }) => {
+              if (!mounted) return
+              if (!retrySession) {
+                toast.error('Ugyldig eller utløpt tilbakestillingslenke')
+                setTimeout(() => navigate('/auth'), 2000)
+              }
+            })
+          }, 1000)
+        }
+      })
     }
 
-    // Set the session from the token
-    supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: searchParams.get('refresh_token') || '',
-    }).catch((error) => {
-      console.error('Error setting session:', error)
-      toast.error('Kunne ikke validere lenken')
-      navigate('/auth')
-    })
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [searchParams, navigate])
 
   const validateForm = () => {
@@ -79,6 +134,17 @@ export function ResetPasswordPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (isValidating) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent mx-auto mb-4" />
+          <p className="text-muted-fg">Validerer lenke...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
