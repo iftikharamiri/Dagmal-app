@@ -219,8 +219,12 @@ export function AuthPage() {
     setIsSendingReset(true)
 
     try {
+      // Use production domain for email links, or fallback to current origin
+      const appUrl = import.meta.env.VITE_APP_URL || 
+        (window.location.origin.includes('localhost') ? 'https://spisly.no' : window.location.origin)
+      
       const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail.trim(), {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${appUrl}/reset-password`,
       })
 
       if (error) throw error
