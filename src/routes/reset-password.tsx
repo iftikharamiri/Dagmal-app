@@ -18,6 +18,7 @@ export function ResetPasswordPage() {
 
   useEffect(() => {
     let mounted = true
+    let redirectTimeout: number | null = null
 
     // Check URL for hash fragment (Supabase puts tokens in hash)
     const hashParams = new URLSearchParams(window.location.hash.substring(1))
@@ -29,65 +30,104 @@ export function ResetPasswordPage() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return
 
-      // Check if this is a password recovery event
-      const currentHash = new URLSearchParams(window.location.hash.substring(1))
-      const currentType = currentHash.get('type') || searchParams.get('type')
+      console.log('Auth state change:', event, session ? 'has session' : 'no session')
 
-      if (event === 'PASSWORD_RECOVERY' || (session && currentType === 'recovery')) {
+      if (event === 'PASSWORD_RECOVERY') {
         setIsValidating(false)
         // Clear the hash from URL for cleaner experience
         window.history.replaceState(null, '', '/reset-password')
-      } else if (event === 'SIGNED_OUT' || (!session && !accessToken && !currentHash.get('access_token'))) {
+        if (redirectTimeout) {
+          clearTimeout(redirectTimeout)
+          redirectTimeout = null
+        }
+      } else if (session && (type === 'recovery' || hashParams.get('type') === 'recovery')) {
         setIsValidating(false)
-        // Only show error if we're sure there's no valid session
-        if (!accessToken && !currentHash.get('access_token')) {
-          toast.error('Ugyldig eller utløpt tilbakestillingslenke')
-          setTimeout(() => navigate('/auth'), 2000)
+        window.history.replaceState(null, '', '/reset-password')
+        if (redirectTimeout) {
+          clearTimeout(redirectTimeout)
+          redirectTimeout = null
         }
       }
     })
 
+    // First, try to set session if we have tokens in URL
     if (accessToken && type === 'recovery') {
-      // Set the session from the token
-      setIsValidating(true)
+      console.log('Setting session from URL tokens')
       supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken || '',
       }).then(({ data: { session }, error }) => {
         if (!mounted) return
-        setIsValidating(false)
-        if (error || !session) {
+        
+        if (error) {
           console.error('Error setting session:', error)
-          toast.error('Kunne ikke validere lenken')
-          setTimeout(() => navigate('/auth'), 2000)
-        } else {
-          // Clear the hash from URL for cleaner experience
-          window.history.replaceState(null, '', '/reset-password')
         }
-      })
-    } else {
-      // Check if user already has a valid recovery session
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!mounted) return
-        setIsValidating(false)
-        if (!session) {
-          // Give a moment for Supabase to process the hash if it exists
+        
+        if (session) {
+          setIsValidating(false)
+          window.history.replaceState(null, '', '/reset-password')
+        } else {
+          // Wait a bit for Supabase to process automatically
           setTimeout(() => {
             if (!mounted) return
             supabase.auth.getSession().then(({ data: { session: retrySession } }) => {
               if (!mounted) return
-              if (!retrySession) {
-                toast.error('Ugyldig eller utløpt tilbakestillingslenke')
-                setTimeout(() => navigate('/auth'), 2000)
+              if (retrySession) {
+                setIsValidating(false)
+                window.history.replaceState(null, '', '/reset-password')
+              } else {
+                setIsValidating(false)
+                toast.error('Kunne ikke validere lenken. Prøv å be om en ny lenke.')
+                redirectTimeout = setTimeout(() => navigate('/auth'), 3000)
               }
             })
-          }, 1000)
+          }, 2000)
+        }
+      })
+    } else if (window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery')) {
+      // Hash exists but we need to wait for Supabase to process it
+      console.log('Waiting for Supabase to process hash')
+      setTimeout(() => {
+        if (!mounted) return
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (!mounted) return
+          if (session) {
+            setIsValidating(false)
+            window.history.replaceState(null, '', '/reset-password')
+          } else {
+            // Give it more time
+            setTimeout(() => {
+              if (!mounted) return
+              supabase.auth.getSession().then(({ data: { session: finalSession } }) => {
+                if (!mounted) return
+                setIsValidating(false)
+                if (finalSession) {
+                  window.history.replaceState(null, '', '/reset-password')
+                } else {
+                  toast.error('Ugyldig eller utløpt tilbakestillingslenke')
+                  redirectTimeout = setTimeout(() => navigate('/auth'), 3000)
+                }
+              })
+            }, 2000)
+          }
+        })
+      }, 1500)
+    } else {
+      // No tokens in URL - check if there's already a valid session
+      console.log('No tokens in URL, checking existing session')
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!mounted) return
+        setIsValidating(false)
+        if (!session) {
+          toast.error('Ingen tilbakestillingslenke funnet. Vennligst be om en ny lenke fra innloggingssiden.')
+          redirectTimeout = setTimeout(() => navigate('/auth'), 3000)
         }
       })
     }
 
     return () => {
       mounted = false
+      if (redirectTimeout) clearTimeout(redirectTimeout)
       subscription.unsubscribe()
     }
   }, [searchParams, navigate])
