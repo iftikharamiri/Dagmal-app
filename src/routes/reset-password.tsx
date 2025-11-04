@@ -78,7 +78,7 @@ export function ResetPasswordPage() {
               } else {
                 setIsValidating(false)
                 toast.error('Kunne ikke validere lenken. Prøv å be om en ny lenke.')
-                redirectTimeout = setTimeout(() => navigate('/auth'), 3000)
+                redirectTimeout = window.setTimeout(() => navigate('/auth'), 3000)
               }
             })
           }, 2000)
@@ -105,7 +105,7 @@ export function ResetPasswordPage() {
                   window.history.replaceState(null, '', '/reset-password')
                 } else {
                   toast.error('Ugyldig eller utløpt tilbakestillingslenke')
-                  redirectTimeout = setTimeout(() => navigate('/auth'), 3000)
+                  redirectTimeout = window.setTimeout(() => navigate('/auth'), 3000)
                 }
               })
             }, 2000)
@@ -120,14 +120,14 @@ export function ResetPasswordPage() {
         setIsValidating(false)
         if (!session) {
           toast.error('Ingen tilbakestillingslenke funnet. Vennligst be om en ny lenke fra innloggingssiden.')
-          redirectTimeout = setTimeout(() => navigate('/auth'), 3000)
+          redirectTimeout = window.setTimeout(() => navigate('/auth'), 3000)
         }
       })
     }
 
     return () => {
       mounted = false
-      if (redirectTimeout) clearTimeout(redirectTimeout)
+      if (redirectTimeout) window.clearTimeout(redirectTimeout)
       subscription.unsubscribe()
     }
   }, [searchParams, navigate])
