@@ -217,6 +217,11 @@ export function RewardsPage() {
                     ))}
                   </div>
                 )}
+                {(label === 'Kaffe' || label === 'Lunsj') && (
+                  <div className="absolute top-3 left-3">
+                    <span className="px-0 py-0.5 text-[11px] leading-none text-black">Siås</span>
+                  </div>
+                )}
                 {(label === 'Lunsj' || label === 'Gavekort 100 kr' || label === 'Gavekort 200 kr') && (
                   <div className="absolute top-3 right-3">
                     <span className="px-0 py-0.5 text-[11px] leading-none text-black">Trekning</span>
