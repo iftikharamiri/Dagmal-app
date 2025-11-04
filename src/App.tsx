@@ -23,6 +23,7 @@ import { PhoneAuthTest } from '@/components/PhoneAuthTest'
 import { AIPage } from '@/routes/ai'
 import RewardsPage from '@/routes/rewards'
 import { WelcomePage } from '@/routes/welcome'
+import { ResetPasswordPage } from '@/routes/reset-password'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,8 +52,8 @@ function AppContent() {
     }
   }, [location.pathname])
 
-  // Hide bottom navigation on auth, welcome, business, admin, and AI pages
-  const showBottomNav = !location.pathname.startsWith('/auth') && !location.pathname.startsWith('/welcome') && !location.pathname.startsWith('/business') && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/ai')
+  // Hide bottom navigation on auth, welcome, business, admin, AI, and reset-password pages
+  const showBottomNav = !location.pathname.startsWith('/auth') && !location.pathname.startsWith('/welcome') && !location.pathname.startsWith('/business') && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/ai') && !location.pathname.startsWith('/reset-password')
 
   return (
     <div className="min-h-screen bg-bg">
@@ -60,6 +61,7 @@ function AppContent() {
         <Route path="/" element={<HomePage />} />
         <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/claims" element={<ClaimsPage />} />

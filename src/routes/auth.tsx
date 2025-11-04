@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, ArrowLeft, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { cn } from '@/lib/utils'
@@ -12,6 +12,9 @@ export function AuthPage() {
   const isSignUp = mode === 'signup'
   const [accountType, setAccountType] = useState<'user' | 'company'>('user')
   const [showPassword, setShowPassword] = useState(false)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
+  const [isSendingReset, setIsSendingReset] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -200,6 +203,39 @@ export function AuthPage() {
     }
   }
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!forgotPasswordEmail.trim()) {
+      toast.error('Vennligst skriv inn e-postadressen din')
+      return
+    }
+
+    if (!/\S+@\S+\.\S+/.test(forgotPasswordEmail.trim())) {
+      toast.error('Ugyldig e-postadresse')
+      return
+    }
+
+    setIsSendingReset(true)
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+
+      if (error) throw error
+
+      toast.success('Tilbakestillingslenke sendt! Sjekk e-posten din.')
+      setShowForgotPassword(false)
+      setForgotPasswordEmail('')
+    } catch (error: any) {
+      console.error('Password reset error:', error)
+      toast.error(error.message || 'Kunne ikke sende tilbakestillingslenke')
+    } finally {
+      setIsSendingReset(false)
+    }
+  }
+
   // No landing here; welcome is handled by /welcome
 
   return (
@@ -365,10 +401,7 @@ export function AuthPage() {
           {mode === 'signin' && (
             <div className="mt-4 text-center">
               <button
-                onClick={() => {
-                  // TODO: Implement forgot password
-                  toast.info('Funksjon kommer snart')
-                }}
+                onClick={() => setShowForgotPassword(true)}
                 className="text-sm text-muted-fg hover:text-fg"
               >
                 {norwegianText.auth.forgotPassword}
@@ -377,6 +410,77 @@ export function AuthPage() {
           )}
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-card w-full max-w-md rounded-2xl shadow-2xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Tilbakestill passord</h2>
+              <button
+                onClick={() => {
+                  setShowForgotPassword(false)
+                  setForgotPasswordEmail('')
+                }}
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
+                aria-label="Lukk"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="text-muted-fg mb-6">
+              Skriv inn e-postadressen din, så sender vi deg en lenke for å tilbakestille passordet.
+            </p>
+
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div>
+                <label className="block font-medium mb-2">
+                  <Mail className="inline h-4 w-4 mr-2" />
+                  E-post
+                </label>
+                <input
+                  type="email"
+                  value={forgotPasswordEmail}
+                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                  placeholder="din@epost.no"
+                  className="input w-full"
+                  autoComplete="email"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForgotPassword(false)
+                    setForgotPasswordEmail('')
+                  }}
+                  className="btn-ghost flex-1"
+                  disabled={isSendingReset}
+                >
+                  Avbryt
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSendingReset}
+                  className="btn-primary flex-1"
+                >
+                  {isSendingReset ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-fg border-t-transparent" />
+                      <span>Sender...</span>
+                    </div>
+                  ) : (
+                    'Send lenke'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
