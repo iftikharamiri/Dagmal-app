@@ -47,7 +47,7 @@ export function AIPage() {
         aria-label="Hjem"
         title="Hjem"
       >
-        <Home className="h-4 w-4 text-primary" />
+        <Home className="h-4 w-4 text-black" />
       </button>
 
       {/* Sofie 1 will be part of the scrollable header below (not fixed) */}
