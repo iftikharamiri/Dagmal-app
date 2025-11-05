@@ -1,0 +1,4369 @@
+{
+  "restaurant_info": {
+    "name": "SIÅS Kafe",
+    "description": "Studentenes kafe – snacks, baguetter, is, drikke og varm mat",
+    "phone": null,
+    "address": null,
+    "city": null,
+    "categories": [
+      "Kantine",
+      "Kafe",
+      "Snacks",
+      "Drikke"
+    ]
+  },
+  "menu_metadata": {
+    "version": "1.0",
+    "last_updated": "2025-11-05T00:00:00Z",
+    "currency": "NOK",
+    "language": "no"
+  },
+  "categories": [
+    {
+      "id": "sias-meny",
+      "name": "Meny",
+      "description": "SIÅS komplett meny",
+      "display_order": 1,
+      "items": [
+        {
+          "id": "104010",
+          "name": "1 PIZZA SLICE",
+          "price": 3400,
+          "meta": {
+            "student": 34,
+            "ansatt": 38,
+            "original_id": "104010"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3400
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3800
+            }
+          ]
+        },
+        {
+          "id": "104020",
+          "name": "2 PIZZA SLICE",
+          "price": 6800,
+          "meta": {
+            "student": 68,
+            "ansatt": 76,
+            "original_id": "104020"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 6800
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 7600
+            }
+          ]
+        },
+        {
+          "id": "104030",
+          "name": "3 PIZZA SLICE",
+          "price": 10200,
+          "meta": {
+            "student": 102,
+            "ansatt": 114,
+            "original_id": "104030"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 10200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 11400
+            }
+          ]
+        },
+        {
+          "id": "102022",
+          "name": "BAGUETTE - BRIE",
+          "price": 7100,
+          "meta": {
+            "student": 71,
+            "ansatt": 82,
+            "original_id": "102022"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8200
+            }
+          ]
+        },
+        {
+          "id": "102021",
+          "name": "BAGUETTE - EGG&BACON",
+          "price": 7100,
+          "meta": {
+            "student": 71,
+            "ansatt": 82,
+            "original_id": "102021"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8200
+            }
+          ]
+        },
+        {
+          "id": "102019",
+          "name": "BAGUETTE - KYLLING",
+          "price": 7100,
+          "meta": {
+            "student": 71,
+            "ansatt": 82,
+            "original_id": "102019"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8200
+            }
+          ]
+        },
+        {
+          "id": "102018",
+          "name": "BAGUETTE - LAKS&EGG",
+          "price": 7100,
+          "meta": {
+            "student": 71,
+            "ansatt": 82,
+            "original_id": "102018"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8200
+            }
+          ]
+        },
+        {
+          "id": "102017",
+          "name": "BAGUETTE - OST & SKI",
+          "price": 7100,
+          "meta": {
+            "student": 71,
+            "ansatt": 82,
+            "original_id": "102017"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8200
+            }
+          ]
+        },
+        {
+          "id": "102016",
+          "name": "BAGUETTE - REKER",
+          "price": 7100,
+          "meta": {
+            "student": 71,
+            "ansatt": 82,
+            "original_id": "102016"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8200
+            }
+          ]
+        },
+        {
+          "id": "102015",
+          "name": "BAGUETTE - ROASTBIFF",
+          "price": 7100,
+          "meta": {
+            "student": 71,
+            "ansatt": 82,
+            "original_id": "102015"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8200
+            }
+          ]
+        },
+        {
+          "id": "102023",
+          "name": "BAGUETTE - TUNFISK",
+          "price": 7100,
+          "meta": {
+            "student": 71,
+            "ansatt": 82,
+            "original_id": "102023"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8200
+            }
+          ]
+        },
+        {
+          "id": "102013",
+          "name": "BAGUETTE - VEGANSK",
+          "price": 7100,
+          "meta": {
+            "student": 71,
+            "ansatt": 82,
+            "original_id": "102013"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8200
+            }
+          ]
+        },
+        {
+          "id": "102012",
+          "name": "BAGUETTE - VEGETAR",
+          "price": 7100,
+          "meta": {
+            "student": 71,
+            "ansatt": 82,
+            "original_id": "102012"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8200
+            }
+          ]
+        },
+        {
+          "id": "102011",
+          "name": "BAGUETTE -30%",
+          "price": 4900,
+          "meta": {
+            "student": 49,
+            "ansatt": 57,
+            "original_id": "102011"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 5700
+            }
+          ]
+        },
+        {
+          "id": "103101",
+          "name": "BAKST \"GÅRSDAGENS\" (-30%)",
+          "price": 2000,
+          "meta": {
+            "student": 20,
+            "ansatt": 23,
+            "original_id": "103101"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2300
+            }
+          ]
+        },
+        {
+          "id": "103106",
+          "name": "BERLINERBOLLE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103106"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "311032",
+          "name": "BONAQUA EPLE 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311032"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311032-2",
+          "name": "BONAQUA KULLSYRE 0,5",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311032"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311031",
+          "name": "BONAQUA NATUREL 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311031"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311033",
+          "name": "BONAQUA SITRON 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311033"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100018",
+          "name": "BRENTE MANDLER",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 40,
+            "original_id": "100018"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4000
+            }
+          ]
+        },
+        {
+          "id": "sias-brownie-bringeb-r-lakris-vegansk",
+          "name": "BROWNIE BRINGEBÆR LAKRIS VEGANSK",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "105050",
+          "name": "BRYTEBRØD GROVT 750G BAXT",
+          "price": 1200,
+          "meta": {
+            "student": 12,
+            "ansatt": 14,
+            "original_id": "105050"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 1200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 1400
+            }
+          ]
+        },
+        {
+          "id": "105040",
+          "name": "BRØDSKIVE",
+          "price": 800,
+          "meta": {
+            "student": 8,
+            "ansatt": 9,
+            "original_id": "105040"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 800
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 900
+            }
+          ]
+        },
+        {
+          "id": "311190",
+          "name": "BURN ORIGINAL",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "311190"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "311180",
+          "name": "BURN ZERO",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "311180"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "100013",
+          "name": "BYGG-LUNSJ BLÅBÆR",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100013"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100012",
+          "name": "BYGG-LUNSJ BRINGEBÆR",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100012"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100011",
+          "name": "BYGG-LUNSJ JORDBÆR",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100011"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "sias-chiafr-pudding",
+          "name": "CHIAFRØPUDDING",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 33
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3300
+            }
+          ]
+        },
+        {
+          "id": "311060",
+          "name": "COCA-COLA 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311060"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311070",
+          "name": "COLA ZERO 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311070"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "103040",
+          "name": "COOKIES DARK CHOCOLATE 85G DONORA",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 32,
+            "original_id": "103040"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3200
+            }
+          ]
+        },
+        {
+          "id": "sias-cookies-macadamia-w-ch-donora",
+          "name": "COOKIES MACADAMIA/W CH DONORA",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 32
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3200
+            }
+          ]
+        },
+        {
+          "id": "103040-2",
+          "name": "COOKIES MILK CHOCOLATE 85G DONARA",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 32,
+            "original_id": "103040"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3200
+            }
+          ]
+        },
+        {
+          "id": "103130",
+          "name": "CROISSANT NUGAT&SJOKOLADE UNIBAKE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103130"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107220",
+          "name": "DOC BRINGEBÆR OG SIT",
+          "price": 3800,
+          "meta": {
+            "student": 38,
+            "ansatt": 38,
+            "original_id": "107220"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3800
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3800
+            }
+          ]
+        },
+        {
+          "id": "107230",
+          "name": "DOC EUKALYPTUS",
+          "price": 3800,
+          "meta": {
+            "student": 38,
+            "ansatt": 38,
+            "original_id": "107230"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3800
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3800
+            }
+          ]
+        },
+        {
+          "id": "107250",
+          "name": "DOC HONNING OG LAKRI",
+          "price": 3800,
+          "meta": {
+            "student": 38,
+            "ansatt": 38,
+            "original_id": "107250"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3800
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3800
+            }
+          ]
+        },
+        {
+          "id": "107251",
+          "name": "DOC MENTOL",
+          "price": 3800,
+          "meta": {
+            "student": 38,
+            "ansatt": 38,
+            "original_id": "107251"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3800
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3800
+            }
+          ]
+        },
+        {
+          "id": "107240",
+          "name": "DOC ORIGINAL",
+          "price": 3800,
+          "meta": {
+            "student": 38,
+            "ansatt": 38,
+            "original_id": "107240"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3800
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3800
+            }
+          ]
+        },
+        {
+          "id": "103050",
+          "name": "DONUT",
+          "price": 2700,
+          "meta": {
+            "student": 27,
+            "ansatt": 30,
+            "original_id": "103050"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3000
+            }
+          ]
+        },
+        {
+          "id": "110070",
+          "name": "DREAM MANGO",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110070"
+          }
+        },
+        {
+          "id": "110294",
+          "name": "DUMLE IS - SNACKS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110294"
+          }
+        },
+        {
+          "id": "311206",
+          "name": "EKSAMENSMIDDAG",
+          "price": 7000,
+          "meta": {
+            "student": 70,
+            "ansatt": 0,
+            "original_id": "311206"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 0
+            }
+          ]
+        },
+        {
+          "id": "sias-eple-og-karamellkake",
+          "name": "EPLE OG KARAMELLKAKE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107190",
+          "name": "EXTRA EUCALYPTUS",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 29,
+            "original_id": "107190"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "107202",
+          "name": "EXTRA FRUIT",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 29,
+            "original_id": "107202"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "107180",
+          "name": "EXTRA MENTHOL",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 29,
+            "original_id": "107180"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "107201",
+          "name": "EXTRA SALTY LICORICE",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 29,
+            "original_id": "107201"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "107170",
+          "name": "EXTRA SPEARMINT",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 29,
+            "original_id": "107170"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "107200",
+          "name": "EXTRA SUPERBERRIES",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 29,
+            "original_id": "107200"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "107203",
+          "name": "EXTRA SWEETMINT",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 29,
+            "original_id": "107203"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "311050",
+          "name": "FANTA 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311050"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311052",
+          "name": "FANTA APPELSIN 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311052"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311051",
+          "name": "FANTA EXOTIC 0,51",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311051"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311093",
+          "name": "FANTA LEM ZERO 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311093"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311092",
+          "name": "FANTA ORA ZERO 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311092"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "107141",
+          "name": "FISHERMAN CITRUS",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107141"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107130",
+          "name": "FISHERMAN MINT",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107130"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107140",
+          "name": "FISHERMAN ORG U/SU",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107140"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107120",
+          "name": "FISHERMAN ORIGINAL",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107120"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107132",
+          "name": "FISHERMAN SALMIAK",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107132"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107131",
+          "name": "FISHERMAN SPEARMINT",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107131"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "sias-flap-jack-energi-med-sjokolade",
+          "name": "FLAP JACK ENERGI MED SJOKOLADE",
+          "price": 2700,
+          "meta": {
+            "student": 27,
+            "ansatt": 30
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3000
+            }
+          ]
+        },
+        {
+          "id": "103060",
+          "name": "FLAPJACK",
+          "price": 2700,
+          "meta": {
+            "student": 27,
+            "ansatt": 30,
+            "original_id": "103060"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3000
+            }
+          ]
+        },
+        {
+          "id": "110080",
+          "name": "FRUITERO",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110080"
+          }
+        },
+        {
+          "id": "110090",
+          "name": "FRUITERO MIX",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110090"
+          }
+        },
+        {
+          "id": "105020",
+          "name": "FRUKT HEL",
+          "price": 1200,
+          "meta": {
+            "student": 12,
+            "ansatt": 14,
+            "original_id": "105020"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 1200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 1400
+            }
+          ]
+        },
+        {
+          "id": "103080",
+          "name": "FYRSTEKAKE 1-PK 75G",
+          "price": 3600,
+          "meta": {
+            "student": 36,
+            "ansatt": 40,
+            "original_id": "103080"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4000
+            }
+          ]
+        },
+        {
+          "id": "110220",
+          "name": "GIGANT IS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110220"
+          }
+        },
+        {
+          "id": "100092",
+          "name": "GO'MORGEN BRINGEBÆR",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 34,
+            "original_id": "100092"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3400
+            }
+          ]
+        },
+        {
+          "id": "100098",
+          "name": "GO'MORGEN JORDBÆR",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 34,
+            "original_id": "100098"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3400
+            }
+          ]
+        },
+        {
+          "id": "100090",
+          "name": "GO'MORGEN MANGO",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 34,
+            "original_id": "100090"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3400
+            }
+          ]
+        },
+        {
+          "id": "100091",
+          "name": "GO'MORGEN MANGO BAN",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 34,
+            "original_id": "100091"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3400
+            }
+          ]
+        },
+        {
+          "id": "100095",
+          "name": "GO'MORGEN MELON PAS",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 34,
+            "original_id": "100095"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3400
+            }
+          ]
+        },
+        {
+          "id": "100099",
+          "name": "GO'MORGEN MORELL&VANI",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 34,
+            "original_id": "100099"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3400
+            }
+          ]
+        },
+        {
+          "id": "100097",
+          "name": "GO'MORGEN SKOGSBÆR",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 34,
+            "original_id": "100097"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3400
+            }
+          ]
+        },
+        {
+          "id": "100093",
+          "name": "GO'MORGEN VAN. HAVR",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 34,
+            "original_id": "100093"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3400
+            }
+          ]
+        },
+        {
+          "id": "100096",
+          "name": "GO'MORGEN VAN. NØTM",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 34,
+            "original_id": "100096"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3400
+            }
+          ]
+        },
+        {
+          "id": "100094",
+          "name": "GO'MORGEN VANILJE UTEN",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 34,
+            "original_id": "100094"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3400
+            }
+          ]
+        },
+        {
+          "id": "110030",
+          "name": "GULL PINNE",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110030"
+          }
+        },
+        {
+          "id": "103100",
+          "name": "GULROTKAKE LANGPANNE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103100"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "100230",
+          "name": "HAVRE LUNSJ EPLE KAN",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100230"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100231",
+          "name": "HAVRE LUNSJ HAGEBÆR",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100231"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "110293",
+          "name": "HOCKEYPULVER IS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110293"
+          }
+        },
+        {
+          "id": "107100",
+          "name": "IFA",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107100"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "100140",
+          "name": "ISKAFFE BRASIL",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37,
+            "original_id": "100140"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100160",
+          "name": "ISKAFFE CAFFE LATTE",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37,
+            "original_id": "100160"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100130",
+          "name": "ISKAFFE CAPPU U/SUKK",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37,
+            "original_id": "100130"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100120",
+          "name": "ISKAFFE CAPPUCCINO",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37,
+            "original_id": "100120"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "sias-iskaffe-dobbel-latte",
+          "name": "ISKAFFE DOBBEL LATTE",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "sias-iskaffe-latte-protein",
+          "name": "ISKAFFE LATTE PROTEIN",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "sias-iskaffe-latte-uten",
+          "name": "ISKAFFE LATTE UTEN",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100172",
+          "name": "ISKAFFE MACCHIATO",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37,
+            "original_id": "100172"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100150",
+          "name": "ISKAFFE MOCHA",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37,
+            "original_id": "100150"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100170",
+          "name": "ISKAFFE MOCHA UTEN",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37,
+            "original_id": "100170"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100173",
+          "name": "ISKAFFE SAL. CARAMEL",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37,
+            "original_id": "100173"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100171",
+          "name": "ISKAFFE XMAS MOCHA",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37,
+            "original_id": "100171"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100041",
+          "name": "ISTE FERSKEN",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "100041"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100040",
+          "name": "ISTE LIME",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "100040"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100045",
+          "name": "ISTE LIME GRØNN 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "100045"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100042",
+          "name": "ISTE SORT TE FERSKEN UTEN",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "100042"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100043",
+          "name": "ISTE SORT TE MANGO",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "100043"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311095",
+          "name": "JULEBRUS 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311095"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311096",
+          "name": "JULEBRUS LETT 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311096"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "310010",
+          "name": "KAFFE",
+          "price": 2600,
+          "meta": {
+            "student": 26,
+            "ansatt": 29,
+            "original_id": "310010"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "103120",
+          "name": "KANELKNUTE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103120"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "sias-kanelnute-giant-160g",
+          "name": "KANELNUTE GIANT 160G",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 33
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3300
+            }
+          ]
+        },
+        {
+          "id": "sias-kjempe-yes",
+          "name": "KJEMPE YES",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null
+          }
+        },
+        {
+          "id": "103105",
+          "name": "KLADDKAKE",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 40,
+            "original_id": "103105"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4000
+            }
+          ]
+        },
+        {
+          "id": "100015",
+          "name": "KOKOSRULL",
+          "price": 2700,
+          "meta": {
+            "student": 27,
+            "ansatt": 30,
+            "original_id": "100015"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3000
+            }
+          ]
+        },
+        {
+          "id": "107090",
+          "name": "KROKANRULL",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "107090"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "110280",
+          "name": "KRONE IS SJOKOLADE",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110280"
+          }
+        },
+        {
+          "id": "110270",
+          "name": "KRONEIS JORDBÆR",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110270"
+          }
+        },
+        {
+          "id": "107050",
+          "name": "KVIKK LUNSJ",
+          "price": 4000,
+          "meta": {
+            "student": 40,
+            "ansatt": 40,
+            "original_id": "107050"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4000
+            }
+          ]
+        },
+        {
+          "id": "sias-langpanne-rocky-road",
+          "name": "LANGPANNE ROCKY ROAD",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "102070",
+          "name": "LEVERPOSTEI",
+          "price": 1000,
+          "meta": {
+            "student": 10,
+            "ansatt": 11,
+            "original_id": "102070"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 1000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 1100
+            }
+          ]
+        },
+        {
+          "id": "110230",
+          "name": "LION",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110230"
+          }
+        },
+        {
+          "id": "sias-litago-beger-jordb-r",
+          "name": "LITAGO BEGER JORDBÆR",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null
+          }
+        },
+        {
+          "id": "110250",
+          "name": "LITAGO BEGER SJOKO",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110250"
+          }
+        },
+        {
+          "id": "100110",
+          "name": "LITAGO JORDBÆRMELK",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 39,
+            "original_id": "100110"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100020",
+          "name": "LITAGO LETT SJOKOLA",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 39,
+            "original_id": "100020"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100100",
+          "name": "LITAGO SJOKOLADEMELK",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 39,
+            "original_id": "100100"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "110295",
+          "name": "LITAGO SMAK AV BURSD",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110295"
+          }
+        },
+        {
+          "id": "100022",
+          "name": "LITAGO UTEN KOKOS",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 39,
+            "original_id": "100022"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100021",
+          "name": "LITAGO UTEN SJOKOLA",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 39,
+            "original_id": "100021"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "110100",
+          "name": "LOLLIPOP",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110100"
+          }
+        },
+        {
+          "id": "102050",
+          "name": "MAKRELL I TOMAT",
+          "price": 1100,
+          "meta": {
+            "student": 11,
+            "ansatt": 12,
+            "original_id": "102050"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 1100
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 1200
+            }
+          ]
+        },
+        {
+          "id": "103103",
+          "name": "MAKRONER",
+          "price": 2200,
+          "meta": {
+            "student": 22,
+            "ansatt": 25,
+            "original_id": "103103"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2500
+            }
+          ]
+        },
+        {
+          "id": "107060",
+          "name": "MELKERULL",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "107060"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "107260",
+          "name": "MELLOM BAR HAVRE/NØT",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 32,
+            "original_id": "107260"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3200
+            }
+          ]
+        },
+        {
+          "id": "103104",
+          "name": "MINI DONUTS",
+          "price": 2000,
+          "meta": {
+            "student": 20,
+            "ansatt": 23,
+            "original_id": "103104"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2300
+            }
+          ]
+        },
+        {
+          "id": "311160",
+          "name": "MONSTER ABSOLUTELY Z",
+          "price": 4600,
+          "meta": {
+            "student": 46,
+            "ansatt": 46,
+            "original_id": "311160"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4600
+            }
+          ]
+        },
+        {
+          "id": "311121",
+          "name": "MONSTER ENERGY",
+          "price": 4600,
+          "meta": {
+            "student": 46,
+            "ansatt": 46,
+            "original_id": "311121"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4600
+            }
+          ]
+        },
+        {
+          "id": "311100",
+          "name": "MONSTER ESPRESSO",
+          "price": 4600,
+          "meta": {
+            "student": 46,
+            "ansatt": 46,
+            "original_id": "311100"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4600
+            }
+          ]
+        },
+        {
+          "id": "311110",
+          "name": "MONSTER MULE",
+          "price": 4600,
+          "meta": {
+            "student": 46,
+            "ansatt": 46,
+            "original_id": "311110"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4600
+            }
+          ]
+        },
+        {
+          "id": "311150",
+          "name": "MONSTER THE DOCTOR",
+          "price": 4600,
+          "meta": {
+            "student": 46,
+            "ansatt": 46,
+            "original_id": "311150"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4600
+            }
+          ]
+        },
+        {
+          "id": "311151",
+          "name": "MONSTER ULTRA",
+          "price": 4600,
+          "meta": {
+            "student": 46,
+            "ansatt": 46,
+            "original_id": "311151"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4600
+            }
+          ]
+        },
+        {
+          "id": "311120",
+          "name": "MONSTER ULTRA VIOLET",
+          "price": 4600,
+          "meta": {
+            "student": 46,
+            "ansatt": 46,
+            "original_id": "311120"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4600
+            }
+          ]
+        },
+        {
+          "id": "103031",
+          "name": "MUFFINS LAKTOSEFRI",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103031"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "sias-muffins-lemon-cheese-cake-baxt",
+          "name": "MUFFINS LEMON CHEESE CAKE BAXT",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "103030",
+          "name": "MUFFINS TULIP SJOKOLADE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103030"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "sias-mufiins-blueberry-aunt-mabels",
+          "name": "MUFIINS BLUEBERRY AUNT MABELS",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "sias-mufiins-chocolate-trippel-baxt",
+          "name": "MUFIINS CHOCOLATE TRIPPEL BAXT",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107150",
+          "name": "MYNTHON",
+          "price": 3200,
+          "meta": {
+            "student": 32,
+            "ansatt": 32,
+            "original_id": "107150"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3200
+            }
+          ]
+        },
+        {
+          "id": "107080",
+          "name": "NEW ENERGY",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107080"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "311201",
+          "name": "NOCCO CARIBBEAN",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "311201"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "311203",
+          "name": "NOCCO CLOUDY SODA",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "311203"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "311202",
+          "name": "NOCCO LIMON",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "311202"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "311204",
+          "name": "NOCCO MANGO DEL SOL",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "311204"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "311200",
+          "name": "NOCCO PÆRE",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "311200"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "103102",
+          "name": "OREOKAKE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103102"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "sias-pain-chocolat-premium-75g",
+          "name": "PAIN CHOCOLAT PREMIUM 75G",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "102110",
+          "name": "PANINI m/CHORIZO",
+          "price": 7200,
+          "meta": {
+            "student": 72,
+            "ansatt": 78,
+            "original_id": "102110"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 7800
+            }
+          ]
+        },
+        {
+          "id": "102090",
+          "name": "PANINI m/KYLLING",
+          "price": 7200,
+          "meta": {
+            "student": 72,
+            "ansatt": 78,
+            "original_id": "102090"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 7800
+            }
+          ]
+        },
+        {
+          "id": "102100",
+          "name": "PANINI m/OST&SKINKE",
+          "price": 7200,
+          "meta": {
+            "student": 72,
+            "ansatt": 78,
+            "original_id": "102100"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 7200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 7800
+            }
+          ]
+        },
+        {
+          "id": "sias-pean-tt-kubbe-60g",
+          "name": "PEANØTT KUBBE 60G",
+          "price": 1800,
+          "meta": {
+            "student": 18,
+            "ansatt": 18
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 1800
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 1800
+            }
+          ]
+        },
+        {
+          "id": "311094",
+          "name": "PEPSI MAX 0,51",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311094"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "110040",
+          "name": "PINUP",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110040"
+          }
+        },
+        {
+          "id": "106030",
+          "name": "PIZZA STYKKER",
+          "price": 3400,
+          "meta": {
+            "student": 34,
+            "ansatt": 38,
+            "original_id": "106030"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3400
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3800
+            }
+          ]
+        },
+        {
+          "id": "sias-plattfot-diplom-is",
+          "name": "PLATTFOT DIPLOM-IS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null
+          }
+        },
+        {
+          "id": "100016",
+          "name": "PUNSJRULL",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 30,
+            "original_id": "100016"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3000
+            }
+          ]
+        },
+        {
+          "id": "311130",
+          "name": "RED BULL",
+          "price": 4200,
+          "meta": {
+            "student": 42,
+            "ansatt": 42,
+            "original_id": "311130"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4200
+            }
+          ]
+        },
+        {
+          "id": "311171",
+          "name": "RED BULL BL EDITION",
+          "price": 4200,
+          "meta": {
+            "student": 42,
+            "ansatt": 42,
+            "original_id": "311171"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4200
+            }
+          ]
+        },
+        {
+          "id": "311170",
+          "name": "RED BULL PEACH",
+          "price": 4200,
+          "meta": {
+            "student": 42,
+            "ansatt": 42,
+            "original_id": "311170"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4200
+            }
+          ]
+        },
+        {
+          "id": "311140",
+          "name": "RED BULL SUKKERFRI",
+          "price": 4200,
+          "meta": {
+            "student": 42,
+            "ansatt": 42,
+            "original_id": "311140"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4200
+            }
+          ]
+        },
+        {
+          "id": "311131",
+          "name": "RED THE YELLOW EDT.",
+          "price": 4200,
+          "meta": {
+            "student": 42,
+            "ansatt": 42,
+            "original_id": "311131"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4200
+            }
+          ]
+        },
+        {
+          "id": "sias-red-velvet-kake-langpanne",
+          "name": "RED VELVET KAKE LANGPANNE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "311172",
+          "name": "REDBULL APRIKOS",
+          "price": 4200,
+          "meta": {
+            "student": 42,
+            "ansatt": 42,
+            "original_id": "311172"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4200
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4200
+            }
+          ]
+        },
+        {
+          "id": "107110",
+          "name": "RICOLA CARAMEL",
+          "price": 3700,
+          "meta": {
+            "student": 37,
+            "ansatt": 37,
+            "original_id": "107110"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3700
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100115",
+          "name": "RIS LUNSJ BLÅ/BRINGB",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100115"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100117",
+          "name": "RIS LUNSJ JORDBÆR",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100117"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100116",
+          "name": "RIS LUNSJ RIPS/BRING",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100116"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100118",
+          "name": "RISLUNSJ JORDBÆR UTEN",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100118"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "110292",
+          "name": "ROYAL HVIT SJOK/JORD",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110292"
+          }
+        },
+        {
+          "id": "sias-royal-jordb-hvit",
+          "name": "ROYAL JORDB HVIT",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null
+          }
+        },
+        {
+          "id": "110160",
+          "name": "ROYAL MANDEL",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110160"
+          }
+        },
+        {
+          "id": "110150",
+          "name": "ROYAL MØRK",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110150"
+          }
+        },
+        {
+          "id": "110190",
+          "name": "ROYAL PEANØTT VEGAN",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110190"
+          }
+        },
+        {
+          "id": "110140",
+          "name": "ROYAL PISTASJ",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110140"
+          }
+        },
+        {
+          "id": "110130",
+          "name": "ROYAL TR. SJOKOLADE",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110130"
+          }
+        },
+        {
+          "id": "110120",
+          "name": "ROYAL TRIPPLE",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110120"
+          }
+        },
+        {
+          "id": "110191",
+          "name": "ROYAL TRIPPLE FRAPPE",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110191"
+          }
+        },
+        {
+          "id": "110170",
+          "name": "ROYAL TRIPPLE LAKRIS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110170"
+          }
+        },
+        {
+          "id": "110180",
+          "name": "ROYAL TRIPPLE MAGI",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110180"
+          }
+        },
+        {
+          "id": "101164",
+          "name": "SALAT KYLLING",
+          "price": 6900,
+          "meta": {
+            "student": 69,
+            "ansatt": 75,
+            "original_id": "101164"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 6900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 7500
+            }
+          ]
+        },
+        {
+          "id": "101166",
+          "name": "SALAT OST OG SKINKE",
+          "price": 6900,
+          "meta": {
+            "student": 69,
+            "ansatt": 75,
+            "original_id": "101166"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 6900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 7500
+            }
+          ]
+        },
+        {
+          "id": "101163",
+          "name": "SALAT REKER",
+          "price": 6900,
+          "meta": {
+            "student": 69,
+            "ansatt": 75,
+            "original_id": "101163"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 6900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 7500
+            }
+          ]
+        },
+        {
+          "id": "101042",
+          "name": "SALAT/VARMMAT Plast",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "101042"
+          }
+        },
+        {
+          "id": "103107",
+          "name": "SALTY KARAMELL",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103107"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "110020",
+          "name": "SANDWICH IS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110020"
+          }
+        },
+        {
+          "id": "103161",
+          "name": "SERINAKAKER",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "103161"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "110010",
+          "name": "SITTING ORIGINAL",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110010"
+          }
+        },
+        {
+          "id": "103090",
+          "name": "SJOKOLADEKAKE LANGPANNE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103090"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "100050",
+          "name": "SJOKOM ELK 250 ML",
+          "price": 2500,
+          "meta": {
+            "student": 25,
+            "ansatt": 28,
+            "original_id": "100050"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2800
+            }
+          ]
+        },
+        {
+          "id": "sias-sjokomums",
+          "name": "SJOKOMUMS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null
+          }
+        },
+        {
+          "id": "sias-skillingsbolle",
+          "name": "SKILLINGSBOLLE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "103020",
+          "name": "SKOLEBRØD",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103020"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107070",
+          "name": "SMIL",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 45,
+            "original_id": "107070"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 4500
+            }
+          ]
+        },
+        {
+          "id": "100070",
+          "name": "SMOOTHIE",
+          "price": 4500,
+          "meta": {
+            "student": 45,
+            "ansatt": 52,
+            "original_id": "100070"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 4500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 5200
+            }
+          ]
+        },
+        {
+          "id": "102080",
+          "name": "SMØR",
+          "price": 500,
+          "meta": {
+            "student": 5,
+            "ansatt": 6,
+            "original_id": "102080"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 600
+            }
+          ]
+        },
+        {
+          "id": "107040",
+          "name": "SMÅSULTEN NØTTEMIX",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107040"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107011",
+          "name": "SMÅSULTEN NØTTER/BÆ",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107011"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107030",
+          "name": "SMÅSULTEN NØTTER/FRU",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 35,
+            "original_id": "107030"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "107091",
+          "name": "SNICKERS IS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "107091"
+          }
+        },
+        {
+          "id": "110240",
+          "name": "SNICKERS IS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110240"
+          }
+        },
+        {
+          "id": "110050",
+          "name": "SOL IS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110050"
+          }
+        },
+        {
+          "id": "310051",
+          "name": "SOLBÆRTODDY",
+          "price": 2600,
+          "meta": {
+            "student": 26,
+            "ansatt": 29,
+            "original_id": "310051"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "107210",
+          "name": "SOLIDOX SPEARMINT",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 29,
+            "original_id": "107210"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "103110",
+          "name": "SOLSKINNSBOLLE",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103110"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "110291",
+          "name": "SPLIT IS",
+          "price": 0,
+          "meta": {
+            "student": null,
+            "ansatt": null,
+            "original_id": "110291"
+          }
+        },
+        {
+          "id": "311090",
+          "name": "SPRITE 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311090"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "311091",
+          "name": "SPRITE ZERO 0,5L",
+          "price": 3900,
+          "meta": {
+            "student": 39,
+            "ansatt": 39,
+            "original_id": "311091"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100190",
+          "name": "SUNNIVA APPELSIN 1/2",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 39,
+            "original_id": "100190"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100210",
+          "name": "SUNNIVA APPELSIN 1/4",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 33,
+            "original_id": "100210"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3300
+            }
+          ]
+        },
+        {
+          "id": "100180",
+          "name": "SUNNIVA EPLE 1/2",
+          "price": 3500,
+          "meta": {
+            "student": 35,
+            "ansatt": 39,
+            "original_id": "100180"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3500
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3900
+            }
+          ]
+        },
+        {
+          "id": "100200",
+          "name": "SUNNIVA EPLE 1/4",
+          "price": 2900,
+          "meta": {
+            "student": 29,
+            "ansatt": 33,
+            "original_id": "100200"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3300
+            }
+          ]
+        },
+        {
+          "id": "106060",
+          "name": "SUPPE",
+          "price": 5900,
+          "meta": {
+            "student": 59,
+            "ansatt": 69,
+            "original_id": "106060"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 5900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 6900
+            }
+          ]
+        },
+        {
+          "id": "102060",
+          "name": "SYLTETØY",
+          "price": 1000,
+          "meta": {
+            "student": 10,
+            "ansatt": 11,
+            "original_id": "102060"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 1000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 1100
+            }
+          ]
+        },
+        {
+          "id": "310020",
+          "name": "TE",
+          "price": 2600,
+          "meta": {
+            "student": 26,
+            "ansatt": 29,
+            "original_id": "310020"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "100014",
+          "name": "TINE HAVREGRØT HON/B",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100014"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100017",
+          "name": "TINE HAVREGRØT MAN/B",
+          "price": 3300,
+          "meta": {
+            "student": 33,
+            "ansatt": 37,
+            "original_id": "100017"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3300
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3700
+            }
+          ]
+        },
+        {
+          "id": "100221",
+          "name": "TINE LETTM 0,5%1/41",
+          "price": 2000,
+          "meta": {
+            "student": 20,
+            "ansatt": 23,
+            "original_id": "100221"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2300
+            }
+          ]
+        },
+        {
+          "id": "100220",
+          "name": "TINE LETTM 1%1/41",
+          "price": 2000,
+          "meta": {
+            "student": 20,
+            "ansatt": 23,
+            "original_id": "100220"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2300
+            }
+          ]
+        },
+        {
+          "id": "sias-toppris-kubbe-30g",
+          "name": "TOPPRIS KUBBE 30G",
+          "price": 1800,
+          "meta": {
+            "student": 18,
+            "ansatt": 19
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 1800
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 1900
+            }
+          ]
+        },
+        {
+          "id": "103160",
+          "name": "VAFLER",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103160"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "310040",
+          "name": "VARM SJOKOLADE",
+          "price": 2600,
+          "meta": {
+            "student": 26,
+            "ansatt": 29,
+            "original_id": "310040"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 2600
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 2900
+            }
+          ]
+        },
+        {
+          "id": "103010",
+          "name": "WIENER BRØD",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103010"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "103140",
+          "name": "WIENER PEKAN",
+          "price": 3000,
+          "meta": {
+            "student": 30,
+            "ansatt": 35,
+            "original_id": "103140"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 3000
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 3500
+            }
+          ]
+        },
+        {
+          "id": "105033",
+          "name": "WRAP KYLLING",
+          "price": 6900,
+          "meta": {
+            "student": 69,
+            "ansatt": 80,
+            "original_id": "105033"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 6900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8000
+            }
+          ]
+        },
+        {
+          "id": "105031",
+          "name": "WRAP LAKS",
+          "price": 6900,
+          "meta": {
+            "student": 69,
+            "ansatt": 80,
+            "original_id": "105031"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 6900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8000
+            }
+          ]
+        },
+        {
+          "id": "105034",
+          "name": "WRAP SKINKE",
+          "price": 6900,
+          "meta": {
+            "student": 69,
+            "ansatt": 80,
+            "original_id": "105034"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 6900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8000
+            }
+          ]
+        },
+        {
+          "id": "105030",
+          "name": "WRAP TACO",
+          "price": 6900,
+          "meta": {
+            "student": 69,
+            "ansatt": 80,
+            "original_id": "105030"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 6900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8000
+            }
+          ]
+        },
+        {
+          "id": "105035",
+          "name": "WRAP VEGAN",
+          "price": 6900,
+          "meta": {
+            "student": 69,
+            "ansatt": 80,
+            "original_id": "105035"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 6900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8000
+            }
+          ]
+        },
+        {
+          "id": "105032",
+          "name": "WRAP VEGETAR",
+          "price": 6900,
+          "meta": {
+            "student": 69,
+            "ansatt": 80,
+            "original_id": "105032"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 6900
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 8000
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "allergen_info": {}
+}

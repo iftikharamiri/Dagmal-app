@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, Upload, Clock, Users, DollarSign, Calendar, ChefHat, TrendingUp, Target, Plus } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -27,6 +27,7 @@ interface DealFormData {
   imageUrl: string
   originalPrice: number
   discountPercentage: number
+  selectedPriceTiers: string[] // Array of selected tiers: ['student', 'ansatt']
   availableFor: string[]
   dietaryInfo: string[]
   availableDays: string[]
@@ -64,6 +65,7 @@ const daysOfWeek = [
 
 export function CreateDealPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   // If an edit id is present, we will load the deal and prefill the form
   const params = new URLSearchParams(location.search)
   const editId = params.get('edit')
@@ -78,6 +80,7 @@ export function CreateDealPage() {
     imageUrl: '',
     originalPrice: 0,
     discountPercentage: 20,
+    selectedPriceTiers: [], // Will be populated when menu item is selected
     availableFor: ['dine_in'],
     dietaryInfo: [],
     availableDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
@@ -127,13 +130,30 @@ export function CreateDealPage() {
 
   // Handle dish selection from modal
   const handleDishSelect = (dish: MenuItem) => {
+    const tiers: any[] = (dish as any).price_tiers || []
+    const studentTier = tiers.find(t => (t.type || t.label) === 'student')
+    const ansattTier = tiers.find(t => (t.type || t.label) === 'ansatt')
+    const initialPrice = dish.price && dish.price > 0
+      ? Math.round(dish.price / 100)
+      : studentTier?.amount_ore != null
+        ? Math.round(studentTier.amount_ore / 100)
+        : ansattTier?.amount_ore != null
+          ? Math.round(ansattTier.amount_ore / 100)
+          : 0
+
+    // Auto-select both tiers if available
+    const availableTiers: string[] = []
+    if (studentTier) availableTiers.push('student')
+    if (ansattTier) availableTiers.push('ansatt')
+
     setFormData(prev => ({
       ...prev,
       selectedMenuItem: dish,
       title: dish.name,
       description: dish.description || '',
-      // If the menu item doesn't have a price, let the user set it below
-      originalPrice: dish.price && dish.price > 0 ? Math.round(dish.price / 100) : 0,
+      // Prefill from item price or tiers; can still be overridden
+      originalPrice: initialPrice,
+      selectedPriceTiers: availableTiers, // Auto-select both if available
       dietaryInfo: dish.dietary_info || []
     }))
   }
@@ -263,7 +283,13 @@ export function CreateDealPage() {
       toast.error('Beskrivelse er påkrevd')
       return false
     }
-    if (formData.originalPrice <= 0) {
+    // If menu item has price_tiers, require at least one tier selected
+    if ((formData.selectedMenuItem as any)?.price_tiers && formData.selectedPriceTiers.length === 0) {
+      toast.error('Velg minst én pris (Student eller Ansatt)')
+      return false
+    }
+    // If no price_tiers, require originalPrice
+    if (!(formData.selectedMenuItem as any)?.price_tiers && formData.originalPrice <= 0) {
       toast.error('Opprinnelig pris må være større enn 0')
       return false
     }
@@ -318,6 +344,8 @@ export function CreateDealPage() {
         per_user_limit: formData.perUserLimit,
         total_limit: formData.totalLimit,
         verification_code: verificationCode,
+        menu_item_id: formData.selectedMenuItem?.id || null, // Store menu item reference for price_tiers
+        selected_price_tiers: formData.selectedPriceTiers.length > 0 ? formData.selectedPriceTiers : null, // Store selected tiers
         is_active: true
       }
       
@@ -342,6 +370,8 @@ export function CreateDealPage() {
             end_time: formData.endTime,
             per_user_limit: formData.perUserLimit,
             total_limit: formData.totalLimit,
+            menu_item_id: formData.selectedMenuItem?.id || null,
+            selected_price_tiers: formData.selectedPriceTiers.length > 0 ? formData.selectedPriceTiers : null,
             is_active: true
           })
           .eq('id', editId)
@@ -430,14 +460,8 @@ export function CreateDealPage() {
 
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="space-y-8">
-
-
           {/* Menu Selection */}
           <div className="bg-white rounded-2xl p-6 shadow-soft">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              🍽️ Velg retter for tilbudet
-            </h2>
-            
             {!formData.selectedMenuItem ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -476,7 +500,7 @@ export function CreateDealPage() {
                         Endre
                       </button>
                       <button
-                        onClick={() => setFormData(prev => ({ ...prev, selectedMenuItem: null, title: '', description: '', originalPrice: 0, imageUrl: '', dietaryInfo: [] }))}
+                        onClick={() => setFormData(prev => ({ ...prev, selectedMenuItem: null, title: '', description: '', originalPrice: 0, imageUrl: '', dietaryInfo: [], selectedPriceTiers: [] }))}
                         className="px-3 py-1 text-sm text-danger hover:text-danger/80"
                       >
                         Fjern
@@ -581,6 +605,59 @@ export function CreateDealPage() {
           <div className="bg-white rounded-2xl p-6 shadow-soft">
             <h2 className="text-lg font-semibold mb-4">Prissetting</h2>
             
+            {/* Price tier selector (if available) - Allow selecting both */}
+            {formData.selectedMenuItem && (formData.selectedMenuItem as any)?.price_tiers && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">Velg priser (kan velge begge)</label>
+                <div className="flex gap-3">
+                  {((formData.selectedMenuItem as any).price_tiers as any[]).map((tier, idx) => {
+                    const tierType = tier.type === 'student' ? 'student' : tier.type === 'ansatt' ? 'ansatt' : tier.type
+                    const isSelected = formData.selectedPriceTiers.includes(tierType)
+                    return (
+                      <label
+                        key={idx}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition-colors ${
+                          isSelected
+                            ? 'bg-primary text-primary-fg border-primary'
+                            : 'bg-white border-border hover:border-primary'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={(e) => {
+                            const newTiers = e.target.checked
+                              ? [...formData.selectedPriceTiers, tierType]
+                              : formData.selectedPriceTiers.filter(t => t !== tierType)
+                            updateFormData('selectedPriceTiers', newTiers)
+                            // Update originalPrice to first selected tier's price
+                            if (newTiers.length > 0 && e.target.checked) {
+                              const firstTier = ((formData.selectedMenuItem as any).price_tiers as any[]).find(
+                                t => (t.type || t.label) === newTiers[0]
+                              )
+                              if (firstTier) {
+                                updateFormData('originalPrice', Math.round((firstTier.amount_ore || 0) / 100))
+                              }
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-2 border-current"
+                        />
+                        <span className="font-medium">
+                          {tier.type === 'student' ? 'Student' : tier.type === 'ansatt' ? 'Ansatt' : tier.type}
+                        </span>
+                        {tier.amount_ore != null && (
+                          <span className="text-sm opacity-80">{Math.round(tier.amount_ore / 100)} kr</span>
+                        )}
+                      </label>
+                    )
+                  })}
+                </div>
+                {formData.selectedPriceTiers.length === 0 && (
+                  <p className="text-xs text-danger mt-2">Velg minst én pris</p>
+                )}
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Opprinnelig pris (kr) *</label>
@@ -610,7 +687,35 @@ export function CreateDealPage() {
               </div>
             </div>
 
-            {formData.originalPrice > 0 && (
+            {/* Price preview - show both selected tiers if available */}
+            {formData.selectedMenuItem && (formData.selectedMenuItem as any)?.price_tiers && formData.selectedPriceTiers.length > 0 ? (
+              <div className="bg-success/10 border border-success/20 rounded-xl p-4 space-y-3">
+                <p className="font-medium text-success mb-2">Pris etter rabatt:</p>
+                {formData.selectedPriceTiers.map((tierType) => {
+                  const tier = ((formData.selectedMenuItem as any).price_tiers as any[]).find(
+                    (t: any) => t.type === tierType
+                  )
+                  if (!tier) return null
+                  const originalPriceKr = Math.round((tier.amount_ore || 0) / 100)
+                  const finalPriceKr = Math.round(originalPriceKr * (1 - formData.discountPercentage / 100))
+                  const savings = originalPriceKr - finalPriceKr
+                  return (
+                    <div key={tierType} className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">
+                          {tierType === 'student' ? 'Student' : 'Ansatt'}:
+                        </p>
+                        <p className="text-xl font-bold text-success">{finalPriceKr} kr</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500 line-through">{originalPriceKr} kr</p>
+                        <p className="text-sm font-semibold text-success">Spar {savings} kr</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : formData.originalPrice > 0 ? (
               <div className="bg-success/10 border border-success/20 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -623,7 +728,7 @@ export function CreateDealPage() {
                   </div>
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* Service Types */}

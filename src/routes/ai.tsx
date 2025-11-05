@@ -1,16 +1,18 @@
 import React from 'react'
 import { useState, useEffect, useRef } from 'react'
-import { ChevronDown, Mic, Home } from 'lucide-react'
+import { ChevronDown, Mic, Home, Check } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 export function AIPage() {
   const navigate = useNavigate()
   const [inputText, setInputText] = useState('')
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'sofie'; text: string }>>([])
+  const [showSofieDropdown, setShowSofieDropdown] = useState(false)
   const endRef = useRef<HTMLDivElement | null>(null)
+  const dropdownRef = useRef<HTMLDivElement | null>(null)
 
-  const sofieDisabledText = 'Utviklerne mine har ikke aktivert meg ennå. Håper vi ses i neste versjon av appen. Skriv 1 for en kort vits i mellomtiden.'
-  const jokeText = 'Jeg prøvde å spise en klokke. Veldig tidkrevende.'
+  const sofieDisabledText = 'Jeg er under oppgradering, kommer straks tilbake. Vil du ha en vits? Skriv 1.'
+  const jokeText = 'Jeg prøvde å spise en klokke. Veldig tidskrevende.'
 
   function handleSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault()
@@ -36,6 +38,20 @@ export function AIPage() {
     }
   }, [messages])
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowSofieDropdown(false)
+      }
+    }
+
+    if (showSofieDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showSofieDropdown])
+
   const hasConversation = messages.length > 0
 
   return (
@@ -56,9 +72,39 @@ export function AIPage() {
       <div className="px-4 pt-12 pb-4 flex-shrink-0">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
-            <div className="inline-flex items-center gap-2 text-sm text-black">
-              <span className="font-semibold">Sofie 1</span>
-              <ChevronDown className="h-4 w-4" />
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setShowSofieDropdown(!showSofieDropdown)}
+                className="inline-flex items-center gap-2 text-sm text-black hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <span className="font-semibold">Sofie 0</span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${showSofieDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {/* Dropdown Menu */}
+              {showSofieDropdown && (
+                <div className="absolute top-full left-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50 overflow-hidden">
+                  {/* Sofie 0 - Selected */}
+                  <div className="px-4 py-3 border-b border-gray-700">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm font-medium text-white">Sofie 0</div>
+                      </div>
+                      <Check className="h-4 w-4 text-white" />
+                    </div>
+                  </div>
+                  
+                  {/* Sofie 1 - Coming Soon */}
+                  <div className="px-4 py-3 bg-gray-900/50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm font-medium text-gray-500">Sofie 1</div>
+                        <div className="text-xs text-gray-500 mt-0.5">Kommer snart</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="mt-3 flex items-start gap-3">

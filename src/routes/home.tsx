@@ -308,8 +308,88 @@ export function HomePage() {
       
       console.log('🔄 Final transformed data:', transformedData.length, 'deals')
       
+      // Fetch menu items for deals with menu_item_id to get price_tiers
+      const dealsWithMenuItems = transformedData.filter((deal: any) => deal.menu_item_id)
+      const menuItemIds = dealsWithMenuItems.map((deal: any) => deal.menu_item_id)
+      
+      let menuItemsMap: { [key: string]: any } = {}
+      if (menuItemIds.length > 0) {
+        console.log('📋 Fetching menu items for dual pricing:', menuItemIds.length)
+        const { data: menuItems, error: menuItemsError } = await supabase
+          .from('menu_items')
+          .select('id, price_tiers')
+          .in('id', menuItemIds)
+        
+        if (menuItemsError) {
+          console.warn('⚠️ Could not fetch menu items:', menuItemsError)
+        } else {
+          menuItemsMap = (menuItems || []).reduce((acc, item) => {
+            acc[item.id] = item
+            return acc
+          }, {} as { [key: string]: any })
+          console.log('✅ Fetched menu items:', Object.keys(menuItemsMap).length)
+        }
+      }
+      
+      // Calculate dual pricing for deals with menu_item_id
+      const dealsWithPricing = transformedData.map((deal: any) => {
+        if (deal.menu_item_id && menuItemsMap[deal.menu_item_id]) {
+          const menuItem = menuItemsMap[deal.menu_item_id]
+          // Handle price_tiers as JSONB or string
+          let priceTiers = menuItem.price_tiers || []
+          if (typeof priceTiers === 'string') {
+            try {
+              priceTiers = JSON.parse(priceTiers)
+            } catch (e) {
+              console.warn('Could not parse price_tiers:', e)
+              priceTiers = []
+            }
+          }
+          
+          const selectedTiers = deal.selected_price_tiers || ['student', 'ansatt'] // Default to both if not specified
+          const studentTier = priceTiers.find((t: any) => t.type === 'student')
+          const ansattTier = priceTiers.find((t: any) => t.type === 'ansatt')
+          
+          console.log(`💰 Deal ${deal.id}: menu_item_id=${deal.menu_item_id}, price_tiers=${priceTiers.length}, student=${!!studentTier}, ansatt=${!!ansattTier}, selected=${selectedTiers.join(',')}`)
+          
+          if (studentTier || ansattTier) {
+            const discountPercent = deal.discount_percentage / 100
+            const pricing: any = {}
+            
+            // Only calculate prices for selected tiers
+            if (selectedTiers.includes('student') && studentTier) {
+              const studentOriginal = studentTier.amount_ore
+              const studentFinal = Math.round(studentOriginal * (1 - discountPercent))
+              pricing.studentPrice = { original: studentOriginal, final: studentFinal }
+            }
+            
+            if (selectedTiers.includes('ansatt') && ansattTier) {
+              const ansattOriginal = ansattTier.amount_ore
+              const ansattFinal = Math.round(ansattOriginal * (1 - discountPercent))
+              pricing.ansattPrice = { original: ansattOriginal, final: ansattFinal }
+            }
+            
+            // Only add pricing if at least one tier is selected
+            if (Object.keys(pricing).length > 0) {
+              console.log(`✅ Added dual pricing for deal ${deal.id}:`, pricing)
+              return {
+                ...deal,
+                ...pricing
+              }
+            }
+          } else {
+            console.log(`⚠️ Deal ${deal.id} has menu_item_id but no price_tiers found`)
+          }
+        } else {
+          if (deal.menu_item_id) {
+            console.log(`⚠️ Deal ${deal.id} has menu_item_id=${deal.menu_item_id} but menu item not found in map`)
+          }
+        }
+        return deal
+      })
+      
       // Sort deals by restaurant availability first, then by highest discount
-      const sortedDeals = sortDealsByRestaurantAvailability(transformedData)
+      const sortedDeals = sortDealsByRestaurantAvailability(dealsWithPricing)
       console.log('📊 Sorted deals:', sortedDeals.length, 'deals')
       
       return sortedDeals as DealWithRestaurant[]

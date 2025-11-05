@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { formatTime, formatPrice } from '@/lib/utils'
 import { MenuUploadModal } from '@/components/MenuUploadModal'
 import { NotificationCard } from '@/components/NotificationCard'
+import { AddLocationModal } from '@/components/AddLocationModal'
 import { CompleteMenu, parseMenuToDatabase } from '@/lib/menuUtils'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
@@ -60,11 +61,11 @@ export function RestaurantDashboardPage() {
   const [editPosition, setEditPosition] = useState<{ lat: number; lng: number } | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [isUploadingBackground, setIsUploadingBackground] = useState(false)
-  const [isUploadingMenu, setIsUploadingMenu] = useState(false)
   const [isUploadingJsonMenu, setIsUploadingJsonMenu] = useState(false)
   const [backgroundImageUrl, setBackgroundImageUrl] = useState('')
-  const [menuPdfUrl, setMenuPdfUrl] = useState('')
   const [showMenuUploadModal, setShowMenuUploadModal] = useState(false)
+  const [isDeletingMenu, setIsDeletingMenu] = useState(false)
+  const [showAddLocationModal, setShowAddLocationModal] = useState(false)
 
   // Copy verification code to clipboard
   const copyToClipboard = async (code: string) => {
@@ -247,6 +248,16 @@ export function RestaurantDashboardPage() {
       const { menuItems, categories } = parseMenuToDatabase(menu, restaurant.id)
       console.log('Parsed menu items:', menuItems.length, 'Categories:', categories)
 
+      // Ensure unique names per restaurant to avoid unique constraint (restaurant_id, name)
+      const nameCount = new Map<string, number>()
+      const dedupedMenuItems = menuItems.map((it) => {
+        const base = (it.name || '').trim()
+        const count = (nameCount.get(base) || 0) + 1
+        nameCount.set(base, count)
+        const finalName = count === 1 ? base : `${base} (${count})`
+        return { ...it, name: finalName }
+      })
+
       // Update restaurant categories if provided
       if (categories.length > 0) {
         console.log('Updating restaurant categories:', categories)
@@ -280,13 +291,13 @@ export function RestaurantDashboardPage() {
       // Insert menu items in batches
       console.log('Inserting menu items in batches...')
       const batchSize = 10
-      for (let i = 0; i < menuItems.length; i += batchSize) {
-        const batch = menuItems.slice(i, i + batchSize)
+      for (let i = 0; i < dedupedMenuItems.length; i += batchSize) {
+        const batch = dedupedMenuItems.slice(i, i + batchSize)
         console.log(`Inserting batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(menuItems.length/batchSize)}:`, batch.length, 'items')
         
         const { error } = await supabase
           .from('menu_items')
-          .upsert(batch, { onConflict: 'restaurant_id,name' })
+          .upsert(batch, { onConflict: 'id' })
 
         if (error) {
           console.error('Batch insert error:', error)
@@ -295,7 +306,7 @@ export function RestaurantDashboardPage() {
       }
 
       console.log('Menu upload completed successfully!')
-      toast.success(`${menuItems.length} menu items uploaded successfully!`)
+      toast.success(`${dedupedMenuItems.length} menu items uploaded successfully!`)
       
       // Refresh restaurant data
       queryClient.invalidateQueries({ queryKey: ['owned-restaurant'] })
@@ -304,6 +315,43 @@ export function RestaurantDashboardPage() {
       console.error('Error uploading complete menu:', error)
       console.error('Error details:', JSON.stringify(error, null, 2))
       toast.error(`Failed to upload menu: ${error.message || 'Unknown error'}`)
+    }
+  }
+
+  // Handle menu deletion
+  const handleDeleteMenu = async () => {
+    if (!restaurant) return
+
+    // Confirm deletion
+    const confirmed = window.confirm(
+      'Er du sikker på at du vil slette hele menyen? Denne handlingen kan ikke angres, og alle menyretter vil bli permanent slettet.'
+    )
+
+    if (!confirmed) return
+
+    setIsDeletingMenu(true)
+    try {
+      // Delete all menu items for this restaurant
+      const { error } = await supabase
+        .from('menu_items')
+        .delete()
+        .eq('restaurant_id', restaurant.id)
+
+      if (error) {
+        console.error('Error deleting menu:', error)
+        throw error
+      }
+
+      toast.success('Menyen er slettet!')
+      
+      // Refresh restaurant data
+      queryClient.invalidateQueries({ queryKey: ['owned-restaurant'] })
+      
+    } catch (error: any) {
+      console.error('Error deleting menu:', error)
+      toast.error(`Kunne ikke slette meny: ${error.message || 'Unknown error'}`)
+    } finally {
+      setIsDeletingMenu(false)
     }
   }
 
@@ -376,7 +424,8 @@ export function RestaurantDashboardPage() {
       }
 
       // Process and insert menu items
-      const processedItems = menuItems.map((item, index) => ({
+      // Build items and ensure unique names per restaurant
+      const processedRaw = menuItems.map((item, index) => ({
         restaurant_id: restaurant.id,
         name: item.name || `Rett ${index + 1}`,
         description: item.description || null,
@@ -387,13 +436,22 @@ export function RestaurantDashboardPage() {
         is_available: true
       }))
 
+      const nameCount2 = new Map<string, number>()
+      const processedItems = processedRaw.map((it) => {
+        const base = (it.name || '').trim()
+        const count = (nameCount2.get(base) || 0) + 1
+        nameCount2.set(base, count)
+        const finalName = count === 1 ? base : `${base} (${count})`
+        return { ...it, name: finalName }
+      })
+
       // Insert menu items in batches
       const batchSize = 10
       for (let i = 0; i < processedItems.length; i += batchSize) {
         const batch = processedItems.slice(i, i + batchSize)
         const { error } = await supabase
           .from('menu_items')
-          .upsert(batch, { onConflict: 'restaurant_id,name' })
+          .upsert(batch, { onConflict: 'id' })
 
         if (error) throw error
       }
@@ -412,139 +470,6 @@ export function RestaurantDashboardPage() {
       }
     } finally {
       setIsUploadingJsonMenu(false)
-    }
-  }
-
-  // Handle menu PDF upload
-  const handleMenuUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file || !restaurant) return
-
-    // Validate file type
-    if (file.type !== 'application/pdf') {
-      toast.error('Kun PDF-filer er tillatt for menyen')
-      return
-    }
-
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('PDF-filen er for stor. Maksimal størrelse er 10MB')
-      return
-    }
-
-    setIsUploadingMenu(true)
-    try {
-      const fileExt = file.name.split('.').pop()
-      // Clean the filename to avoid issues with special characters and spaces
-      const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').toLowerCase()
-      const fileName = `${restaurant.id}-menu-${Date.now()}.${fileExt}`
-      
-      console.log('🔄 Uploading menu PDF:', {
-        originalFileName: file.name,
-        cleanedFileName: cleanFileName,
-        finalFileName: fileName,
-        fileSize: file.size,
-        fileType: file.type,
-        restaurantId: restaurant.id
-      })
-      
-      // Try uploading to restaurant-images bucket first
-      let uploadData, uploadError
-      try {
-        const result = await supabase.storage
-          .from('restaurant-images')
-          .upload(fileName, file, {
-            cacheControl: '3600',
-            upsert: false
-          })
-        uploadData = result.data
-        uploadError = result.error
-      } catch (error) {
-        console.error('❌ Storage upload failed:', error)
-        uploadError = error
-      }
-
-      if (uploadError) {
-        console.error('❌ Menu upload error:', uploadError)
-        
-        if (uploadError.message?.includes('Bucket not found')) {
-          toast.error('Lagringsbøtte ikke funnet. Kontakt support for å sette opp fillagring.')
-          return
-        }
-        
-        if (uploadError.message?.includes('already exists')) {
-          toast.error('En fil med dette navnet eksisterer allerede. Vennligst endre filnavnet.')
-          return
-        }
-        
-        if (uploadError.message?.includes('permission')) {
-          toast.error('Ingen tilgang til å laste opp filer. Kontakt support.')
-          return
-        }
-        
-        throw uploadError
-      }
-
-      console.log('✅ Menu upload successful:', uploadData)
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('restaurant-images')
-        .getPublicUrl(fileName)
-
-      console.log('🔗 Menu public URL:', publicUrl)
-
-      setMenuPdfUrl(publicUrl)
-      
-      // Save to localStorage for persistence
-      if (restaurant?.id) {
-        localStorage.setItem(`restaurant-menu-${restaurant.id}`, publicUrl)
-      }
-      
-      // Update restaurant profile in database
-      try {
-        console.log('🔄 Attempting to update restaurant with menu URL:', {
-          restaurantId: restaurant.id,
-          menuPdfUrl: publicUrl
-        })
-        
-        const { data: updateData, error: updateError } = await supabase
-          .from('restaurants')
-          .update({ menu_pdf_url: publicUrl })
-          .eq('id', restaurant.id)
-          .select()
-
-        if (updateError) {
-          console.error('❌ Error updating restaurant with menu URL:', updateError)
-          console.error('❌ Update error details:', {
-            message: updateError.message,
-            code: updateError.code,
-            details: updateError.details,
-            hint: updateError.hint
-          })
-          toast.error(`Menypdf lastet opp, men kunne ikke lagre til profil: ${updateError.message}`)
-        } else {
-          console.log('✅ Restaurant profile updated with menu URL:', updateData)
-          // Refresh the restaurant data
-          queryClient.invalidateQueries({ queryKey: ['owned-restaurant'] })
-        }
-      } catch (error) {
-        console.error('❌ Error updating restaurant profile:', error)
-        toast.error('Menypdf lastet opp, men kunne ikke lagre til profil.')
-      }
-      
-      toast.success('Menypdf lastet opp! Du kan nå søke i menyen når du oppretter tilbud.')
-    } catch (error: any) {
-      console.error('❌ Error uploading menu PDF:', error)
-      
-      if (error.message?.includes('storage')) {
-        toast.error('Lagringsfeil. Vennligst prøv igjen eller kontakt support.')
-      } else if (error.message?.includes('network')) {
-        toast.error('Nettverksfeil. Sjekk internettforbindelsen og prøv igjen.')
-      } else {
-        toast.error('Kunne ikke laste opp menypdf. Prøv igjen eller bruk en mindre fil.')
-      }
-    } finally {
-      setIsUploadingMenu(false)
     }
   }
 
@@ -745,16 +670,6 @@ export function RestaurantDashboardPage() {
     }
   }, [restaurant?.id])
 
-  // Load saved menu PDF URL from localStorage when restaurant is loaded
-  React.useEffect(() => {
-    if (restaurant?.id) {
-      const savedMenuUrl = localStorage.getItem(`restaurant-menu-${restaurant.id}`)
-      if (savedMenuUrl) {
-        setMenuPdfUrl(savedMenuUrl)
-      }
-    }
-  }, [restaurant?.id])
-
   // Calculate stats
   const stats = {
     totalDeals: deals.length,
@@ -941,12 +856,21 @@ export function RestaurantDashboardPage() {
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <h2 className="text-xl font-bold">{restaurant.name}</h2>
-                  <button 
-                    onClick={startEditingProfile}
-                    className="text-primary hover:bg-primary/10 p-2 rounded-lg transition-colors"
-                  >
-                    <Edit3 className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => setShowAddLocationModal(true)}
+                      className="text-primary hover:bg-primary/10 px-3 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Legg til lokasjon</span>
+                    </button>
+                    <button 
+                      onClick={startEditingProfile}
+                      className="text-primary hover:bg-primary/10 p-2 rounded-lg transition-colors"
+                    >
+                      <Edit3 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
                 <p className="text-muted-fg mb-2">{restaurant.description}</p>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -1093,65 +1017,6 @@ export function RestaurantDashboardPage() {
                   </div>
                 </div>
 
-                {/* Menu PDF Upload */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">Menypdf</label>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-4">
-                      <div className="w-32 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden border border-border">
-                        {menuPdfUrl ? (
-                          <div className="flex flex-col items-center justify-center p-2">
-                            <div className="text-2xl mb-1">📄</div>
-                            <span className="text-xs text-center">PDF Meny</span>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center text-xl">
-                            📄
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <label className="bg-primary text-primary-fg px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors cursor-pointer flex items-center gap-2">
-                          <Upload className="h-4 w-4" />
-                          {isUploadingMenu ? 'Laster opp...' : 'Last opp menypdf'}
-                          <input
-                            type="file"
-                            accept=".pdf,application/pdf"
-                            onChange={handleMenuUpload}
-                            className="hidden"
-                            disabled={isUploadingMenu}
-                          />
-                        </label>
-                        <p className="text-xs text-muted-fg mt-1">PDF (maks 10MB)</p>
-                      </div>
-                    </div>
-                    
-                    {/* Alternative: URL input */}
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-muted-fg">Eller lim inn menypdf-URL:</label>
-                      <input
-                        type="url"
-                        value={menuPdfUrl}
-                        onChange={(e) => {
-                          setMenuPdfUrl(e.target.value)
-                          if (restaurant?.id) {
-                            localStorage.setItem(`restaurant-menu-${restaurant.id}`, e.target.value)
-                          }
-                        }}
-                        placeholder="https://..."
-                        className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
-                      />
-                    </div>
-                    
-                    {menuPdfUrl && (
-                      <div className="flex items-center gap-2 text-sm text-success">
-                        <div className="w-2 h-2 bg-success rounded-full"></div>
-                        <span>Menypdf lastet opp - tilgjengelig for søk i tilbud</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
                 {/* Complete Menu Upload */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium mb-2">Complete Menu (JSON)</label>
@@ -1166,13 +1031,23 @@ export function RestaurantDashboardPage() {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <button
-                          onClick={() => setShowMenuUploadModal(true)}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                        >
-                          <Upload className="h-4 w-4" />
-                          Upload Complete Menu
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setShowMenuUploadModal(true)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                          >
+                            <Upload className="h-4 w-4" />
+                            Upload Complete Menu
+                          </button>
+                          <button
+                            onClick={handleDeleteMenu}
+                            disabled={isDeletingMenu}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            {isDeletingMenu ? 'Sletter...' : 'Slett meny'}
+                          </button>
+                        </div>
                         <p className="text-xs text-muted-fg mt-1">Upload a structured JSON menu with categories and items</p>
                       </div>
                     </div>
@@ -1520,6 +1395,16 @@ export function RestaurantDashboardPage() {
           restaurantId={restaurant.id}
         />
       )}
+
+      {/* Add Location Modal */}
+      <AddLocationModal
+        isOpen={showAddLocationModal}
+        onClose={() => setShowAddLocationModal(false)}
+        onSuccess={() => {
+          // Redirect to restaurant selection page after adding location
+          navigate('/business/select')
+        }}
+      />
     </div>
   )
 }

@@ -100,6 +100,7 @@ export interface Database {
           dietary_info: string[]
           image_url: string | null
           is_available: boolean
+          price_tiers: Array<{ type: string; amount_ore: number }> | null
           created_at: string
           updated_at: string
         }
@@ -150,6 +151,8 @@ export interface Database {
           claimed_count: number
           is_active: boolean
           verification_code: string
+          menu_item_id: string | null
+          selected_price_tiers: string[] | null
           created_at: string
         }
         Insert: {
@@ -170,6 +173,8 @@ export interface Database {
           claimed_count?: number
           is_active?: boolean
           verification_code?: string
+          menu_item_id?: string | null
+          selected_price_tiers?: string[] | null
           created_at?: string
         }
         Update: {

@@ -94,10 +94,10 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                       <div className="flex items-center justify-between mb-2">
                         <button
                           onClick={() => navigate(`/restaurant/${deal.restaurant_id}`)}
-                          className="inline-flex items-center gap-0.5 font-semibold text-fg truncate transition-colors duration-200 text-left"
+                          className="inline-flex items-center gap-0.5 font-semibold text-gray-900 truncate transition-colors duration-200 text-left"
                         >
                           <span className="truncate max-w-[12rem]">{deal.restaurant.name}</span>
-                          <ChevronRight className="h-4 w-4 text-fg" />
+                          <ChevronRight className="h-4 w-4 text-gray-900" />
                         </button>
                         <div className="flex items-center gap-1 text-xs text-muted-fg">
                           <Users className="h-3 w-3" />
@@ -107,7 +107,7 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
 
                       {/* Dish name with availability */}
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <h4 className="font-medium text-fg line-clamp-2 text-xs">{deal.title}</h4>
+                        <h4 className="font-medium text-gray-900 line-clamp-2 text-xs">{deal.title}</h4>
                         {isAvailable && deal.total_limit && (
                           <span className="text-success text-xs font-medium whitespace-nowrap">
                             {deal.total_limit - deal.claimed_count}/{deal.total_limit} tilgjengelig
@@ -121,14 +121,40 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                           <MapPin className="h-4 w-4" />
                           <span className="text-xs">{deal.restaurant.address || 'Oslo'}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-fg">
-                            {(deal.final_price / 100).toFixed(0)} kr
-                          </span>
-                          <span className="text-[10px] text-muted-fg line-through">
-                            {(deal.original_price / 100).toFixed(0)} kr
-                          </span>
-                        </div>
+                        {/* Dual pricing display (student/ansatt) - Vertical layout */}
+                        {(deal as any).studentPrice || (deal as any).ansattPrice ? (
+                          <div className="flex flex-col items-end gap-0.5">
+                            {(deal as any).studentPrice && (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs text-gray-900 font-semibold">
+                                  {((deal as any).studentPrice.final / 100).toFixed(0)} kr <span className="font-normal">(Student)</span>
+                                </span>
+                                <span className="text-[10px] text-gray-400 line-through">
+                                  {((deal as any).studentPrice.original / 100).toFixed(0)} kr
+                                </span>
+                              </div>
+                            )}
+                            {(deal as any).ansattPrice && (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs text-gray-900 font-semibold">
+                                  {((deal as any).ansattPrice.final / 100).toFixed(0)} kr <span className="font-normal">(Ansatt)</span>
+                                </span>
+                                <span className="text-[10px] text-gray-400 line-through">
+                                  {((deal as any).ansattPrice.original / 100).toFixed(0)} kr
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-900 font-semibold">
+                              {(deal.final_price / 100).toFixed(0)} kr
+                            </span>
+                            <span className="text-[10px] text-gray-400 line-through">
+                              {(deal.original_price / 100).toFixed(0)} kr
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Claim Button */}

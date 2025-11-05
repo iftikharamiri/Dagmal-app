@@ -83,6 +83,8 @@ export function DealsList({
               discountType="percent"
               originalPrice={deal.original_price || undefined}
               finalPrice={deal.final_price || undefined}
+              studentPrice={(deal as any).studentPrice || null}
+              ansattPrice={(deal as any).ansattPrice || null}
               timeWindow={{
                 start: deal.start_time,
                 end: deal.end_time,

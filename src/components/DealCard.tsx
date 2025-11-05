@@ -13,6 +13,9 @@ interface DealCardProps {
   discountType: 'percent' | 'amount'
   originalPrice?: number
   finalPrice?: number
+  // Dual pricing (student/ansatt)
+  studentPrice?: { original: number; final: number } | null
+  ansattPrice?: { original: number; final: number } | null
   badges?: string[]
   timeWindow: { start: string; end: string }
   dineIn: boolean
@@ -35,6 +38,8 @@ export function DealCard({
   discountType,
   originalPrice,
   finalPrice,
+  studentPrice,
+  ansattPrice,
   timeWindow,
   dineIn,
   takeaway,
@@ -138,7 +143,7 @@ export function DealCard({
 
         {/* Dish name with availability */}
         <div className="flex items-center justify-between gap-2">
-          <p className="text-gray-600 text-xs leading-relaxed font-medium">{title}</p>
+          <p className="text-gray-900 text-xs leading-relaxed font-medium">{title}</p>
           {totalLimit && (
             <span className="text-green-600 text-xs font-medium whitespace-nowrap">
               {totalLimit - claimedCount}/{totalLimit} tilgjengelig
@@ -148,20 +153,46 @@ export function DealCard({
 
         {/* Location and Price on same line */}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-gray-600">
+          <div className="flex items-center gap-2 text-gray-600 -mt-1 -ml-1">
             <MapPin className="h-4 w-4" />
-            <span className="text-sm">{address || 'Oslo'}</span>
+            <span className="text-xs">{address || 'Oslo'}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-gray-900">
-              {finalPrice ? formatPrice(finalPrice) : 'Gratis'}
-            </span>
-            {originalPrice && (
-              <span className="text-xs text-gray-400 line-through">
-                {formatPrice(originalPrice)}
+          {/* Dual pricing display (student/ansatt) - Vertical layout */}
+          {(studentPrice || ansattPrice) ? (
+            <div className="flex flex-col items-end gap-1">
+              {studentPrice && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-900 font-semibold">
+                    {formatPrice(studentPrice.final)} <span className="font-normal">(Student)</span>
+                  </span>
+                  <span className="text-[10px] text-gray-400 line-through">
+                    {formatPrice(studentPrice.original)}
+                  </span>
+                </div>
+              )}
+              {ansattPrice && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-900 font-semibold">
+                    {formatPrice(ansattPrice.final)} <span className="font-normal">(Ansatt)</span>
+                  </span>
+                  <span className="text-[10px] text-gray-400 line-through">
+                    {formatPrice(ansattPrice.original)}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-900 font-semibold">
+                {finalPrice ? formatPrice(finalPrice) : 'Gratis'}
               </span>
-            )}
-          </div>
+              {originalPrice && (
+                <span className="text-[10px] text-gray-400 line-through">
+                  {formatPrice(originalPrice)}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Claim section */}
