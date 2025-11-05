@@ -1,11 +1,25 @@
 {
-  "business_type": null,
-  "currency": "NOK",
-  "menu": {
-    "categories": [
-      {
-        "name": "Meny",
-        "items": [
+  "restaurant_info": {
+    "name": "SIÅS Kafe",
+    "description": "Studentenes kafe – snacks, baguetter, is, drikke og varm mat",
+    "phone": null,
+    "address": null,
+    "city": null,
+    "categories": ["Kantine", "Kafe", "Snacks", "Drikke"]
+  },
+  "menu_metadata": {
+    "version": "1.0",
+    "last_updated": "2025-11-05T00:00:00Z",
+    "currency": "NOK",
+    "language": "no"
+  },
+  "categories": [
+    {
+      "id": "sias-meny",
+      "name": "Meny",
+      "description": "SIÅS komplett meny",
+      "display_order": 1,
+      "items": [
           { "id": "104010", "name": "1 PIZZA SLICE", "price": null, "meta": { "student": 34, "ansatt": 38 } },
           { "id": "104020", "name": "2 PIZZA SLICE", "price": null, "meta": { "student": 68, "ansatt": 76 } },
           { "id": "104030", "name": "3 PIZZA SLICE", "price": null, "meta": { "student": 102, "ansatt": 114 } },
@@ -242,10 +256,10 @@
           { "id": "105030", "name": "WRAP TACO", "price": null, "meta": { "student": 69, "ansatt": 80 } },
           { "id": "105035", "name": "WRAP VEGAN", "price": null, "meta": { "student": 69, "ansatt": 80 } },
           { "id": "105032", "name": "WRAP VEGETAR", "price": null, "meta": { "student": 69, "ansatt": 80 } }
-        ]
-      }
-    ]
-  }
+      ]
+    }
+  ],
+  "allergen_info": {}
 }
 
 
