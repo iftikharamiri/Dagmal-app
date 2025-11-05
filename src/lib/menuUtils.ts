@@ -137,6 +137,7 @@ export function parseMenuToDatabase(menuJson: CompleteMenu, restaurantId: string
             dietary_info: item.dietary_info || [],
             image_url: item.image_url || null,
             is_available: item.is_available !== false,
+            price_tiers: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }

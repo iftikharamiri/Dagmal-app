@@ -77,6 +77,8 @@ export function HomePage() {
             image_url: 'https://picsum.photos/seed/fish/800/600',
             is_active: true,
             verification_code: 'ABC123',
+            menu_item_id: null,
+            selected_price_tiers: null,
             created_at: new Date().toISOString(),
             restaurant: {
               id: 'rest-1',
@@ -115,6 +117,8 @@ export function HomePage() {
             image_url: 'https://picsum.photos/seed/pizza/800/600',
             is_active: true,
             verification_code: 'DEF456',
+            menu_item_id: null,
+            selected_price_tiers: null,
             created_at: new Date().toISOString(),
             restaurant: {
               id: 'rest-2',
@@ -153,6 +157,8 @@ export function HomePage() {
             image_url: 'https://picsum.photos/seed/vegan/800/600',
             is_active: true,
             verification_code: 'GHI789',
+            menu_item_id: null,
+            selected_price_tiers: null,
             created_at: new Date().toISOString(),
             restaurant: {
               id: 'rest-3',
@@ -191,6 +197,8 @@ export function HomePage() {
             image_url: 'https://picsum.photos/seed/sushi/800/600',
             is_active: true,
             verification_code: 'JKL012',
+            menu_item_id: null,
+            selected_price_tiers: null,
             created_at: new Date().toISOString(),
             restaurant: {
               id: 'rest-4',

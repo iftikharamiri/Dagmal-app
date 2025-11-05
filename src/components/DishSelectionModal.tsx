@@ -64,6 +64,7 @@ export function DishSelectionModal({ isOpen, onClose, onSelectDish, restaurantId
             dietary_info: ['soy', 'egg', 'milk', 'mustard', 'celery', 'gluten'],
             image_url: null,
             is_available: true,
+            price_tiers: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           },
@@ -77,6 +78,7 @@ export function DishSelectionModal({ isOpen, onClose, onSelectDish, restaurantId
             dietary_info: ['soy', 'egg', 'milk', 'mustard', 'celery', 'gluten'],
             image_url: null,
             is_available: true,
+            price_tiers: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           },
@@ -90,6 +92,7 @@ export function DishSelectionModal({ isOpen, onClose, onSelectDish, restaurantId
             dietary_info: ['soy', 'egg', 'milk', 'mustard', 'celery', 'gluten'],
             image_url: null,
             is_available: true,
+            price_tiers: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           },
@@ -103,6 +106,7 @@ export function DishSelectionModal({ isOpen, onClose, onSelectDish, restaurantId
             dietary_info: ['soy', 'egg', 'milk', 'mustard', 'celery', 'gluten'],
             image_url: null,
             is_available: true,
+            price_tiers: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           },
@@ -116,6 +120,7 @@ export function DishSelectionModal({ isOpen, onClose, onSelectDish, restaurantId
             dietary_info: ['soy', 'mustard', 'celery', 'sesame', 'gluten'],
             image_url: null,
             is_available: true,
+            price_tiers: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           },
@@ -129,6 +134,7 @@ export function DishSelectionModal({ isOpen, onClose, onSelectDish, restaurantId
             dietary_info: ['soy', 'egg', 'celery', 'gluten'],
             image_url: null,
             is_available: true,
+            price_tiers: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           },
@@ -142,6 +148,7 @@ export function DishSelectionModal({ isOpen, onClose, onSelectDish, restaurantId
             dietary_info: ['soy', 'egg', 'milk', 'celery', 'gluten'],
             image_url: null,
             is_available: true,
+            price_tiers: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           },
@@ -155,6 +162,7 @@ export function DishSelectionModal({ isOpen, onClose, onSelectDish, restaurantId
             dietary_info: ['milk'],
             image_url: null,
             is_available: true,
+            price_tiers: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }
