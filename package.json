@@ -1,5 +1,5 @@
 {
-  "name": "norwegian-restaurant-deals",
+  "name": "Spisly",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -47,8 +47,8 @@
     "@types/leaflet": "^1.9.8",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
-    "@typescript-eslint/eslint-plugin": "^6.10.0",
-    "@typescript-eslint/parser": "^6.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.3",
+    "@typescript-eslint/parser": "^8.46.3",
     "@vitejs/plugin-react": "^4.1.0",
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.0",
