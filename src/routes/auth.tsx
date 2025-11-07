@@ -155,15 +155,13 @@ export function AuthPage() {
 
       // Real Supabase mode
       if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp(
-          {
-            email: formData.email.trim(),
-            password: formData.password,
-          },
-          {
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email.trim(),
+          password: formData.password,
+          options: {
             emailRedirectTo: `${appUrl}/auth/callback`,
-          }
-        )
+          },
+        })
 
         if (error) throw error
 
