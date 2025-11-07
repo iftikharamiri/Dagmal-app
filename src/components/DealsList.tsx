@@ -99,6 +99,7 @@ export function DealsList({
               badges={deal.restaurant.categories}
               totalLimit={deal.total_limit}
               claimedCount={deal.claimed_count}
+              isActive={deal.is_active}
             />
           </div>
         )

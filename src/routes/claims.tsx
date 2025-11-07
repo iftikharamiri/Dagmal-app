@@ -9,6 +9,7 @@ import { useAuthGuard } from '@/hooks/useAuthGuard'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { formatPrice, formatTime, cn, completeClaim } from '@/lib/utils'
+import { isDealClaimableToday, isDealRedeemableNow } from '@/lib/dealUtils'
 import type { ClaimWithDealAndRestaurant } from '@/lib/database.types'
 
 // QR Code Modal Component
@@ -455,24 +456,10 @@ export function ClaimsPage() {
 
   // Derived: active, non-expired claims only
   const activeClaims = (claims || []).filter((claim) => {
-    const now = new Date()
     const claimAny = claim as any
     if (claim.status === 'completed' || claim.status === 'cancelled' || claimAny.redeemed_at) return false
-    // keep only allowed statuses (query already filtered) and time window is valid if deal present
     if (!claim.deal) return false
-    try {
-      const start = claim.deal.start_time ? new Date(`1970-01-01T${claim.deal.start_time}Z`) : null
-      const end = claim.deal.end_time ? new Date(`1970-01-01T${claim.deal.end_time}Z`) : null
-      // If times are provided as HH:mm, we treat validity as within same day; UI-level guard: just ensure end is in the future relative to local time window
-      if (end) {
-        const nowTime = now.getUTCHours() * 60 + now.getUTCMinutes()
-        const endTime = end.getUTCHours() * 60 + end.getUTCMinutes()
-        return nowTime <= endTime
-      }
-      return true
-    } catch {
-      return true
-    }
+    return isDealClaimableToday(claim.deal)
   })
 
   // Derived: history claims (completed/cancelled)
@@ -599,6 +586,9 @@ export function ClaimsPage() {
                 const restaurant = deal.restaurant
                 const claimDate = new Date(claim.created_at)
                 const isRecent = Date.now() - claimDate.getTime() < 24 * 60 * 60 * 1000 // 24 hours
+                const now = new Date()
+                const claimableToday = isDealClaimableToday(deal, now)
+                const redeemableNow = isDealRedeemableNow(deal, now)
 
                 return (
                   <div key={claim.id} className={cn(
@@ -684,8 +674,18 @@ export function ClaimsPage() {
                       </div>
                     </div>
 
+                    {/* Verification Code - Availability Notice */}
+                    {deal.verification_code && claimableToday && !redeemableNow && (
+                      <div className="flex items-center gap-2 bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-2 rounded-2xl border border-yellow-200">
+                        <Clock className="h-4 w-4" />
+                        <span>
+                          Verifikasjonskoden er tilgjengelig fra {formatTime(deal.start_time)}
+                        </span>
+                      </div>
+                    )}
+
                     {/* Verification Code - Swipe to Reveal */}
-                    {deal.verification_code && (
+                    {deal.verification_code && redeemableNow && (
                       <SwipeToReveal 
                         code={deal.verification_code}
                         claimId={claim.id}

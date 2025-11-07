@@ -1,7 +1,6 @@
 import { Heart, Clock, TrendingUp, Users, MapPin, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { DealCard } from '@/components/DealCard'
-import { isDealCurrentlyAvailable, calculatePopularityScore } from '@/lib/dealUtils'
+import { isDealCurrentlyAvailable, isDealClaimableToday } from '@/lib/dealUtils'
 import type { DealWithRestaurant } from '@/lib/database.types'
 
 interface PopularDealsProps {
@@ -30,8 +29,8 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
       <div className="relative">
         <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {deals.map((deal) => {
-            const isAvailable = isDealCurrentlyAvailable(deal)
-            const popularityScore = calculatePopularityScore(deal)
+            const isClaimableToday = isDealClaimableToday(deal)
+            const isRedeemableNow = isDealCurrentlyAvailable(deal)
             const isFavorite = favoriteDeals.includes(deal.id)
 
             return (
@@ -46,7 +45,9 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
 
 
                   {/* Deal Card */}
-                  <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow">
+                  <div className={`bg-white rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow ${
+                    isClaimableToday ? '' : 'opacity-60'
+                  }`}>
                     {/* Image */}
                     <div className="relative h-48 bg-muted">
                       {deal.image_url ? (
@@ -108,7 +109,7 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                       {/* Dish name with availability */}
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <h4 className="font-medium text-gray-900 line-clamp-2 text-xs">{deal.title}</h4>
-                        {isAvailable && deal.total_limit && (
+                        {isClaimableToday && deal.total_limit && (
                           <span className="text-success text-xs font-medium whitespace-nowrap">
                             {deal.total_limit - deal.claimed_count}/{deal.total_limit} tilgjengelig
                           </span>
@@ -157,17 +158,29 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                         )}
                       </div>
 
+                      {/* Upcoming notice */}
+                      {isClaimableToday && !isRedeemableNow && (
+                        <div className="flex items-center justify-end gap-1 text-xs text-muted-fg mb-2">
+                          <Clock className="h-3 w-3" />
+                          <span>Tilgjengelig fra {deal.start_time.slice(0, 5)}</span>
+                        </div>
+                      )}
+
                       {/* Claim Button */}
                       <button
                         onClick={() => onClaimDeal(deal)}
-                        disabled={!isAvailable}
+                        disabled={!isClaimableToday}
                         className={`w-full py-2 px-4 rounded-xl font-medium transition-colors ${
-                          isAvailable
+                          isClaimableToday
                             ? 'bg-primary text-primary-fg hover:bg-primary/90'
                             : 'bg-muted text-muted-fg cursor-not-allowed'
                         }`}
                       >
-                        {isAvailable ? 'Hent tilbud' : 'Utløpt'}
+                        {isClaimableToday
+                          ? isRedeemableNow
+                            ? 'Hent tilbud'
+                            : 'Planlegg henting'
+                          : 'Utløpt'}
                       </button>
                     </div>
                   </div>

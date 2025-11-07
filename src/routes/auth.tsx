@@ -6,8 +6,14 @@ import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
+import type { Database } from '@/lib/database.types'
+import type { User } from '@supabase/supabase-js'
+
+type ProfileRow = Database['public']['Tables']['profiles']['Row'] & { role?: string | null }
 
 export function AuthPage() {
+  const queryClient = useQueryClient()
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const isSignUp = mode === 'signup'
   const [accountType, setAccountType] = useState<'user' | 'company'>('user')
@@ -23,6 +29,60 @@ export function AuthPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const navigate = useNavigate()
+
+  const hydrateUserSession = async (): Promise<{ user: User | null; profile: ProfileRow | null }> => {
+    const { data: userResult } = await supabase.auth.getUser()
+    const currentUser = userResult.user ?? null
+
+    if (!currentUser) {
+      queryClient.removeQueries({ queryKey: ['auth-user'], exact: true })
+      queryClient.removeQueries({ queryKey: ['profile'], exact: false })
+      return { user: null, profile: null }
+    }
+
+    queryClient.setQueryData(['auth-user'], currentUser)
+
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', currentUser.id)
+      .maybeSingle()
+
+    if (profileError) {
+      console.error('Error loading profile after login:', profileError)
+    }
+
+    let resolvedProfile = (profileData as ProfileRow | null) ?? null
+
+    if (!resolvedProfile) {
+      const displayName = currentUser.email?.split('@')[0] || 'Bruker'
+      const { data: createdProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          id: currentUser.id,
+          display_name: displayName,
+          phone: null,
+          cuisines: [],
+          dietary: [],
+          favorites: [],
+          favorite_deals: [],
+        })
+        .select('*')
+        .single()
+
+      if (createError) {
+        console.error('Error creating profile after login:', createError)
+      } else {
+        resolvedProfile = createdProfile as ProfileRow
+      }
+    }
+
+    if (resolvedProfile) {
+      queryClient.setQueryData(['profile'], resolvedProfile)
+    }
+
+    return { user: currentUser, profile: resolvedProfile }
+  }
 
   useEffect(() => {
     // Check if user is already logged in
@@ -124,42 +184,32 @@ export function AuthPage() {
 
         if (error) throw error
 
+        const { user: loggedInUser, profile: hydratedProfile } = await hydrateUserSession()
+
+        if (!loggedInUser) {
+          throw new Error('Kunne ikke hente brukerdata etter innlogging')
+        }
+
         // Extra gate for company login: must be a registered restaurant owner
         if (accountType === 'company') {
-          const { data: userResult } = await supabase.auth.getUser()
-          const userId = userResult.user?.id
+          const userId = loggedInUser.id
+          const profileRole = hydratedProfile?.role
+          const isOwnerRole = profileRole === 'restaurant_owner' || profileRole === 'admin'
 
-          if (userId) {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('role')
-              .eq('id', userId)
-              .single()
-
-            const isOwnerRole = profile?.role === 'restaurant_owner' || profile?.role === 'admin'
-
-            let ownsRestaurant = false
-            if (!isOwnerRole) {
-              const { data: restaurants } = await supabase
-                .from('restaurants')
-                .select('id')
-                .eq('owner_id', userId)
-                .limit(1)
-              ownsRestaurant = !!(restaurants && restaurants.length > 0)
-            }
-
-            if (!isOwnerRole && !ownsRestaurant) {
-              await supabase.auth.signOut()
-              setErrors({ submit: 'Denne e-posten er ikke registrert som bedriftseier. Velg Bruker, eller registrer bedrift.' })
-              return
-            }
-          }
-
-          // After company login, decide destination based on number of owned restaurants
           const { data: owned } = await supabase
             .from('restaurants')
             .select('id,name')
             .eq('owner_id', userId)
+
+          const ownsRestaurant = !!(owned && owned.length > 0)
+
+          if (!isOwnerRole && !ownsRestaurant) {
+            await supabase.auth.signOut()
+            queryClient.removeQueries({ queryKey: ['auth-user'], exact: true })
+            queryClient.removeQueries({ queryKey: ['profile'], exact: false })
+            setErrors({ submit: 'Denne e-posten er ikke registrert som bedriftseier. Velg Bruker, eller registrer bedrift.' })
+            return
+          }
 
           if (owned && owned.length > 1) {
             toast.success('Logget inn! Velg restaurant')

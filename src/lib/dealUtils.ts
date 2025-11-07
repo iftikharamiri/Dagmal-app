@@ -1,21 +1,64 @@
 import type { DealWithRestaurant } from '@/lib/database.types'
 
+const DAY_MAP = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+
+const toHHMM = (time: string) => time.slice(0, 5)
+
+const getCurrentHHMM = (now: Date) => now.toTimeString().slice(0, 5)
+
+const resolveNow = (input?: unknown): Date => {
+  if (input instanceof Date) {
+    return input
+  }
+
+  return new Date()
+}
+
+const isDealActiveOnDay = (deal: DealWithRestaurant, nowInput?: unknown) => {
+  const now = resolveNow(nowInput)
+  if (!deal.available_days || deal.available_days.length === 0) {
+    return true
+  }
+
+  const todayName = DAY_MAP[now.getDay()]
+  const normalizedDays = deal.available_days.map(day => day.toLowerCase())
+
+  return normalizedDays.includes(todayName)
+}
+
 /**
- * Check if a deal is currently available based on time and day
+ * Check if a deal can be claimed at any point today (until end time)
  */
-export function isDealCurrentlyAvailable(deal: DealWithRestaurant): boolean {
-  const now = new Date()
-  const currentTime = now.toTimeString().slice(0, 5) // HH:MM format
-  const currentDay = now.getDay() // 0 = Sunday, 1 = Monday, etc.
+export function isDealClaimableToday(deal: DealWithRestaurant, nowInput?: unknown): boolean {
+  const now = resolveNow(nowInput)
+  if (!deal.is_active) return false
+  if (!isDealActiveOnDay(deal, now)) return false
 
-  // For now, let's just check time and active status - skip day check temporarily
-  const startTime = deal.start_time.slice(0, 5)
-  const endTime = deal.end_time.slice(0, 5)
-  const isTimeAvailable = currentTime >= startTime && currentTime <= endTime
-  const isActive = deal.is_active
+  const currentTime = getCurrentHHMM(now)
+  const endTime = toHHMM(deal.end_time)
 
-  // Simplified logic - just check time and active status
-  return isTimeAvailable && isActive
+  return currentTime <= endTime
+}
+
+/**
+ * Check if a deal is currently redeemable (within the active window right now)
+ */
+export function isDealRedeemableNow(deal: DealWithRestaurant, nowInput?: unknown): boolean {
+  const now = resolveNow(nowInput)
+  if (!isDealClaimableToday(deal, now)) return false
+
+  const currentTime = getCurrentHHMM(now)
+  const startTime = toHHMM(deal.start_time)
+  const endTime = toHHMM(deal.end_time)
+
+  return currentTime >= startTime && currentTime <= endTime
+}
+
+/**
+ * Check if a deal is currently available based on time and day (redeemable right now)
+ */
+export function isDealCurrentlyAvailable(deal: DealWithRestaurant, nowInput?: unknown): boolean {
+  return isDealRedeemableNow(deal, nowInput)
 }
 
 /**
