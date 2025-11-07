@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { 
   Building2, Plus, BarChart3, Settings, Clock, Users, TrendingUp, 
   Calendar, MapPin, Phone, Mail, ArrowLeft, Menu, PieChart, 
-  Target, Award, ChefHat
+  Target, Award, ChefHat, DollarSign
 } from 'lucide-react'
 import { norwegianText } from '@/i18n/no'
 import { cn } from '@/lib/utils'
