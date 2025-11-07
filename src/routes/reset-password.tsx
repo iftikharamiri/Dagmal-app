@@ -166,6 +166,7 @@ export function ResetPasswordPage() {
 
       if (error) throw error
 
+      await supabase.auth.signOut()
       toast.success('Passordet ditt er oppdatert! Du kan nå logge inn.')
       navigate('/auth')
     } catch (error: any) {
