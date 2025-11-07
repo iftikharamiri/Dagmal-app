@@ -29,6 +29,7 @@ export function AuthPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const navigate = useNavigate()
+  const appUrl = import.meta.env.VITE_APP_URL || window.location.origin
 
   const hydrateUserSession = async (): Promise<{ user: User | null; profile: ProfileRow | null }> => {
     const { data: userResult } = await supabase.auth.getUser()
@@ -154,10 +155,15 @@ export function AuthPage() {
 
       // Real Supabase mode
       if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({
-          email: formData.email.trim(),
-          password: formData.password,
-        })
+        const { data, error } = await supabase.auth.signUp(
+          {
+            email: formData.email.trim(),
+            password: formData.password,
+          },
+          {
+            emailRedirectTo: `${appUrl}/auth/callback`,
+          }
+        )
 
         if (error) throw error
 
@@ -269,10 +275,6 @@ export function AuthPage() {
     setIsSendingReset(true)
 
     try {
-      // Use production domain for email links, or fallback to current origin
-      const appUrl = import.meta.env.VITE_APP_URL || 
-        (window.location.origin.includes('localhost') ? 'https://spisly.no' : window.location.origin)
-      
       const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail.trim(), {
         redirectTo: `${appUrl}/reset-password`,
       })
