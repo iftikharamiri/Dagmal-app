@@ -1,61 +1,59 @@
-import { useEffect, useRef, startTransition } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 
 export function useAuthGuard() {
   const navigate = useNavigate()
   const hasNavigated = useRef(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
 
-  const { data: user, isLoading } = useQuery({
-    queryKey: ['auth-user'],
-    queryFn: async () => {
-      // Force real Supabase mode
-      const isDemoMode = false
+  useEffect(() => {
+    let isMounted = true
 
-      if (isDemoMode) {
-        // Return demo user from localStorage
-        const demoUser = localStorage.getItem('demo_user')
-        if (demoUser) {
-          return JSON.parse(demoUser)
-        }
-        return null
-      }
-      
-      // Real Supabase mode - check session first
+    const loadSession = async () => {
+      setIsLoading(true)
       try {
         const { data: { session } } = await supabase.auth.getSession()
+
+        if (!isMounted) return
+
         if (!session) {
-          // No session, clear any stale tokens
-          await supabase.auth.signOut()
-          return null
+          setUser(null)
+          return
         }
-        
-        const { data: { user }, error } = await supabase.auth.getUser()
-        if (error) {
-          // Invalid user, clear session
-          await supabase.auth.signOut()
-          return null
-        }
-        return user
+
+        setUser(session.user)
       } catch (error) {
-        // If anything fails, clear session and return null
-        await supabase.auth.signOut()
-        return null
+        if (!isMounted) return
+        setUser(null)
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
       }
-    },
-    retry: false, // Don't retry on auth errors
-  })
+    }
+
+    loadSession()
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return
+      setUser(session?.user ?? null)
+      setIsLoading(false)
+    })
+
+    return () => {
+      isMounted = false
+      authListener.subscription.unsubscribe()
+    }
+  }, [])
 
   useEffect(() => {
     if (!isLoading && !user && !hasNavigated.current) {
       // Only navigate if not already on auth page and haven't navigated yet
       if (window.location.pathname !== '/auth') {
         hasNavigated.current = true
-        // Wrap navigation in startTransition to prevent throttling
-        startTransition(() => {
-          navigate('/auth?reason=protected', { replace: true })
-        })
+        navigate('/auth?reason=protected', { replace: true })
       }
     }
   }, [user, isLoading, navigate])
