@@ -10,16 +10,23 @@ export function AIPage() {
   const [showSofieDropdown, setShowSofieDropdown] = useState(false)
   const endRef = useRef<HTMLDivElement | null>(null)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
+  const jokesRef = useRef<string[]>([
+    'Jeg prøvde å spise en klokke. Veldig tidskrevende.',
+    'Hva er den mest utskjelte sauen? Møkkavær!',
+    'Hva kaller man en fisk uten øyne? Fsk.',
+    ,
+  ])
 
   const sofieDisabledText = 'Jeg er under oppgradering, kommer straks tilbake. Vil du ha en vits? Skriv 1.'
-  const jokeText = 'Jeg prøvde å spise en klokke. Veldig tidskrevende.'
 
   function handleSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault()
     const trimmed = inputText.trim()
     if (!trimmed) return
     if (trimmed === '1') {
-      setMessages(prev => [...prev, { role: 'user', text: trimmed }, { role: 'sofie', text: jokeText }])
+      const jokes = jokesRef.current
+      const randomJoke = jokes[Math.floor(Math.random() * jokes.length)]
+      setMessages(prev => [...prev, { role: 'user', text: trimmed }, { role: 'sofie', text: randomJoke }])
     } else {
       setMessages(prev => [...prev, { role: 'user', text: trimmed }, { role: 'sofie', text: sofieDisabledText }])
     }
