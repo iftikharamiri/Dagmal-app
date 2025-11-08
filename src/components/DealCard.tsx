@@ -27,7 +27,9 @@ interface DealCardProps {
   address?: string
   totalLimit?: number | null
   claimedCount?: number
-  isActive: boolean
+  isAvailableNowOverride?: boolean
+  ctaLabel?: string
+  isActionDisabled?: boolean
 }
 
 export function DealCard({
@@ -51,26 +53,25 @@ export function DealCard({
   address,
   totalLimit,
   claimedCount = 0,
-  isActive,
+  isAvailableNowOverride,
+  ctaLabel,
+  isActionDisabled,
 }: DealCardProps) {
   const navigate = useNavigate()
-  const startTime = formatTime(timeWindow.start)
-  const endTime = formatTime(timeWindow.end)
-  const dealDayActive = isDealActiveToday(days)
-  const nowString = new Date().toTimeString().slice(0, 5)
-  const isClaimableToday = isActive && dealDayActive && nowString <= endTime
-  const isRedeemableNow = isClaimableToday && isTimeInRange(startTime, endTime)
-  const isUpcoming = isClaimableToday && !isRedeemableNow
-
+  const isAvailableNow =
+    typeof isAvailableNowOverride === 'boolean'
+      ? isAvailableNowOverride
+      : isTimeInRange(timeWindow.start, timeWindow.end) && isDealActiveToday(days)
   // Calculate availability
   const remaining = totalLimit ? Math.max(0, totalLimit - claimedCount) : null
   const isLimitedQuantity = totalLimit !== null && totalLimit !== undefined
   const isSoldOut = isLimitedQuantity && remaining === 0
+  const buttonLabel = ctaLabel || norwegianText.actions.claimDeal
+  const disabled = isActionDisabled ?? (!isAvailableNow || isSoldOut)
 
   return (
     <div className={cn(
-      'bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300',
-      !isClaimableToday && 'opacity-60'
+      'bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300'
     )}>
       {/* Large Image Section - Made bigger to match reference, responsive */}
       <div className="relative h-[300px] sm:h-[400px] overflow-hidden bg-transparent">
@@ -119,17 +120,15 @@ export function DealCard({
           </span>
         </div>
 
-        {/* Service type badge - Styled to match popular deals */}
-        <div className="absolute bottom-0 left-0 bg-black/70 rounded-xl px-2 py-1.5 text-white backdrop-blur-sm shadow-lg">
-          <div className="text-xs font-medium">
-            {dineIn && takeaway
-              ? `${norwegianText.deal.dineIn} • ${norwegianText.deal.takeaway}`
-              : dineIn
-                ? norwegianText.deal.dineIn
-                : norwegianText.deal.takeaway}
-          </div>
-          <div className="text-[10px] text-gray-200 mt-0.5">
-            {startTime} - {endTime}
+        {/* Service type badge - Styled to match reference */}
+        <div className="absolute bottom-4 left-4">
+          <div className="bg-black/70 text-white px-4 py-2 rounded-lg backdrop-blur-sm shadow-lg">
+            <div className="text-sm font-semibold">
+              {dineIn ? norwegianText.deal.dineIn : norwegianText.deal.takeaway}
+            </div>
+            <div className="text-xs text-gray-200 mt-0.5">
+              {formatTime(timeWindow.start)} - {formatTime(timeWindow.end)}
+            </div>
           </div>
         </div>
       </div>
@@ -206,30 +205,21 @@ export function DealCard({
         </div>
 
         {/* Claim section */}
-        <div className="flex flex-col items-end gap-2">
-          {isUpcoming && (
-            <span className="text-xs text-muted-fg">
-              Tilgjengelig fra {startTime}
-            </span>
-          )}
+        <div className="flex items-center justify-end">
           <button
             onClick={() => {
-              console.log('🔘 Claim button klikket', { title, isRedeemableNow, isSoldOut })
+              console.log('🔘 Claim button clicked', { title, isAvailableNow, isSoldOut })
               onClaim()
             }}
-            disabled={!isClaimableToday || isSoldOut}
+            disabled={disabled}
             className={cn(
               'bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm',
               'hover:bg-blue-700 transition-colors duration-200 shadow-lg',
               'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-              (!isClaimableToday || isSoldOut) && 'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400'
+              disabled && 'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400'
             )}
           >
-            {isSoldOut
-              ? 'Utsolgt'
-              : isRedeemableNow
-                ? norwegianText.actions.claimDeal
-                : 'Planlegg henting'}
+            {isSoldOut ? 'Utsolgt' : buttonLabel}
           </button>
         </div>
       </div>

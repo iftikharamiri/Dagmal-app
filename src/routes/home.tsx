@@ -13,7 +13,12 @@ import { useGeolocation, useReverseGeocoding } from '@/hooks/useGeolocation'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { debounce } from '@/lib/utils'
-import { sortDealsByRestaurantAvailability, getAvailableDealsCount, getPopularDeals } from '@/lib/dealUtils'
+import {
+  sortDealsByRestaurantAvailability,
+  getAvailableDealsCount,
+  getPopularDeals,
+  filterDealsWithinActiveDateRange,
+} from '@/lib/dealUtils'
 import type { DealWithRestaurant } from '@/lib/database.types'
 
 interface FilterState {
@@ -56,6 +61,9 @@ export function HomePage() {
       if (isDemoMode) {
         // Return demo data
         await new Promise(resolve => setTimeout(resolve, 500)) // Simulate loading
+
+        const todayISO = new Date().toISOString().split('T')[0]
+        const nextWeekISO = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
         
         const demoDeals: DealWithRestaurant[] = [
           {
@@ -66,6 +74,8 @@ export function HomePage() {
             discount_percentage: 30,
             original_price: 29900,
             final_price: 20930,
+            start_date: todayISO,
+            end_date: nextWeekISO,
             start_time: '12:00',
             end_time: '22:00',
             available_days: ['1','2','3','4','5','6','7'],
@@ -106,6 +116,8 @@ export function HomePage() {
             discount_percentage: 40,
             original_price: 18000,
             final_price: 10800,
+            start_date: todayISO,
+            end_date: nextWeekISO,
             start_time: '11:00',
             end_time: '21:00',
             available_days: ['1','2','3','4','5','6','7'],
@@ -146,6 +158,8 @@ export function HomePage() {
             discount_percentage: 25,
             original_price: 16000,
             final_price: 12000,
+            start_date: todayISO,
+            end_date: nextWeekISO,
             start_time: '12:00',
             end_time: '14:00',
             available_days: ['1','2','3','4','5','6','7'],
@@ -186,6 +200,8 @@ export function HomePage() {
             discount_percentage: 20,
             original_price: 25000,
             final_price: 20000,
+            start_date: todayISO,
+            end_date: nextWeekISO,
             start_time: '16:00',
             end_time: '23:00',
             available_days: ['1','2','3','4','5','6','7'],
@@ -239,8 +255,9 @@ export function HomePage() {
         
         // Sort deals by restaurant availability first, then by highest discount
         const sortedDeals = sortDealsByRestaurantAvailability(filteredDeals)
+        const activeDeals = filterDealsWithinActiveDateRange(sortedDeals)
         
-        return sortedDeals
+        return activeDeals
       }
 
       // Real Supabase mode
@@ -398,9 +415,11 @@ export function HomePage() {
       
       // Sort deals by restaurant availability first, then by highest discount
       const sortedDeals = sortDealsByRestaurantAvailability(dealsWithPricing)
+      const activeDeals = filterDealsWithinActiveDateRange(sortedDeals)
       console.log('📊 Sorted deals:', sortedDeals.length, 'deals')
+      console.log('🗓️ Active within date range:', activeDeals.length)
       
-      return sortedDeals as DealWithRestaurant[]
+      return activeDeals as DealWithRestaurant[]
     },
   })
 
@@ -499,6 +518,19 @@ export function HomePage() {
     () => debounce((query: string) => setSearchQuery(query), 300),
     []
   )
+
+  const { popularDeals, regularDeals } = useMemo(() => {
+    const popular = getPopularDeals(deals, 3)
+    const popularIds = new Set(popular.map((deal) => deal.id))
+    const regular = deals.filter((deal) => !popularIds.has(deal.id))
+
+    return {
+      popularDeals: popular,
+      regularDeals: regular,
+    }
+  }, [deals])
+
+  const totalActiveDeals = popularDeals.length + regularDeals.length
 
   const handleFavoriteToggle = async (restaurantId: string) => {
     if (!profile) {
@@ -816,7 +848,7 @@ export function HomePage() {
       <main className="pb-20">
         {/* Popular Deals Section */}
         <PopularDeals
-          deals={getPopularDeals(deals, 3)}
+          deals={popularDeals}
           favorites={profile?.favorites || []}
           favoriteDeals={profile?.favorite_deals || []}
           onFavoriteToggle={handleFavoriteToggle}
@@ -824,34 +856,23 @@ export function HomePage() {
           onClaimDeal={setSelectedDeal}
         />
 
-        {/* Available Now Section */}
+        {/* Deals Section */}
         <div className="px-4 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">{deals.length} aktive tilbud</span>
-            </div>
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium">{totalActiveDeals} aktive tilbud</span>
           </div>
 
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="bg-success text-white px-2 py-1 rounded-full text-xs font-medium">
-                {getAvailableDealsCount(deals)}
-              </span>
-              <h3 className="text-lg font-semibold">Tilgjengelig nå</h3>
-            </div>
-
-            {/* Deals List */}
-            <DealsList
-              deals={deals}
-              favorites={profile?.favorites || []}
-              favoriteDeals={profile?.favorite_deals || []}
-              onFavoriteToggle={handleFavoriteToggle}
-              onFavoriteDealToggle={handleFavoriteDealToggle}
-              onClaimDeal={setSelectedDeal}
-              isLoading={dealsLoading}
-            />
-          </div>
+          {/* Deals List */}
+          <DealsList
+            deals={regularDeals}
+            favorites={profile?.favorites || []}
+            favoriteDeals={profile?.favorite_deals || []}
+            onFavoriteToggle={handleFavoriteToggle}
+            onFavoriteDealToggle={handleFavoriteDealToggle}
+            onClaimDeal={setSelectedDeal}
+            isLoading={dealsLoading}
+          />
         </div>
       </main>
 

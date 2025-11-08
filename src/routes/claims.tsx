@@ -9,7 +9,6 @@ import { useAuthGuard } from '@/hooks/useAuthGuard'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { formatPrice, formatTime, cn, completeClaim } from '@/lib/utils'
-import { isDealClaimableToday, isDealRedeemableNow } from '@/lib/dealUtils'
 import type { ClaimWithDealAndRestaurant } from '@/lib/database.types'
 
 // QR Code Modal Component
@@ -59,12 +58,14 @@ function QRCodeModal({ code, onClose }: { code: string; onClose: () => void }) {
 }
 
 // Swipe to Reveal Component
-function SwipeToReveal({ code, claimId, onReveal, onShowQR, onExpire }: { 
+function SwipeToReveal({ code, claimId, onReveal, onShowQR, onExpire, disabled = false, disabledMessage }: { 
   code: string
   claimId: string
   onReveal?: () => void
   onShowQR?: () => void
   onExpire?: () => void
+  disabled?: boolean
+  disabledMessage?: string
 }) {
   const [dragOffset, setDragOffset] = useState(0)
   const [isRevealed, setIsRevealed] = useState(false)
@@ -120,16 +121,27 @@ function SwipeToReveal({ code, claimId, onReveal, onShowQR, onExpire }: {
       }
     }
 
-    checkRevealedState()
+    if (!disabled) {
+      checkRevealedState()
+    } else {
+      setIsRevealed(false)
+      setTimeRemaining(300)
+    }
 
     // Also check when window regains focus (user navigates back)
     const handleFocus = () => {
-      checkRevealedState()
+      if (!disabled) {
+        checkRevealedState()
+      }
     }
     
-    window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
-  }, [STORAGE_KEY, EXPIRY_TIME, onExpire])
+    if (!disabled) {
+      window.addEventListener('focus', handleFocus)
+      return () => window.removeEventListener('focus', handleFocus)
+    }
+
+    return () => {}
+  }, [STORAGE_KEY, EXPIRY_TIME, onExpire, disabled])
 
   // Save revealed state to localStorage when revealed for the first time
   useEffect(() => {
@@ -153,7 +165,7 @@ function SwipeToReveal({ code, claimId, onReveal, onShowQR, onExpire }: {
 
   // Timer: countdown based on actual elapsed time (works across navigation)
   useEffect(() => {
-    if (!isRevealed) {
+    if (!isRevealed || disabled) {
       if (timerRef.current) {
         clearInterval(timerRef.current)
         timerRef.current = null
@@ -203,24 +215,24 @@ function SwipeToReveal({ code, claimId, onReveal, onShowQR, onExpire }: {
         timerRef.current = null
       }
     }
-  }, [isRevealed, onExpire, STORAGE_KEY, EXPIRY_TIME])
+  }, [isRevealed, onExpire, STORAGE_KEY, EXPIRY_TIME, disabled])
 
   const handleStart = (clientX: number) => {
-    if (isRevealed) return
+    if (isRevealed || disabled) return
     updateSliderWidth() // Recalculate width
     startXRef.current = clientX
     isDraggingRef.current = true
   }
 
   const handleMove = (clientX: number) => {
-    if (!isDraggingRef.current || isRevealed) return
+    if (!isDraggingRef.current || isRevealed || disabled) return
     const diff = clientX - startXRef.current
     const maxOffset = sliderWidthRef.current * 0.85 // Allow drag up to 85% of width
     setDragOffset(Math.max(0, Math.min(diff, maxOffset)))
   }
 
   const handleEnd = () => {
-    if (!isDraggingRef.current || isRevealed) {
+    if (!isDraggingRef.current || isRevealed || disabled) {
       isDraggingRef.current = false
       return
     }
@@ -247,18 +259,18 @@ function SwipeToReveal({ code, claimId, onReveal, onShowQR, onExpire }: {
   // Setup touch event listeners with passive: false to allow preventDefault
   useEffect(() => {
     const slider = sliderRef.current
-    if (!slider || isRevealed) return
+    if (!slider || isRevealed || disabled) return
 
     const touchStartHandler = (e: TouchEvent) => {
       e.preventDefault()
-      if (isRevealed) return
+      if (isRevealed || disabled) return
       updateSliderWidth()
       startXRef.current = e.touches[0].clientX
       isDraggingRef.current = true
     }
 
     const touchMoveHandler = (e: TouchEvent) => {
-      if (!isDraggingRef.current || isRevealed) return
+      if (!isDraggingRef.current || isRevealed || disabled) return
       e.preventDefault()
       const diff = e.touches[0].clientX - startXRef.current
       const maxOffset = sliderWidthRef.current * 0.85
@@ -267,7 +279,7 @@ function SwipeToReveal({ code, claimId, onReveal, onShowQR, onExpire }: {
 
     const touchEndHandler = (e: TouchEvent) => {
       e.preventDefault()
-      if (!isDraggingRef.current || isRevealed) {
+      if (!isDraggingRef.current || isRevealed || disabled) {
         isDraggingRef.current = false
         return
       }
@@ -300,11 +312,12 @@ function SwipeToReveal({ code, claimId, onReveal, onShowQR, onExpire }: {
       slider.removeEventListener('touchmove', touchMoveHandler)
       slider.removeEventListener('touchend', touchEndHandler)
     }
-  }, [isRevealed, onReveal, threshold])
+  }, [isRevealed, onReveal, threshold, disabled])
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (disabled) return
     handleStart(e.clientX)
     const handleMouseMove = (e: MouseEvent) => {
       e.preventDefault()
@@ -318,6 +331,19 @@ function SwipeToReveal({ code, claimId, onReveal, onShowQR, onExpire }: {
     }
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
+  }
+
+  if (disabled) {
+    return (
+      <div className="space-y-2">
+        {disabledMessage && (
+          <div className="text-sm text-warning font-medium text-center">{disabledMessage}</div>
+        )}
+        <div className="bg-muted border border-border rounded-xl px-4 py-3 text-sm text-muted-fg text-center">
+          Verifikasjonskoden blir tilgjengelig når tidsvinduet åpner.
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -454,12 +480,43 @@ export function ClaimsPage() {
     retryOnMount: false,
   })
 
-  // Derived: active, non-expired claims only
+  const getClaimDateValue = (claim: ClaimWithDealAndRestaurant): Date | null => {
+    const rawDate = (claim as any).claim_date || claim.created_at
+    if (!rawDate) return null
+    // If rawDate already includes time component, let Date parse handle it
+    if (rawDate.includes('T')) {
+      return new Date(rawDate)
+    }
+    // Treat as YYYY-MM-DD in local time
+    return new Date(`${rawDate}T00:00:00`)
+  }
+
+  const getWindowBounds = (claim: ClaimWithDealAndRestaurant) => {
+    if (!claim.deal) return null
+    const baseDate = getClaimDateValue(claim)
+    if (!baseDate) return null
+
+    const [startHour = 0, startMinute = 0] = (claim.deal.start_time || '00:00').split(':').map(Number)
+    const [endHour = 23, endMinute = 59] = (claim.deal.end_time || '23:59').split(':').map(Number)
+
+    const start = new Date(baseDate)
+    start.setHours(startHour, startMinute, 0, 0)
+
+    const end = new Date(baseDate)
+    end.setHours(endHour, endMinute, 0, 0)
+
+    if (end <= start) {
+      end.setDate(end.getDate() + 1)
+    }
+
+    return { start, end }
+  }
+
   const activeClaims = (claims || []).filter((claim) => {
     const claimAny = claim as any
     if (claim.status === 'completed' || claim.status === 'cancelled' || claimAny.redeemed_at) return false
     if (!claim.deal) return false
-    return isDealClaimableToday(claim.deal)
+    return true
   })
 
   // Derived: history claims (completed/cancelled)
@@ -584,11 +641,31 @@ export function ClaimsPage() {
               {activeClaims.map((claim) => {
                 const deal = claim.deal
                 const restaurant = deal.restaurant
-                const claimDate = new Date(claim.created_at)
-                const isRecent = Date.now() - claimDate.getTime() < 24 * 60 * 60 * 1000 // 24 hours
+                const createdAt = new Date(claim.created_at)
+                const claimDateValue = getClaimDateValue(claim) || createdAt
+                const windowBounds = getWindowBounds(claim)
                 const now = new Date()
-                const claimableToday = isDealClaimableToday(deal, now)
-                const redeemableNow = isDealRedeemableNow(deal, now)
+                const isRecent = Date.now() - createdAt.getTime() < 24 * 60 * 60 * 1000 // 24 hours
+                const isRedeemable = windowBounds ? now >= windowBounds.start && now <= windowBounds.end : true
+                const isUpcoming = windowBounds ? now < windowBounds.start : false
+                const availabilityMessage = (() => {
+                  if (!windowBounds) return undefined
+                  if (isUpcoming) {
+                    const isSameDay = windowBounds.start.toDateString() === now.toDateString()
+                    const dateLabel = isSameDay
+                      ? ''
+                      : `${windowBounds.start.toLocaleDateString('no-NO', {
+                          weekday: 'short',
+                          day: '2-digit',
+                          month: 'short',
+                        })} `
+                    return `Tilgjengelig ${dateLabel}fra kl ${formatTime(deal.start_time)}`
+                  }
+                  if (!isRedeemable) {
+                    return 'Tidsvinduet er utløpt'
+                  }
+                  return undefined
+                })()
 
                 return (
                   <div key={claim.id} className={cn(
@@ -616,7 +693,14 @@ export function ClaimsPage() {
                     <div className="flex items-center gap-4 text-sm">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
-                        <span>{claimDate.toLocaleDateString('no-NO')}</span>
+                        <span>{
+                          claimDateValue.toLocaleDateString('no-NO', {
+                            weekday: 'short',
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })
+                        }</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
@@ -674,18 +758,8 @@ export function ClaimsPage() {
                       </div>
                     </div>
 
-                    {/* Verification Code - Availability Notice */}
-                    {deal.verification_code && claimableToday && !redeemableNow && (
-                      <div className="flex items-center gap-2 bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-2 rounded-2xl border border-yellow-200">
-                        <Clock className="h-4 w-4" />
-                        <span>
-                          Verifikasjonskoden er tilgjengelig fra {formatTime(deal.start_time)}
-                        </span>
-                      </div>
-                    )}
-
                     {/* Verification Code - Swipe to Reveal */}
-                    {deal.verification_code && redeemableNow && (
+                    {deal.verification_code && (
                       <SwipeToReveal 
                         code={deal.verification_code}
                         claimId={claim.id}
@@ -701,6 +775,8 @@ export function ClaimsPage() {
                             toast.error(e?.message || 'Kunne ikke markere tilbudet som brukt')
                           }
                         }}
+                        disabled={!isRedeemable}
+                        disabledMessage={availabilityMessage}
                       />
                     )}
 

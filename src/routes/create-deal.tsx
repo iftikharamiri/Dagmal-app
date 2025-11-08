@@ -31,6 +31,8 @@ interface DealFormData {
   availableFor: string[]
   dietaryInfo: string[]
   availableDays: string[]
+  startDate: string
+  endDate: string
   startTime: string
   endTime: string
   perUserLimit: number
@@ -69,6 +71,7 @@ export function CreateDealPage() {
   // If an edit id is present, we will load the deal and prefill the form
   const params = new URLSearchParams(location.search)
   const editId = params.get('edit')
+  const todayISO = new Date().toISOString().split('T')[0]
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -84,6 +87,8 @@ export function CreateDealPage() {
     availableFor: ['dine_in'],
     dietaryInfo: [],
     availableDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+    startDate: todayISO,
+    endDate: todayISO,
     startTime: '11:00',
     endTime: '15:00',
     perUserLimit: 1,
@@ -305,6 +310,14 @@ export function CreateDealPage() {
       toast.error('Velg minst en dag')
       return false
     }
+    if (!formData.startDate || !formData.endDate) {
+      toast.error('Datoer er påkrevd')
+      return false
+    }
+    if (formData.startDate > formData.endDate) {
+      toast.error('Sluttdato må være etter startdato')
+      return false
+    }
     if (!formData.startTime || !formData.endTime) {
       toast.error('Tidspunkt er påkrevd')
       return false
@@ -327,6 +340,8 @@ export function CreateDealPage() {
       
       const finalPrice = calculateFinalPrice()
       const verificationCode = generateVerificationCode()
+      const today = new Date().toISOString().split('T')[0]
+      const isWithinActiveRange = !formData.endDate || formData.endDate >= today
       
       const dealData = {
         restaurant_id: restaurant.id,
@@ -339,6 +354,8 @@ export function CreateDealPage() {
         available_for: formData.availableFor,
         dietary_info: formData.dietaryInfo,
         available_days: formData.availableDays,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
         start_time: formData.startTime,
         end_time: formData.endTime,
         per_user_limit: formData.perUserLimit,
@@ -346,7 +363,7 @@ export function CreateDealPage() {
         verification_code: verificationCode,
         menu_item_id: formData.selectedMenuItem?.id || null, // Store menu item reference for price_tiers
         selected_price_tiers: formData.selectedPriceTiers.length > 0 ? formData.selectedPriceTiers : null, // Store selected tiers
-        is_active: true
+        is_active: isWithinActiveRange
       }
       
       console.log('📝 Deal data:', dealData)
@@ -366,13 +383,15 @@ export function CreateDealPage() {
             available_for: formData.availableFor,
             dietary_info: formData.dietaryInfo,
             available_days: formData.availableDays,
+            start_date: formData.startDate,
+            end_date: formData.endDate,
             start_time: formData.startTime,
             end_time: formData.endTime,
             per_user_limit: formData.perUserLimit,
             total_limit: formData.totalLimit,
             menu_item_id: formData.selectedMenuItem?.id || null,
             selected_price_tiers: formData.selectedPriceTiers.length > 0 ? formData.selectedPriceTiers : null,
-            is_active: true
+            is_active: isWithinActiveRange
           })
           .eq('id', editId)
         error = updError
@@ -797,6 +816,40 @@ export function CreateDealPage() {
                   ))}
                 </div>
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Fra dato *</label>
+                  <input
+                    type="date"
+                    value={formData.startDate}
+                    min={todayISO}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      updateFormData('startDate', value)
+                      if (formData.endDate && formData.endDate < value) {
+                        updateFormData('endDate', value)
+                      }
+                    }}
+                    className="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Til dato *</label>
+                  <input
+                    type="date"
+                    value={formData.endDate}
+                    min={formData.startDate || todayISO}
+                    onChange={(e) => updateFormData('endDate', e.target.value)}
+                    className="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-fg -mt-2">
+                Tilbudet skjules automatisk etter sluttdatoen.
+              </p>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>

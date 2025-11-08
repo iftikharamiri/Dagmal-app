@@ -1,71 +1,152 @@
 import type { DealWithRestaurant } from '@/lib/database.types'
 
-const DAY_MAP = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+const DAY_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const
 
-const toHHMM = (time: string) => time.slice(0, 5)
-
-const getCurrentHHMM = (now: Date) => now.toTimeString().slice(0, 5)
-
-const resolveNow = (input?: unknown): Date => {
-  if (input instanceof Date) {
-    return input
-  }
-
-  return new Date()
+const DAY_ALIAS_MAP: Record<string, typeof DAY_KEYS[number]> = {
+  '0': 'sunday',
+  '1': 'monday',
+  '2': 'tuesday',
+  '3': 'wednesday',
+  '4': 'thursday',
+  '5': 'friday',
+  '6': 'saturday',
+  '7': 'sunday',
+  sun: 'sunday',
+  sunday: 'sunday',
+  mon: 'monday',
+  monday: 'monday',
+  tue: 'tuesday',
+  tuesday: 'tuesday',
+  wed: 'wednesday',
+  wednesday: 'wednesday',
+  thu: 'thursday',
+  thursday: 'thursday',
+  fri: 'friday',
+  friday: 'friday',
+  sat: 'saturday',
+  saturday: 'saturday',
 }
 
-const isDealActiveOnDay = (deal: DealWithRestaurant, nowInput?: unknown) => {
-  const now = resolveNow(nowInput)
-  if (!deal.available_days || deal.available_days.length === 0) {
+function normalizeDayValue(value: string): typeof DAY_KEYS[number] | null {
+  const normalized = value?.toString().trim().toLowerCase()
+  if (!normalized) return null
+  return DAY_ALIAS_MAP[normalized] ?? null
+}
+
+function parseTimeToMinutes(time: string | null | undefined): number | null {
+  if (!time) return null
+  const trimmed = time.trim()
+  if (!trimmed) return null
+  const [hours, minutes] = trimmed.split(':')
+  const h = parseInt(hours ?? '', 10)
+  const m = parseInt(minutes ?? '0', 10)
+  if (Number.isNaN(h) || Number.isNaN(m)) return null
+  return h * 60 + m
+}
+
+function getCurrentMinutes(now: Date): number {
+  return now.getHours() * 60 + now.getMinutes()
+}
+
+export function isDealWithinActiveDateRange(deal: DealWithRestaurant, referenceDate: Date = new Date()): boolean {
+  const today = referenceDate.toISOString().split('T')[0]
+
+  if (deal.start_date && today < deal.start_date) {
+    return false
+  }
+
+  if (deal.end_date && today > deal.end_date) {
+    return false
+  }
+
+  return true
+}
+
+export function isDealActiveOnReferenceDay(deal: DealWithRestaurant, referenceDate: Date = new Date()): boolean {
+  const availableDays = deal.available_days || []
+  if (availableDays.length === 0) return true
+
+  const currentDayKey = DAY_KEYS[referenceDate.getDay()]
+  const normalizedDays = availableDays
+    .map(normalizeDayValue)
+    .filter((value): value is typeof DAY_KEYS[number] => value !== null)
+
+  if (normalizedDays.length === 0) return true
+
+  return normalizedDays.includes(currentDayKey)
+}
+
+function isCurrentTimeWithinDealWindow(deal: DealWithRestaurant, referenceDate: Date = new Date()): boolean {
+  const startMinutes = parseTimeToMinutes(deal.start_time)
+  const endMinutes = parseTimeToMinutes(deal.end_time)
+
+  if (startMinutes == null || endMinutes == null) return false
+
+  const currentMinutes = getCurrentMinutes(referenceDate)
+
+  if (startMinutes === endMinutes) {
+    // Treat identical start/end as full-day availability
     return true
   }
 
-  const todayName = DAY_MAP[now.getDay()]
-  const normalizedDays = deal.available_days.map(day => day.toLowerCase())
+  if (startMinutes < endMinutes) {
+    return currentMinutes >= startMinutes && currentMinutes <= endMinutes
+  }
 
-  return normalizedDays.includes(todayName)
+  // Handle overnight deals (e.g., 22:00 - 02:00)
+  return currentMinutes >= startMinutes || currentMinutes <= endMinutes
 }
 
 /**
- * Check if a deal can be claimed at any point today (until end time)
+ * Check if a deal is currently available based on time, day, and date range
  */
-export function isDealClaimableToday(deal: DealWithRestaurant, nowInput?: unknown): boolean {
-  const now = resolveNow(nowInput)
+export function isDealCurrentlyAvailable(deal: DealWithRestaurant, referenceDate: Date = new Date()): boolean {
   if (!deal.is_active) return false
-  if (!isDealActiveOnDay(deal, now)) return false
+  if (!isDealWithinActiveDateRange(deal, referenceDate)) return false
+  if (!isDealActiveOnReferenceDay(deal, referenceDate)) return false
 
-  const currentTime = getCurrentHHMM(now)
-  const endTime = toHHMM(deal.end_time)
-
-  return currentTime <= endTime
+  return isCurrentTimeWithinDealWindow(deal, referenceDate)
 }
 
-/**
- * Check if a deal is currently redeemable (within the active window right now)
- */
-export function isDealRedeemableNow(deal: DealWithRestaurant, nowInput?: unknown): boolean {
-  const now = resolveNow(nowInput)
-  if (!isDealClaimableToday(deal, now)) return false
-
-  const currentTime = getCurrentHHMM(now)
-  const startTime = toHHMM(deal.start_time)
-  const endTime = toHHMM(deal.end_time)
-
-  return currentTime >= startTime && currentTime <= endTime
+export function filterDealsWithinActiveDateRange(
+  deals: DealWithRestaurant[],
+  referenceDate: Date = new Date()
+): DealWithRestaurant[] {
+  return deals.filter(
+    (deal) =>
+      deal.is_active &&
+      isDealWithinActiveDateRange(deal, referenceDate) &&
+      isDealActiveOnReferenceDay(deal, referenceDate)
+  )
 }
 
-/**
- * Check if a deal is currently available based on time and day (redeemable right now)
- */
-export function isDealCurrentlyAvailable(deal: DealWithRestaurant, nowInput?: unknown): boolean {
-  return isDealRedeemableNow(deal, nowInput)
+export function isDealUpcomingToday(deal: DealWithRestaurant, referenceDate: Date = new Date()): boolean {
+  if (!deal.is_active) return false
+  if (!isDealWithinActiveDateRange(deal, referenceDate)) return false
+  if (!isDealActiveOnReferenceDay(deal, referenceDate)) return false
+
+  const startMinutes = parseTimeToMinutes(deal.start_time)
+  const endMinutes = parseTimeToMinutes(deal.end_time)
+
+  if (startMinutes == null || endMinutes == null) return false
+
+  const currentMinutes = getCurrentMinutes(referenceDate)
+
+  if (startMinutes === endMinutes) return false
+
+  if (startMinutes < endMinutes) {
+    return currentMinutes < startMinutes
+  }
+
+  // Overnight window: treat as upcoming if current time is before start and before midnight
+  return currentMinutes < startMinutes && currentMinutes > endMinutes
 }
 
 /**
  * Get the number of available deals
  */
 export function getAvailableDealsCount(deals: DealWithRestaurant[]): number {
-  return deals.filter(isDealCurrentlyAvailable).length
+  return deals.filter((deal) => isDealCurrentlyAvailable(deal)).length
 }
 
 /**
@@ -112,14 +193,14 @@ export function sortDealsByRestaurantAvailability(deals: DealWithRestaurant[]): 
  * Get deals that are currently available
  */
 export function getAvailableDeals(deals: DealWithRestaurant[]): DealWithRestaurant[] {
-  return deals.filter(isDealCurrentlyAvailable)
+  return deals.filter((deal) => isDealCurrentlyAvailable(deal))
 }
 
 /**
  * Get deals that are not currently available
  */
 export function getUnavailableDeals(deals: DealWithRestaurant[]): DealWithRestaurant[] {
-  return deals.filter(deal => !isDealCurrentlyAvailable(deal))
+  return deals.filter((deal) => !isDealCurrentlyAvailable(deal))
 }
 
 /**

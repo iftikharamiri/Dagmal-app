@@ -2,6 +2,40 @@ import { useEffect, useRef, useCallback } from 'react'
 import { DealCard } from './DealCard'
 import { norwegianText } from '@/i18n/no'
 import type { DealWithRestaurant } from '@/lib/database.types'
+import { isDealCurrentlyAvailable, isDealUpcomingToday } from '@/lib/dealUtils'
+
+const DEFAULT_DAY_NUMBERS = [1, 2, 3, 4, 5, 6, 7] as const
+
+const DAY_TO_NUMBER_MAP: Record<string, number> = {
+  sunday: 7,
+  0: 7,
+  monday: 1,
+  1: 1,
+  tuesday: 2,
+  2: 2,
+  wednesday: 3,
+  3: 3,
+  thursday: 4,
+  4: 4,
+  friday: 5,
+  5: 5,
+  saturday: 6,
+  6: 6,
+  7: 7,
+}
+
+function getDayNumbers(days: string[] | null | undefined): number[] {
+  if (!days || days.length === 0) return [...DEFAULT_DAY_NUMBERS]
+
+  const mapped = days
+    .map((day) => {
+      const normalized = day?.toString().trim().toLowerCase()
+      return normalized ? DAY_TO_NUMBER_MAP[normalized] : undefined
+    })
+    .filter((value): value is number => typeof value === 'number')
+
+  return mapped.length > 0 ? mapped : [...DEFAULT_DAY_NUMBERS]
+}
 
 interface DealsListProps {
   deals: DealWithRestaurant[]
@@ -67,6 +101,11 @@ export function DealsList({
     <div className="space-y-2">
       {deals.map((deal, index) => {
         const isLast = index === deals.length - 1
+        const dayNumbers = getDayNumbers(deal.available_days)
+        const isCurrentlyAvailable = isDealCurrentlyAvailable(deal)
+        const isUpcomingToday = isDealUpcomingToday(deal)
+        const ctaLabel = isUpcomingToday ? 'Planlegg henting' : norwegianText.actions.claimDeal
+        const isActionDisabled = isUpcomingToday ? false : !isCurrentlyAvailable
         
         return (
           <div
@@ -94,12 +133,14 @@ export function DealsList({
               isFavorite={favoriteDeals.includes(deal.id)}
               onFavoriteToggle={() => onFavoriteDealToggle(deal.id)}
               onClaim={() => onClaimDeal(deal)}
-              days={[1, 2, 3, 4, 5, 6, 7]} // Temporarily use all days for all deals
+              days={dayNumbers}
               address={deal.restaurant.address || undefined}
               badges={deal.restaurant.categories}
               totalLimit={deal.total_limit}
               claimedCount={deal.claimed_count}
-              isActive={deal.is_active}
+              isAvailableNowOverride={isCurrentlyAvailable}
+              ctaLabel={ctaLabel}
+              isActionDisabled={isActionDisabled}
             />
           </div>
         )

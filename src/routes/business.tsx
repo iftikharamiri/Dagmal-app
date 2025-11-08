@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { 
   Building2, Plus, BarChart3, Settings, Clock, Users, TrendingUp, 
   Calendar, MapPin, Phone, Mail, ArrowLeft, Menu, PieChart, 
-  Target, Award, ChefHat, DollarSign
+  Target, DollarSign, Award, ChefHat
 } from 'lucide-react'
 import { norwegianText } from '@/i18n/no'
 import { cn } from '@/lib/utils'
@@ -13,70 +13,6 @@ import { supabase } from '@/lib/supabase'
 export function BusinessPage() {
   const navigate = useNavigate()
   const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'restaurant-setup' | 'menu' | 'offers'>('landing')
-
-  const SmartPricingIcon = ({ className }: { className?: string }) => (
-    <svg
-      className={className}
-      viewBox="0 0 64 64"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect width="64" height="64" rx="12" fill="transparent" />
-      <path
-        d="M18 52V16"
-        stroke="#0B7D3C"
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M18 16L10 24"
-        stroke="#0B7D3C"
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M18 16L26 24"
-        stroke="#0B7D3C"
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M46 12V48"
-        stroke="#F97316"
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M46 48L38 40"
-        stroke="#F97316"
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M46 48L54 40"
-        stroke="#F97316"
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="32" cy="32" r="12" fill="white" stroke="#F97316" strokeWidth="2" />
-      <text
-        x="32"
-        y="36"
-        textAnchor="middle"
-        fontFamily="'Inter', 'Helvetica', 'Arial', sans-serif"
-        fontSize="16"
-        fontWeight="700"
-        fill="#0B7D3C"
-      >
-        kr
-      </text>
-    </svg>
-  )
 
   // Check restaurants owned by user (list)
   const { data: ownedRestaurants = [], isLoading } = useQuery({
@@ -215,7 +151,7 @@ export function BusinessPage() {
           <div className="max-w-6xl mx-auto">
             <h2 className="text-2xl font-bold text-center mb-8">Alt du trenger for å lykkes</h2>
             
-            <div className="grid gap-6 mb-12 md:grid-cols-3">
+            <div className="grid md:grid-cols-2 gap-6 mb-12">
               <div className="card p-6 text-center">
                 <Target className="h-12 w-12 mx-auto mb-4 text-primary" />
                 <h3 className="font-semibold mb-2">Målrettede tilbud</h3>
@@ -223,33 +159,28 @@ export function BusinessPage() {
               </div>
               
               <div className="card p-6 text-center">
-                <SmartPricingIcon className="h-12 w-12 mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Smart prising</h3>
-                <p className="text-sm text-muted-fg">Tilpass prisene etter etterspørsel – høyere ved travle tider, lavere når det er stille. Maksimer inntektene og fyll bordene smartere.</p>
-              </div>
-
-              <div className="card p-6 text-center">
                 <Award className="h-12 w-12 mx-auto mb-4 text-secondary" />
                 <h3 className="font-semibold mb-2">Økt synlighet</h3>
                 <p className="text-sm text-muted-fg">SEO- og AI optimalisering slik at restauranten dukker opp når folk bestiller via AI-plattformer.</p>
               </div>
+            </div>
 
-              {/* Contact */}
-              <div className="card p-8 text-center md:col-start-2">
-                <h3 className="text-xl font-semibold mb-4">Klar til å komme i gang?</h3>
-                <p className="text-muted-fg mb-6">
-                  Kontakt vårt salgsteam for en personlig demo og spesialtilbud for nye partnere.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button className="btn-primary flex-1">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Kontakt salg
-                  </button>
-                  <button className="btn-ghost flex-1">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Ring oss
-                  </button>
-                </div>
+            {/* Contact */}
+            <div className="card p-8 max-w-2xl mx-auto text-center">
+              <h3 className="text-xl font-semibold mb-4">Klar til å komme i gang?</h3>
+              <p className="text-muted-fg mb-6">
+                Kontakt vårt salgsteam for en personlig demo og spesialtilbud for nye partnere.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button className="btn-primary flex-1">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Kontakt salg
+                </button>
+                <button className="btn-ghost flex-1">
+                  <Phone className="h-4 w-4 mr-2" />
+                  Ring oss
+                </button>
               </div>
             </div>
           </div>

@@ -144,6 +144,8 @@ export interface Database {
           available_for: string[]
           dietary_info: string[]
           available_days: string[]
+          start_date: string | null
+          end_date: string | null
           start_time: string
           end_time: string
           per_user_limit: number
@@ -166,6 +168,8 @@ export interface Database {
           available_for?: string[]
           dietary_info?: string[]
           available_days?: string[]
+          start_date?: string | null
+          end_date?: string | null
           start_time: string
           end_time: string
           per_user_limit?: number
@@ -188,6 +192,8 @@ export interface Database {
           available_for?: string[]
           dietary_info?: string[]
           available_days?: string[]
+          start_date?: string | null
+          end_date?: string | null
           start_time?: string
           end_time?: string
           per_user_limit?: number
@@ -204,6 +210,7 @@ export interface Database {
           deal_id: string
           user_id: string
           restaurant_id: string
+          claim_date: string | null
           quantity: number
           service_type: 'dine_in' | 'takeaway'
           phone: string | null
@@ -217,6 +224,7 @@ export interface Database {
           deal_id: string
           user_id: string
           restaurant_id: string
+          claim_date?: string | null
           quantity?: number
           service_type: 'dine_in' | 'takeaway'
           phone?: string | null
@@ -230,6 +238,7 @@ export interface Database {
           deal_id?: string
           user_id?: string
           restaurant_id?: string
+          claim_date?: string | null
           quantity?: number
           service_type?: 'dine_in' | 'takeaway'
           phone?: string | null
