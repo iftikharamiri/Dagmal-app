@@ -81,7 +81,7 @@ export function AIPage() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowSofieDropdown(!showSofieDropdown)}
-                className="inline-flex items-center gap-2 text-sm text-black hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-colors"
+                className="inline-flex items-center gap-2 text-sm text-black hover:bg-muted px-3 py-1.5 rounded-lg transition-colors"
               >
                 <span className="font-semibold">Sofie 0</span>
                 <ChevronDown className={`h-4 w-4 transition-transform ${showSofieDropdown ? 'rotate-180' : ''}`} />
@@ -89,23 +89,23 @@ export function AIPage() {
               
               {/* Dropdown Menu */}
               {showSofieDropdown && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50 overflow-hidden">
+                <div className="absolute top-full left-0 mt-2 w-64 bg-bg rounded-lg shadow-xl border border-border z-50 overflow-hidden">
                   {/* Sofie 0 - Selected */}
-                  <div className="px-4 py-3 border-b border-gray-700">
+                  <div className="px-4 py-3 border-b border-border bg-card">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-sm font-medium text-white">Sofie 0</div>
+                        <div className="text-sm font-medium text-fg">Sofie 0</div>
                       </div>
-                      <Check className="h-4 w-4 text-white" />
+                      <Check className="h-4 w-4 text-primary" />
                     </div>
                   </div>
                   
                   {/* Sofie 1 - Coming Soon */}
-                  <div className="px-4 py-3 bg-gray-900/50">
+                  <div className="px-4 py-3 bg-card/70">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-sm font-medium text-gray-500">Sofie 1</div>
-                        <div className="text-xs text-gray-500 mt-0.5">Kommer snart</div>
+                        <div className="text-sm font-medium text-muted-fg">Sofie 1</div>
+                        <div className="text-xs text-muted-fg mt-0.5">Kommer snart</div>
                       </div>
                     </div>
                   </div>
