@@ -14,7 +14,8 @@ export function AIPage() {
     'Jeg prøvde å spise en klokke. Veldig tidskrevende.',
     'Hva er den mest utskjelte sauen? Møkkavær!',
     'Hva kaller man en fisk uten øyne? Fsk.',
-    ,
+    'Hvorfor tok kaffekoppen et kurs i yoga? Den ville finne roasten sin.',
+    'Hva kaller du en potet som sitter stille? En potetstativ.',
   ])
 
   const sofieDisabledText = 'Jeg er under oppgradering, kommer straks tilbake. Vil du ha en vits? Skriv 1.'

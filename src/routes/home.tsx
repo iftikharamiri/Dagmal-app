@@ -18,6 +18,8 @@ import {
   getAvailableDealsCount,
   getPopularDeals,
   filterDealsWithinActiveDateRange,
+  isDealCurrentlyAvailable,
+  isDealUpcomingToday,
 } from '@/lib/dealUtils'
 import type { DealWithRestaurant } from '@/lib/database.types'
 
@@ -520,12 +522,16 @@ export function HomePage() {
   )
 
   const { popularDeals, regularDeals } = useMemo(() => {
-    const popular = getPopularDeals(deals, 3)
-    const popularIds = new Set(popular.map((deal) => deal.id))
+    const basePopular = getPopularDeals(deals, 3)
+    const popularSorted = [
+      ...basePopular.filter((deal) => isDealCurrentlyAvailable(deal) || isDealUpcomingToday(deal)),
+      ...basePopular.filter((deal) => !isDealCurrentlyAvailable(deal) && !isDealUpcomingToday(deal)),
+    ]
+    const popularIds = new Set(popularSorted.map((deal) => deal.id))
     const regular = deals.filter((deal) => !popularIds.has(deal.id))
 
     return {
-      popularDeals: popular,
+      popularDeals: popularSorted,
       regularDeals: regular,
     }
   }, [deals])
@@ -827,7 +833,6 @@ export function HomePage() {
           </div>
         </div>
 
-
         {/* Search Bar */}
         <div className="relative mb-2">
           <div className="flex items-center gap-3">
@@ -837,7 +842,7 @@ export function HomePage() {
                 type="text"
                 placeholder="Søk restauranter, kjøkken..."
                 onChange={(e) => debouncedSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-border bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-border bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
           </div>
@@ -873,6 +878,32 @@ export function HomePage() {
             onClaimDeal={setSelectedDeal}
             isLoading={dealsLoading}
           />
+
+          {/* Upcoming Partners */}
+          <div className="mt-10">
+            <p className="text-xs font-semibold tracking-[0.3em] text-muted-fg uppercase text-center mb-4">
+              Kommende restauranter
+            </p>
+
+            <div className="overflow-hidden">
+              <div className="flex items-center gap-3 animate-marquee whitespace-nowrap">
+                {[
+                  "Babylon Pizza",
+                  "Babylon Burger",
+                  "Jojo's Pizza & Bar",
+                  "Aas Bistro",
+                  "Charlie's Diner",
+                ].map((partner) => (
+                  <div
+                    key={partner}
+                    className="rounded-2xl border border-border bg-white shadow-sm px-6 py-4 text-base font-semibold text-gray-800"
+                  >
+                    {partner}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 

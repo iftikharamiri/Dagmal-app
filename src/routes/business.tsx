@@ -10,6 +10,36 @@ import { norwegianText } from '@/i18n/no'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 
+const DynamicPricingIcon = () => (
+  <svg
+    className="h-12 w-12 mx-auto mb-4"
+    viewBox="0 0 64 64"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <path
+      d="M20 54V26h-6l12-18 12 18h-6v28z"
+      fill="#0B8A46"
+    />
+    <path
+      d="M44 10v28h6L38 56 26 38h6V10z"
+      fill="#F36F21"
+    />
+    <circle cx="32" cy="32" r="12" fill="#FFFFFF" />
+    <text
+      x="32"
+      y="36"
+      textAnchor="middle"
+      fontSize="14"
+      fontFamily="Inter, system-ui, sans-serif"
+      fill="#0B5333"
+      fontWeight="600"
+    >
+      kr
+    </text>
+  </svg>
+)
+
 export function BusinessPage() {
   const navigate = useNavigate()
   const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'restaurant-setup' | 'menu' | 'offers'>('landing')
@@ -151,7 +181,7 @@ export function BusinessPage() {
           <div className="max-w-6xl mx-auto">
             <h2 className="text-2xl font-bold text-center mb-8">Alt du trenger for å lykkes</h2>
             
-            <div className="grid md:grid-cols-2 gap-6 mb-12">
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
               <div className="card p-6 text-center">
                 <Target className="h-12 w-12 mx-auto mb-4 text-primary" />
                 <h3 className="font-semibold mb-2">Målrettede tilbud</h3>
@@ -162,6 +192,14 @@ export function BusinessPage() {
                 <Award className="h-12 w-12 mx-auto mb-4 text-secondary" />
                 <h3 className="font-semibold mb-2">Økt synlighet</h3>
                 <p className="text-sm text-muted-fg">SEO- og AI optimalisering slik at restauranten dukker opp når folk bestiller via AI-plattformer.</p>
+              </div>
+
+              <div className="card p-6 text-center">
+                <DynamicPricingIcon />
+                <h3 className="font-semibold mb-2">Dynamiske priser</h3>
+                <p className="text-sm text-muted-fg">
+                  Tilpass prisene etter etterspørsel – høyere ved travle tider, lavere når det er stille. Maksimer inntektene og fyll bordene smartere.
+                </p>
               </div>
             </div>
 
