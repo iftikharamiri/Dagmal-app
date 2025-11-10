@@ -26,6 +26,26 @@
       "display_order": 1,
       "items": [
         {
+          "id": "111111",
+          "name": "Vektmat",
+          "price": 0,
+          "meta": {
+            "student": 0,
+            "ansatt": 0,
+            "original_id": "111111"
+          },
+          "price_tiers": [
+            {
+              "type": "student",
+              "amount_ore": 0
+            },
+            {
+              "type": "ansatt",
+              "amount_ore": 0
+            }
+          ]
+        },
+        {
           "id": "104010",
           "name": "1 PIZZA SLICE",
           "price": 3400,

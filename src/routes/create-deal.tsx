@@ -171,15 +171,23 @@ export function CreateDealPage() {
     // Use total limit as expected customers, or default calculation if no limit set
     const expectedCustomers = formData.totalLimit || 8 // default to 8 if no limit
     
-    // Calculate revenue based on the total limit (or expected customers)
-    const discountedPrice = menuItem.price * (1 - discountPercentage / 100)
-    const expectedRevenue = expectedCustomers * discountedPrice
+    const basePriceOre = (() => {
+      if (menuItem.price && menuItem.price > 0) {
+        return menuItem.price
+      }
+      return Math.max(0, Math.round((formData.originalPrice || 0) * 100))
+    })()
+
+    const discountedPriceOre = Math.round(basePriceOre * (1 - discountPercentage / 100))
+    const expectedRevenue = expectedCustomers * discountedPriceOre
     
     // Calculate break-even (how many customers needed to cover costs)
-    const breakEvenPoint = Math.ceil(menuItem.price * 0.7 / discountedPrice) // assuming 70% cost
+    const breakEvenPoint = discountedPriceOre > 0 ? Math.ceil((basePriceOre * 0.7) / discountedPriceOre) : 0 // assuming 70% cost
     
     // Profit margin
-    const profitMargin = ((discountedPrice - menuItem.price * 0.7) / discountedPrice) * 100
+    const profitMargin = discountedPriceOre > 0
+      ? ((discountedPriceOre - basePriceOre * 0.7) / discountedPriceOre) * 100
+      : 0
     
     return {
       expectedCustomers,
@@ -632,6 +640,10 @@ export function CreateDealPage() {
                   {((formData.selectedMenuItem as any).price_tiers as any[]).map((tier, idx) => {
                     const tierType = tier.type === 'student' ? 'student' : tier.type === 'ansatt' ? 'ansatt' : tier.type
                     const isSelected = formData.selectedPriceTiers.includes(tierType)
+                    const baseAmountKr =
+                      tier.amount_ore != null && tier.amount_ore > 0
+                        ? Math.round(tier.amount_ore / 100)
+                        : Math.round(formData.originalPrice || 0)
                     return (
                       <label
                         key={idx}
@@ -654,8 +666,8 @@ export function CreateDealPage() {
                               const firstTier = ((formData.selectedMenuItem as any).price_tiers as any[]).find(
                                 t => (t.type || t.label) === newTiers[0]
                               )
-                              if (firstTier) {
-                                updateFormData('originalPrice', Math.round((firstTier.amount_ore || 0) / 100))
+                              if (firstTier && firstTier.amount_ore && firstTier.amount_ore > 0) {
+                                updateFormData('originalPrice', Math.round(firstTier.amount_ore / 100))
                               }
                             }
                           }}
@@ -664,8 +676,8 @@ export function CreateDealPage() {
                         <span className="font-medium">
                           {tier.type === 'student' ? 'Student' : tier.type === 'ansatt' ? 'Ansatt' : tier.type}
                         </span>
-                        {tier.amount_ore != null && (
-                          <span className="text-sm opacity-80">{Math.round(tier.amount_ore / 100)} kr</span>
+                        {baseAmountKr > 0 && (
+                          <span className="text-sm opacity-80">{baseAmountKr} kr</span>
                         )}
                       </label>
                     )
@@ -715,9 +727,13 @@ export function CreateDealPage() {
                     (t: any) => t.type === tierType
                   )
                   if (!tier) return null
-                  const originalPriceKr = Math.round((tier.amount_ore || 0) / 100)
-                  const finalPriceKr = Math.round(originalPriceKr * (1 - formData.discountPercentage / 100))
-                  const savings = originalPriceKr - finalPriceKr
+                  const basePriceKr =
+                    tier.amount_ore != null && tier.amount_ore > 0
+                      ? Math.round(tier.amount_ore / 100)
+                      : Math.round(formData.originalPrice || 0)
+                  if (basePriceKr <= 0) return null
+                  const finalPriceKr = Math.round(basePriceKr * (1 - formData.discountPercentage / 100))
+                  const savings = basePriceKr - finalPriceKr
                   return (
                     <div key={tierType} className="flex items-center justify-between">
                       <div>
@@ -727,7 +743,7 @@ export function CreateDealPage() {
                         <p className="text-xl font-bold text-success">{finalPriceKr} kr</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-gray-500 line-through">{originalPriceKr} kr</p>
+                        <p className="text-xs text-gray-500 line-through">{basePriceKr} kr</p>
                         <p className="text-sm font-semibold text-success">Spar {savings} kr</p>
                       </div>
                     </div>

@@ -12,10 +12,8 @@ export function AIPage() {
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const jokesRef = useRef<string[]>([
     'Jeg prøvde å spise en klokke. Veldig tidskrevende.',
-    'Hva er den mest utskjelte sauen? Møkkavær!',
-    'Hva kaller man en fisk uten øyne? Fsk.',
-    'Hvorfor tok kaffekoppen et kurs i yoga? Den ville finne roasten sin.',
-    'Hva kaller du en potet som sitter stille? En potetstativ.',
+    'Hva sa den ene veggen til den andre veggen? vi ses på hjørnet!',
+    'hvorfor har elgen horn? Fordi det ville sett dumt ut med rundstykker.'
   ])
 
   const sofieDisabledText = 'Jeg er under oppgradering, kommer straks tilbake. Vil du ha en vits? Skriv 1.'
