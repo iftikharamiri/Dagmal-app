@@ -97,15 +97,18 @@ export function RestaurantPage() {
     enabled: !!profile,
   })
 
-  // Load background image from localStorage when restaurant is loaded
+  // Load background image from database when restaurant is loaded
   React.useEffect(() => {
-    if (restaurant?.id) {
+    if (restaurant?.background_image_url) {
+      setBackgroundImageUrl(restaurant.background_image_url)
+    } else if (restaurant?.id) {
+      // Fallback to localStorage if database doesn't have it yet
       const savedBackground = localStorage.getItem(`restaurant-background-${restaurant.id}`)
       if (savedBackground) {
         setBackgroundImageUrl(savedBackground)
       }
     }
-  }, [restaurant?.id])
+  }, [restaurant?.id, restaurant?.background_image_url])
 
   const handleFavoriteToggle = async () => {
     if (!profile || !restaurant) {

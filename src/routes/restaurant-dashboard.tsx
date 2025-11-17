@@ -215,12 +215,26 @@ export function RestaurantDashboardPage() {
 
       console.log('🔗 Background public URL:', publicUrl)
 
+      // Save to database
+      const { error: updateError } = await supabase
+        .from('restaurants')
+        .update({ background_image_url: publicUrl })
+        .eq('id', restaurant.id)
+
+      if (updateError) {
+        console.error('❌ Error updating restaurant background_image_url:', updateError)
+        throw updateError
+      }
+
       setBackgroundImageUrl(publicUrl)
       
-      // Save to localStorage for persistence
+      // Also save to localStorage as fallback
       if (restaurant?.id) {
         localStorage.setItem(`restaurant-background-${restaurant.id}`, publicUrl)
       }
+      
+      // Invalidate restaurant query to refresh data
+      queryClient.invalidateQueries({ queryKey: ['restaurant', restaurant.id] })
       
       toast.success('Bakgrunnsbilde lastet opp!')
     } catch (error: any) {
@@ -660,15 +674,18 @@ export function RestaurantDashboardPage() {
     enabled: !!restaurant?.id,
   })
 
-  // Load background image from localStorage when restaurant is loaded
+  // Load background image from database when restaurant is loaded
   React.useEffect(() => {
-    if (restaurant?.id) {
+    if (restaurant?.background_image_url) {
+      setBackgroundImageUrl(restaurant.background_image_url)
+    } else if (restaurant?.id) {
+      // Fallback to localStorage if database doesn't have it yet
       const savedBackground = localStorage.getItem(`restaurant-background-${restaurant.id}`)
       if (savedBackground) {
         setBackgroundImageUrl(savedBackground)
       }
     }
-  }, [restaurant?.id])
+  }, [restaurant?.id, restaurant?.background_image_url])
 
   // Calculate stats
   const stats = {
@@ -1006,8 +1023,28 @@ export function RestaurantDashboardPage() {
                         value={backgroundImageUrl}
                         onChange={(e) => {
                           setBackgroundImageUrl(e.target.value)
-                          if (restaurant?.id && e.target.value) {
-                            localStorage.setItem(`restaurant-background-${restaurant.id}`, e.target.value)
+                        }}
+                        onBlur={async (e) => {
+                          const url = e.target.value.trim()
+                          if (url && restaurant?.id) {
+                            try {
+                              const { error } = await supabase
+                                .from('restaurants')
+                                .update({ background_image_url: url })
+                                .eq('id', restaurant.id)
+
+                              if (error) {
+                                console.error('Error updating background_image_url:', error)
+                                toast.error('Kunne ikke lagre URL-en')
+                              } else {
+                                // Also save to localStorage as fallback
+                                localStorage.setItem(`restaurant-background-${restaurant.id}`, url)
+                                // Invalidate restaurant query to refresh data
+                                queryClient.invalidateQueries({ queryKey: ['restaurant', restaurant.id] })
+                              }
+                            } catch (error) {
+                              console.error('Error saving background URL:', error)
+                            }
                           }
                         }}
                         className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"

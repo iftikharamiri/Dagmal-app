@@ -42,6 +42,7 @@ export interface Database {
           name: string
           description: string | null
           image_url: string | null
+          background_image_url: string | null
           phone: string | null
           address: string | null
           city: string | null
@@ -59,6 +60,7 @@ export interface Database {
           name: string
           description?: string | null
           image_url?: string | null
+          background_image_url?: string | null
           phone?: string | null
           address?: string | null
           city?: string | null
@@ -76,6 +78,7 @@ export interface Database {
           name?: string
           description?: string | null
           image_url?: string | null
+          background_image_url?: string | null
           phone?: string | null
           address?: string | null
           city?: string | null
