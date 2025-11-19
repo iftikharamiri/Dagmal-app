@@ -387,26 +387,32 @@ export function HomePage() {
             const discountPercent = deal.discount_percentage / 100
             const pricing: any = {}
             
-            // Only calculate prices for selected tiers
-            if (selectedTiers.includes('student') && studentTier) {
+            // Only calculate prices for selected tiers, and only if amount_ore > 0
+            if (selectedTiers.includes('student') && studentTier && studentTier.amount_ore > 0) {
               const studentOriginal = studentTier.amount_ore
               const studentFinal = Math.round(studentOriginal * (1 - discountPercent))
-              pricing.studentPrice = { original: studentOriginal, final: studentFinal }
+              if (studentFinal > 0) {
+                pricing.studentPrice = { original: studentOriginal, final: studentFinal }
+              }
             }
             
-            if (selectedTiers.includes('ansatt') && ansattTier) {
+            if (selectedTiers.includes('ansatt') && ansattTier && ansattTier.amount_ore > 0) {
               const ansattOriginal = ansattTier.amount_ore
               const ansattFinal = Math.round(ansattOriginal * (1 - discountPercent))
-              pricing.ansattPrice = { original: ansattOriginal, final: ansattFinal }
+              if (ansattFinal > 0) {
+                pricing.ansattPrice = { original: ansattOriginal, final: ansattFinal }
+              }
             }
             
-            // Only add pricing if at least one tier is selected
+            // Only add pricing if at least one tier is selected and has valid prices
             if (Object.keys(pricing).length > 0) {
               console.log(`✅ Added dual pricing for deal ${deal.id}:`, pricing)
               return {
                 ...deal,
                 ...pricing
               }
+            } else {
+              console.log(`⚠️ Deal ${deal.id} has price_tiers but all prices are 0, using regular pricing`)
             }
           } else {
             console.log(`⚠️ Deal ${deal.id} has menu_item_id but no price_tiers found`)
@@ -415,6 +421,10 @@ export function HomePage() {
           if (deal.menu_item_id) {
             console.log(`⚠️ Deal ${deal.id} has menu_item_id=${deal.menu_item_id} but menu item not found in map`)
           }
+        }
+        // Ensure final_price is set correctly if not already set
+        if (!deal.final_price && deal.original_price && deal.discount_percentage) {
+          deal.final_price = Math.round(deal.original_price * (1 - deal.discount_percentage / 100))
         }
         return deal
       })
@@ -892,11 +902,9 @@ export function HomePage() {
             <div className="overflow-hidden">
               <div className="flex items-center gap-3 animate-marquee whitespace-nowrap">
                 {[
-                  "Babylon Pizza",
-                  "Babylon Burger",
                   "Jojo's Pizza & Bar",
                   "Aas Bistro",
-                  "Charlie's Diner",
+                  "Andedammen café og restaurant",
                 ].map((partner) => (
                   <div
                     key={partner}

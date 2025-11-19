@@ -74,7 +74,10 @@ export function DealCard({
       'bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300'
     )}>
       {/* Large Image Section - Made bigger to match reference, responsive */}
-      <div className="relative h-[300px] sm:h-[400px] overflow-hidden bg-transparent">
+      <div 
+        className="relative h-[300px] sm:h-[400px] overflow-hidden bg-transparent cursor-pointer"
+        onClick={() => navigate(`/restaurant/${restaurantId}`)}
+      >
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -102,7 +105,10 @@ export function DealCard({
         
         {/* Favorite button */}
         <button
-          onClick={onFavoriteToggle}
+          onClick={(e) => {
+            e.stopPropagation()
+            onFavoriteToggle()
+          }}
           className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors z-10"
           aria-label={isFavorite ? 'Fjern fra favoritter' : 'Legg til i favoritter'}
         >
@@ -114,14 +120,20 @@ export function DealCard({
         </button>
 
         {/* Discount badge - Styled to match reference exactly */}
-        <div className="absolute top-4 left-4">
+        <div 
+          className="absolute top-4 left-4"
+          onClick={(e) => e.stopPropagation()}
+        >
           <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
 {Math.abs(discountValue)}{discountType === 'percent' ? '%' : ''} off
           </span>
         </div>
 
         {/* Service type badge - Styled to match reference */}
-        <div className="absolute bottom-4 left-4">
+        <div 
+          className="absolute bottom-4 left-4"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="bg-black/70 text-white px-4 py-2 rounded-lg backdrop-blur-sm shadow-lg">
             <div className="text-sm font-semibold">
               {dineIn && takeaway 
@@ -171,26 +183,30 @@ export function DealCard({
             <span className="text-xs">{address || 'Oslo'}</span>
           </div>
           {/* Dual pricing display (student/ansatt) - Vertical layout */}
-          {(studentPrice || ansattPrice) ? (
+          {(studentPrice?.final && studentPrice.final > 0) || (ansattPrice?.final && ansattPrice.final > 0) ? (
             <div className="flex flex-col items-end gap-1">
-              {studentPrice && (
+              {studentPrice?.final && studentPrice.final > 0 && (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-900 font-semibold">
                     {formatPrice(studentPrice.final)} <span className="font-normal">(Student)</span>
                   </span>
-                  <span className="text-[10px] text-gray-400 line-through">
-                    {formatPrice(studentPrice.original)}
-                  </span>
+                  {studentPrice.original > 0 && (
+                    <span className="text-[10px] text-gray-400 line-through">
+                      {formatPrice(studentPrice.original)}
+                    </span>
+                  )}
                 </div>
               )}
-              {ansattPrice && (
+              {ansattPrice?.final && ansattPrice.final > 0 && (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-900 font-semibold">
                     {formatPrice(ansattPrice.final)} <span className="font-normal">(Ansatt)</span>
                   </span>
-                  <span className="text-[10px] text-gray-400 line-through">
-                    {formatPrice(ansattPrice.original)}
-                  </span>
+                  {ansattPrice.original > 0 && (
+                    <span className="text-[10px] text-gray-400 line-through">
+                      {formatPrice(ansattPrice.original)}
+                    </span>
+                  )}
                 </div>
               )}
             </div>

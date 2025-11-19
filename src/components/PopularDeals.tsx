@@ -39,7 +39,10 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
               <div key={deal.id} className="flex-shrink-0 w-80">
                 <div className="relative">
                   {/* Discount Badge */}
-                  <div className="absolute top-3 left-3 z-10">
+                  <div 
+                    className="absolute top-3 left-3 z-10"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <div className="bg-gradient-to-r from-danger to-danger/80 text-white px-3 py-1 rounded-full text-xs font-bold">
 {deal.discount_percentage}%
                     </div>
@@ -49,7 +52,10 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                   {/* Deal Card */}
                   <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow">
                     {/* Image */}
-                    <div className="relative h-48 bg-muted">
+                    <div 
+                      className="relative h-48 bg-muted cursor-pointer"
+                      onClick={() => navigate(`/restaurant/${deal.restaurant_id}`)}
+                    >
                       {deal.image_url ? (
                         <img
                           src={deal.image_url}
@@ -63,7 +69,10 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                       )}
 
                       {/* Service Type and Time Overlay - Bottom Left */}
-                      <div className="absolute bottom-0 left-0 bg-black/70 rounded-xl px-2 py-1.5 text-white backdrop-blur-sm">
+                      <div 
+                        className="absolute bottom-0 left-0 bg-black/70 rounded-xl px-2 py-1.5 text-white backdrop-blur-sm"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <div className="text-xs font-medium">
                           {deal.available_for?.includes('dine_in') && deal.available_for?.includes('takeaway') ? (
                             <span>Spise på stedet • Takeaway</span>
@@ -78,7 +87,10 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
 
                       {/* Favorite Button */}
                       <button
-                        onClick={() => onFavoriteDealToggle(deal.id)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onFavoriteDealToggle(deal.id)
+                        }}
                         className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors z-10"
                       >
                         <Heart 

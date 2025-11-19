@@ -145,6 +145,7 @@ export function RewardsPage() {
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-2">Mynt</h1>
           <p className="text-muted-fg">Hent 1 mynt per dag – bruk på kaffe eller mat</p>
+          <p className="text-muted-fg text-sm mt-2">Bruk av mynter blir tilgjengelig etter nyttår, men du kan samle mynter allerede nå.</p>
         </div>
 
         <div className="mb-6 p-6 text-center bg-card border border-border rounded-2xl shadow-sm relative">
@@ -180,9 +181,9 @@ export function RewardsPage() {
           </h3>
           <div className="grid md:grid-cols-4 gap-4">
             {[
-              { label: 'Kaffe', cost: 7, Icon: Coffee },
-              { label: 'Lunsj', cost: 30, Icon: Pizza },
-              { label: 'Gavekort 100 kr', cost: 50, Icon: Gift },
+              { label: 'Kaffe', cost: 15, Icon: Coffee },
+              { label: 'Lunsj', cost: 45, Icon: Pizza },
+              { label: 'Gavekort 100 kr', cost: 60, Icon: Gift },
               { label: 'Gavekort 200 kr', cost: 100, Icon: Gift },
             ].map(({ label, cost, Icon }) => (
               <button
