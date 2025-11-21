@@ -15,8 +15,10 @@ export function RestaurantPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [selectedDeal, setSelectedDeal] = useState<DealWithRestaurant | null>(null)
-  const [backgroundImageUrl, setBackgroundImageUrl] = useState('')
+  const [backgroundImages, setBackgroundImages] = useState<string[]>([])
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showMenuModal, setShowMenuModal] = useState(false)
+  const [selectedDishImage, setSelectedDishImage] = useState<{ dish: string; day: string; imageUrl: string } | null>(null)
 
   // Fetch restaurant details
   const { data: restaurant, isLoading: restaurantLoading } = useQuery({
@@ -97,18 +99,88 @@ export function RestaurantPage() {
     enabled: !!profile,
   })
 
-  // Load background image from database when restaurant is loaded
+  // Load background images from database when restaurant is loaded
   React.useEffect(() => {
-    if (restaurant?.background_image_url) {
-      setBackgroundImageUrl(restaurant.background_image_url)
-    } else if (restaurant?.id) {
-      // Fallback to localStorage if database doesn't have it yet
-      const savedBackground = localStorage.getItem(`restaurant-background-${restaurant.id}`)
-      if (savedBackground) {
-        setBackgroundImageUrl(savedBackground)
+    if (!restaurant) {
+      setBackgroundImages([])
+      setCurrentImageIndex(0)
+      return
+    }
+
+    // Check restaurant name first for hardcoded backgrounds
+    const restaurantName = restaurant.name?.trim().toLowerCase() || ''
+    const isBikkuben = restaurantName.includes('bikkuben') || restaurantName.includes('bikuben')
+    const isSorhellinga = restaurantName.includes('sør hellinga') || restaurantName.includes('sørhellinga') || restaurantName.includes('sorhellinga')
+
+    // Define carousel images for each restaurant
+    const restaurantCarousels: Record<string, string[]> = {
+      'bikkuben': [
+        '/images/bikkuben-background.jpg',
+        '/images/bikkuben-background1.jpg',
+        '/images/bikkuben-background2.jpg',
+        '/images/bikkuben-background3.jpg',
+        // Add more images here: '/images/bikkuben-background-2.jpg', etc.
+      ],
+      'sørhellinga': [
+        '/images/sørhellinga-background.jpg',
+        '/images/sørhellinga-background1.jpg',
+        '/images/sørhellinga-background2.jpg',
+        // Add more images here: '/images/sørhellinga-background-2.jpg', etc.
+      ],
+    }
+
+    // Priority 1: Database background_image_url (if exists and not empty)
+    if (restaurant.background_image_url && restaurant.background_image_url.trim() !== '') {
+      // If database has single image, use it as array
+      setBackgroundImages([restaurant.background_image_url])
+      setCurrentImageIndex(0)
+      return
+    }
+
+    // Priority 2: Hardcoded carousel for specific restaurants
+    if (isBikkuben) {
+      const images = restaurantCarousels['bikkuben'].filter(img => img) // Filter out empty strings
+      if (images.length > 0) {
+        setBackgroundImages(images)
+        setCurrentImageIndex(0)
+        return
       }
     }
-  }, [restaurant?.id, restaurant?.background_image_url])
+    
+    if (isSorhellinga) {
+      const images = restaurantCarousels['sørhellinga'].filter(img => img) // Filter out empty strings
+      if (images.length > 0) {
+        setBackgroundImages(images)
+        setCurrentImageIndex(0)
+        return
+      }
+    }
+
+    // Priority 3: localStorage fallback
+    if (restaurant.id) {
+      const savedBackground = localStorage.getItem(`restaurant-background-${restaurant.id}`)
+      if (savedBackground && savedBackground.trim() !== '') {
+        setBackgroundImages([savedBackground])
+        setCurrentImageIndex(0)
+        return
+      }
+    }
+
+    // No background found, reset to empty
+    setBackgroundImages([])
+    setCurrentImageIndex(0)
+  }, [restaurant?.id, restaurant?.background_image_url, restaurant?.name])
+
+  // Auto-rotate carousel images every 5 seconds
+  React.useEffect(() => {
+    if (backgroundImages.length <= 1) return // Don't rotate if only one image
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length)
+    }, 5000) // Change image every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [backgroundImages.length])
 
   const handleFavoriteToggle = async () => {
     if (!profile || !restaurant) {
@@ -306,17 +378,27 @@ export function RestaurantPage() {
         </button>
       </div>
 
-      {/* Background Image */}
+      {/* Background Image Carousel */}
       <div className="relative">
         {/* Background image or fallback */}
         <div className="w-full h-64 flex items-center justify-center relative overflow-hidden">
-          {backgroundImageUrl ? (
-            <img
-              src={backgroundImageUrl}
-              alt="Restaurant background"
-              className="w-full h-full object-cover"
-              onError={() => setBackgroundImageUrl('')}
-            />
+          {backgroundImages.length > 0 ? (
+            <>
+              {backgroundImages.map((imageUrl, index) => (
+                <img
+                  key={imageUrl}
+                  src={imageUrl}
+                  alt={`Restaurant background ${index + 1}`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+                    index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  onError={() => {
+                    // Remove failed image from array
+                    setBackgroundImages(prev => prev.filter((_, i) => i !== index))
+                  }}
+                />
+              ))}
+            </>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-amber-100 via-orange-100 to-red-100 flex items-center justify-center relative overflow-hidden">
               {/* Food illustration/pattern */}
@@ -331,14 +413,23 @@ export function RestaurantPage() {
           )}
         </div>
         
-        {/* Image dots indicator */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-          <div className="w-2 h-2 bg-white rounded-full shadow-sm"></div>
-          <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-          <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-          <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-          <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-        </div>
+        {/* Image dots indicator - only show if more than one image */}
+        {backgroundImages.length > 1 && (
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+            {backgroundImages.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentImageIndex(index)}
+                className={`w-2 h-2 rounded-full shadow-sm transition-all ${
+                  index === currentImageIndex 
+                    ? 'bg-white w-6' 
+                    : 'bg-white/50 hover:bg-white/75'
+                }`}
+                aria-label={`Go to image ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <main className="px-4 py-6">
@@ -422,6 +513,183 @@ export function RestaurantPage() {
         {/* Menu Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Meny</h2>
+          
+          {/* Weekplan Section - Only for Bikkuben and Sørhellinga */}
+          {(() => {
+            if (!restaurant?.name) return null
+
+            // Dish images mapping - Update these URLs with your actual image URLs
+            // You can use:
+            // 1. Supabase Storage URLs: https://[project-id].supabase.co/storage/v1/object/public/dish-images/vektmat.jpg
+            // 2. Public folder URLs: /images/dishes/vektmat.jpg (put images in public/images/dishes/)
+            // 3. External URLs: https://example.com/images/vektmat.jpg
+            const dishImages: Record<string, string> = {
+              'vektmat': '', // Ingen bilde ennå
+              'ribbe': '/images/dishes/ribbe.jpg.jpg', // Note: file has double extension
+              'pizza': '/images/dishes/pizza.jpg',
+            }
+
+            // Helper function to get image URL for a dish
+            const getDishImageUrl = (dish: string): string | null => {
+              const lowerDish = dish.toLowerCase()
+              const url = dishImages[lowerDish]
+              // Return null if URL is empty or undefined
+              return url && url.trim() !== '' ? url : null
+            }
+
+            // Define weekplans for each restaurant
+            const bikkubenWeekplan = [
+              { day: 'Mandag', dish: 'vektmat' },
+              { day: 'Tirsdag', dish: 'ribbe' },
+              { day: 'Onsdag', dish: 'vektmat' },
+              { day: 'Torsdag', dish: 'ribbe' },
+              { day: 'Fredag', dish: 'pizza' },
+            ]
+
+            const weekplans: Record<string, { day: string; dish: string }[]> = {
+              'Bikkuben': bikkubenWeekplan,
+              'Bikuben': bikkubenWeekplan, // Handle variation with one 'k'
+              'Sør Hellinga': [
+                { day: 'Mandag', dish: 'vektmat' },
+                { day: 'Tirsdag', dish: 'vektmat' },
+                { day: 'Onsdag', dish: 'vektmat' },
+                { day: 'Torsdag', dish: 'ribbe' },
+                { day: 'Fredag', dish: 'pizza' },
+              ],
+              'Sørhellinga': [
+                { day: 'Mandag', dish: 'vektmat' },
+                { day: 'Tirsdag', dish: 'vektmat' },
+                { day: 'Onsdag', dish: 'vektmat' },
+                { day: 'Torsdag', dish: 'ribbe' },
+                { day: 'Fredag', dish: 'pizza' },
+              ],
+            }
+
+            // Normalize restaurant name for matching (trim and handle variations)
+            const normalizedName = restaurant.name.trim()
+            
+            // Try exact match first
+            let weekplan = weekplans[normalizedName]
+            
+            // If no exact match, try case-insensitive match
+            if (!weekplan) {
+              const lowerName = normalizedName.toLowerCase()
+              for (const [key, value] of Object.entries(weekplans)) {
+                if (key.toLowerCase() === lowerName) {
+                  weekplan = value
+                  break
+                }
+              }
+            }
+            
+            // If still no match, try partial match (e.g., "Bikkuben" matches "Bikkuben Restaurant")
+            if (!weekplan) {
+              for (const [key, value] of Object.entries(weekplans)) {
+                if (normalizedName.toLowerCase().includes(key.toLowerCase()) || 
+                    key.toLowerCase().includes(normalizedName.toLowerCase())) {
+                  weekplan = value
+                  break
+                }
+              }
+            }
+            
+            // Final fallback: check if name contains key words
+            if (!weekplan) {
+              const lowerName = normalizedName.toLowerCase()
+              if (lowerName.includes('bikkuben') || lowerName.includes('bikuben')) {
+                weekplan = bikkubenWeekplan
+              } else if (lowerName.includes('sør') && (lowerName.includes('hellinga') || lowerName.includes('helling'))) {
+                weekplan = weekplans['Sør Hellinga']
+              }
+            }
+            
+            if (!weekplan) {
+              // Debug: log restaurant name to help identify the issue
+              console.log('Restaurant name:', normalizedName, 'Available weekplans:', Object.keys(weekplans))
+              return null
+            }
+
+            return (
+              <>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Ukeplan</h3>
+                  <div className="space-y-3">
+                    {weekplan.map((item, index) => {
+                      const imageUrl = getDishImageUrl(item.dish)
+                      return (
+                        <div 
+                          key={item.day}
+                          className={`flex items-center justify-between py-2 ${
+                            index < weekplan.length - 1 ? 'border-b border-gray-100' : ''
+                          }`}
+                        >
+                          <span className="text-gray-700 font-medium">{item.day}</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-gray-900 capitalize">{item.dish}</span>
+                            {imageUrl ? (
+                              <button
+                                onClick={() => setSelectedDishImage({ dish: item.dish, day: item.day, imageUrl })}
+                                className="flex-shrink-0 hover:opacity-80 transition-opacity"
+                              >
+                                <img
+                                  src={imageUrl}
+                                  alt={item.dish}
+                                  className="w-12 h-12 rounded-lg object-cover border border-gray-200 cursor-pointer"
+                                  onError={(e) => {
+                                    // Hide image if it fails to load
+                                    e.currentTarget.style.display = 'none'
+                                  }}
+                                />
+                              </button>
+                            ) : null}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Dish Image Modal */}
+                {selectedDishImage && (
+                  <div 
+                    className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+                    onClick={() => setSelectedDishImage(null)}
+                  >
+                    <div 
+                      className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* Header */}
+                      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 capitalize">{selectedDishImage.dish}</h3>
+                          <p className="text-sm text-gray-500">{selectedDishImage.day}</p>
+                        </div>
+                        <button
+                          onClick={() => setSelectedDishImage(null)}
+                          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        >
+                          <X className="h-5 w-5 text-gray-600" />
+                        </button>
+                      </div>
+                      
+                      {/* Image */}
+                      <div className="relative w-full aspect-video bg-gray-100">
+                        <img
+                          src={selectedDishImage.imageUrl}
+                          alt={selectedDishImage.dish}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23ddd" width="400" height="300"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="20" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3EImage not found%3C/text%3E%3C/svg%3E'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )
+          })()}
           
           {deals.length > 0 ? (
             <div className="space-y-4">
