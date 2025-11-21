@@ -316,9 +316,49 @@ export function RestaurantPage() {
     }
   }
 
-  const isRestaurantOpen = () => {
-    // TODO: Implement actual opening hours logic
-    return true
+  // Helper function to get current day name in Norwegian
+  const getCurrentDayName = (): string => {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+    return days[new Date().getDay()]
+  }
+
+  // Helper function to format time (HH:mm to HH:MM AM/PM format)
+  const formatTime12Hour = (time24: string): string => {
+    if (!time24) return ''
+    const [hours, minutes] = time24.split(':')
+    const hour = parseInt(hours, 10)
+    const ampm = hour >= 12 ? 'pm' : 'am'
+    const hour12 = hour % 12 || 12
+    return `${hour12}:${minutes}${ampm}`
+  }
+
+  // Get today's opening hours
+  const getTodayOpeningHours = () => {
+    if (!restaurant?.opening_hours) return null
+    
+    const currentDay = getCurrentDayName()
+    const todayHours = restaurant.opening_hours[currentDay]
+    
+    if (!todayHours || todayHours.closed) {
+      return { closed: true }
+    }
+    
+    return {
+      closed: false,
+      open: todayHours.open || '09:00',
+      close: todayHours.close || '21:00',
+    }
+  }
+
+  // Check if restaurant is currently open
+  const isRestaurantOpen = (): boolean => {
+    const todayHours = getTodayOpeningHours()
+    if (!todayHours || todayHours.closed) return false
+    
+    const now = new Date()
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+    
+    return currentTime >= todayHours.open && currentTime <= todayHours.close
   }
 
   const handleMenuClick = () => {
@@ -485,11 +525,131 @@ export function RestaurantPage() {
         <div className="grid grid-cols-2 gap-6 mb-8">
           {/* Opening Hours */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-green-600 font-medium text-sm">Åpen</span>
-              <span className="text-gray-500 text-sm">stenger 9:00pm</span>
-            </div>
-            <p className="text-gray-600 text-sm">9:00am - 9:00pm</p>
+            {(() => {
+              if (!restaurant?.opening_hours) {
+                return (
+                  <>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-gray-500 font-medium text-sm">Åpningstider</span>
+                    </div>
+                    <p className="text-gray-600 text-sm">Ikke oppgitt</p>
+                  </>
+                )
+              }
+              
+              // Get all opening hours
+              const hours = restaurant.opening_hours
+              const monday = hours.monday
+              const tuesday = hours.tuesday
+              const wednesday = hours.wednesday
+              const thursday = hours.thursday
+              const friday = hours.friday
+              const saturday = hours.saturday
+              const sunday = hours.sunday
+              
+              // Check if restaurant is open today
+              const todayHours = getTodayOpeningHours()
+              const isOpen = todayHours && !todayHours.closed ? isRestaurantOpen() : false
+              
+              // Format time: "09:00" -> "09"
+              const formatHour = (time: string) => {
+                if (!time) return ''
+                return time.substring(0, 2) // Returns "09" from "09:00"
+              }
+              
+              // Show simple format based on opening hours pattern
+              let hoursText = ''
+              
+              // Check if all days have same closing time (22:00)
+              const allCloseAt22 = [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+                .every(day => day && !day.closed && day.close === '22:00')
+              
+              if (allCloseAt22) {
+                // Group days by opening time
+                const daysByOpenTime: Record<string, string[]> = {}
+                
+                const dayNames = [
+                  { key: 'monday', label: 'Mandag' },
+                  { key: 'tuesday', label: 'Tirsdag' },
+                  { key: 'wednesday', label: 'Onsdag' },
+                  { key: 'thursday', label: 'Torsdag' },
+                  { key: 'friday', label: 'Fredag' },
+                  { key: 'saturday', label: 'Lørdag' },
+                  { key: 'sunday', label: 'Søndag' }
+                ]
+                
+                dayNames.forEach(({ key, label }) => {
+                  const dayHours = hours[key]
+                  if (dayHours && !dayHours.closed) {
+                    const openTime = formatHour(dayHours.open)
+                    if (!daysByOpenTime[openTime]) {
+                      daysByOpenTime[openTime] = []
+                    }
+                    daysByOpenTime[openTime].push(label)
+                  }
+                })
+                
+                // Format grouped days
+                const groups = Object.entries(daysByOpenTime)
+                  .map(([openTime, days]) => {
+                    if (days.length === 1) {
+                      return `${days[0]}: ${openTime}-22`
+                    } else if (days.length === 2) {
+                      return `${days[0]} og ${days[1]}: ${openTime}-22`
+                    } else {
+                      return `${days[0]} - ${days[days.length - 1]}: ${openTime}-22`
+                    }
+                  })
+                  .join('\n')
+                
+                hoursText = groups
+              } else if (monday && !monday.closed && friday && !friday.closed) {
+                const monThuOpen = formatHour(monday.open)
+                const monThuClose = formatHour(monday.close)
+                const friOpen = formatHour(friday.open)
+                const friClose = formatHour(friday.close)
+                
+                // Check if Saturday has same hours as Friday
+                if (saturday && !saturday.closed && 
+                    friday.open === saturday.open && friday.close === saturday.close) {
+                  // Check if Sunday has same hours as Mon-Thu
+                  if (sunday && !sunday.closed && 
+                      monday.open === sunday.open && monday.close === sunday.close) {
+                    // Format: Søndag - torsdag: 13-21, Fredag - lørdag: 13-22
+                    hoursText = `Søndag - torsdag: ${monThuOpen}-${monThuClose}\nFredag - lørdag: ${friOpen}-${friClose}`
+                  } else {
+                    hoursText = `Mandag-torsdag: ${monThuOpen}-${monThuClose}, Fredag-lørdag: ${friOpen}-${friClose}`
+                  }
+                } else {
+                  hoursText = `Mandag-torsdag: ${monThuOpen}-${monThuClose}, Fredag: ${friOpen}-${friClose}`
+                }
+              } else if (todayHours) {
+                if (todayHours.closed) {
+                  return (
+                    <>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-red-600 font-medium text-sm">Stengt</span>
+                      </div>
+                      <p className="text-gray-600 text-sm">Stengt i dag</p>
+                    </>
+                  )
+                }
+                const open = formatHour(todayHours.open)
+                const close = formatHour(todayHours.close)
+                hoursText = `${open}-${close}`
+              }
+              
+              return (
+                <>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`font-medium text-sm ${isOpen ? 'text-green-600' : 'text-gray-600'}`}>
+                      {isOpen ? 'Åpen' : 'Åpningstider'}
+                    </span>
+                  </div>
+                  <div className="text-gray-600 text-sm whitespace-pre-line">{hoursText || 'Ikke oppgitt'}</div>
+                </>
+              )
+            })()}
           </div>
 
           {/* Address */}

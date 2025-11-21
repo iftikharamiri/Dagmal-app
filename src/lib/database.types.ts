@@ -53,6 +53,7 @@ export interface Database {
           takeaway: boolean
           menu_pdf_url: string | null
           owner_id: string | null
+          opening_hours: any | null
           created_at: string
         }
         Insert: {
@@ -71,6 +72,7 @@ export interface Database {
           takeaway?: boolean
           menu_pdf_url?: string | null
           owner_id?: string | null
+          opening_hours?: any | null
           created_at?: string
         }
         Update: {
@@ -89,6 +91,7 @@ export interface Database {
           takeaway?: boolean
           menu_pdf_url?: string | null
           owner_id?: string | null
+          opening_hours?: any | null
           created_at?: string
         }
       }

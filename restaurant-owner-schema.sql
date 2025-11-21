@@ -99,7 +99,7 @@ BEGIN
   -- Create restaurant record
   INSERT INTO restaurants (
     owner_id, name, description, phone, address, city, 
-    lat, lng, categories, created_at
+    lat, lng, categories, opening_hours, created_at
   ) VALUES (
     app_record.user_id,
     app_record.restaurant_name,
@@ -110,6 +110,7 @@ BEGIN
     app_record.lat,
     app_record.lng,
     app_record.cuisine_types,
+    app_record.opening_hours,
     NOW()
   ) RETURNING id INTO new_restaurant_id;
   
@@ -132,6 +133,10 @@ CREATE INDEX IF NOT EXISTS idx_restaurant_applications_user ON restaurant_applic
 CREATE INDEX IF NOT EXISTS idx_restaurant_applications_status ON restaurant_applications(status);
 CREATE INDEX IF NOT EXISTS idx_restaurants_owner ON restaurants(owner_id);
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
+
+
+
+
 
 
 
