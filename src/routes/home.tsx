@@ -108,6 +108,7 @@ export function HomePage() {
               takeaway: true,
               menu_pdf_url: null,
               owner_id: null,
+              opening_hours: null,
               created_at: new Date().toISOString()
             }
           },
@@ -151,6 +152,7 @@ export function HomePage() {
               takeaway: true,
               menu_pdf_url: null,
               owner_id: null,
+              opening_hours: null,
               created_at: new Date().toISOString()
             }
           },
@@ -194,6 +196,7 @@ export function HomePage() {
               takeaway: true,
               menu_pdf_url: null,
               owner_id: null,
+              opening_hours: null,
               created_at: new Date().toISOString()
             }
           },
@@ -237,6 +240,7 @@ export function HomePage() {
               takeaway: true,
               menu_pdf_url: null,
               owner_id: null,
+              opening_hours: null,
               created_at: new Date().toISOString()
             }
           }
