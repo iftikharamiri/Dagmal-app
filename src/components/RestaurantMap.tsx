@@ -57,6 +57,34 @@ function createDiscountIcon(discount: number, name?: string, id?: string): DivIc
   })
 }
 
+// Create an icon that shows restaurant name with green checkmark (open, no active deals today)
+function createRestaurantNameIcon(name?: string, id?: string): DivIcon {
+  const label = (name || '').toString().slice(0, 24)
+  const html = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+      <div style="
+        display:flex;align-items:center;justify-content:center;
+        width:36px;height:36px;border-radius:9999px;background:#16a34a;color:#fff;
+        font-weight:800;font-size:12px;box-shadow:0 6px 16px rgba(0,0,0,0.25);border:2px solid #fff;">
+        ✓
+      </div>
+      <a href="/restaurant/${id || ''}" style="
+        max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+        background:#111827;color:#fff;padding:4px 8px;border-radius:9999px;
+        font-size:11px;font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.2);">
+        ${label}
+      </a>
+    </div>
+  `
+  return new DivIcon({
+    className: 'restaurant-name-marker',
+    html,
+    iconSize: [180, 60],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -30],
+  })
+}
+
 const closedIcon = new Icon({
   iconUrl: 'data:image/svg+xml;base64,' + btoa(`
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -177,11 +205,11 @@ export function RestaurantMap({
           <Marker
             key={restaurant.id}
             position={[restaurant.lat, restaurant.lng]}
-            icon={(restaurant as any).dealCount && restaurant.activeDeal
+            icon={restaurant.activeDeal && restaurant.activeDeal.discount_percentage
               ? createDiscountIcon(restaurant.activeDeal.discount_percentage, restaurant.name, restaurant.id)
-              : ((restaurant as any).dealCount && (restaurant as any).bestDeal
-                  ? createDiscountIcon((restaurant as any).activeDeal?.discount_percentage || 0, restaurant.name, restaurant.id)
-                  : (restaurant.isOpen ? openIcon : closedIcon))}
+              : restaurant.isOpen
+                ? createRestaurantNameIcon(restaurant.name, restaurant.id)
+                : closedIcon}
             eventHandlers={{
               click: () => onRestaurantClick?.(restaurant),
             }}

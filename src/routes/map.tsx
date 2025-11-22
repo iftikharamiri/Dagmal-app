@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { cn } from '@/lib/utils'
 import { useGeolocation } from '@/hooks/useGeolocation'
+import { filterDealsWithinActiveDateRange } from '@/lib/dealUtils'
 
 interface FilterState {
   cuisines: string[]
@@ -104,9 +105,14 @@ export function MapPage() {
 
       // Convert to array and add best deal info
       return Array.from(restaurantMap.values()).map((restaurant: any) => {
-        // Find the best deal (highest discount percentage)
-        const activeDeal = (restaurant.deals as any[])
-          .filter((deal: any) => deal && deal.is_active)
+        // Filter deals to only include those active today
+        const todayActiveDeals = filterDealsWithinActiveDateRange(
+          (restaurant.deals as any[]).filter((deal: any) => deal && deal.is_active),
+          new Date()
+        )
+        
+        // Find the best deal (highest discount percentage) from today's active deals
+        const activeDeal = todayActiveDeals
           .sort((a: any, b: any) => (b.discount_percentage || 0) - (a.discount_percentage || 0))[0]
 
         return {
@@ -121,11 +127,11 @@ export function MapPage() {
           image_url: restaurant.image_url,
           description: restaurant.description,
           isOpen: restaurant.isOpen,
-          dealCount: (restaurant.deals as any[]).filter((deal: any) => deal && deal.is_active).length,
+          dealCount: todayActiveDeals.length,
           bestDeal: activeDeal ? 
             `${activeDeal.title} - ${activeDeal.discount_percentage}% rabatt` :
             null,
-          activeDeal: activeDeal, // Include full deal info for popup
+          activeDeal: activeDeal || undefined, // Only include if there's an active deal today
         }
       })
     },

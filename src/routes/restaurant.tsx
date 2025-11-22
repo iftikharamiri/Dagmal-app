@@ -8,6 +8,7 @@ import { ClaimFlowModal } from '@/components/ClaimFlowModal'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { cn, isTimeInRange, isDealActiveToday, formatTime, formatPrice } from '@/lib/utils'
+import { filterDealsWithinActiveDateRange } from '@/lib/dealUtils'
 import type { DealWithRestaurant } from '@/lib/database.types'
 
 export function RestaurantPage() {
@@ -39,7 +40,7 @@ export function RestaurantPage() {
   })
 
   // Fetch restaurant deals
-  const { data: deals = [], isLoading: dealsLoading } = useQuery({
+  const { data: allDeals = [], isLoading: dealsLoading } = useQuery({
     queryKey: ['restaurant-deals', id],
     queryFn: async () => {
       if (!id) return []
@@ -59,6 +60,11 @@ export function RestaurantPage() {
     },
     enabled: !!id,
   })
+
+  // Filter deals to only show those active today (same as home page)
+  const deals = React.useMemo(() => {
+    return filterDealsWithinActiveDateRange(allDeals)
+  }, [allDeals])
 
   // Fetch user profile for favorites
   const { data: profile } = useQuery({
@@ -111,6 +117,7 @@ export function RestaurantPage() {
     const restaurantName = restaurant.name?.trim().toLowerCase() || ''
     const isBikkuben = restaurantName.includes('bikkuben') || restaurantName.includes('bikuben')
     const isSorhellinga = restaurantName.includes('sør hellinga') || restaurantName.includes('sørhellinga') || restaurantName.includes('sorhellinga')
+    const isHjerterommet = restaurantName.includes('hjerterommet') || restaurantName.includes('hjerterommet kaffebar')
 
     // Define carousel images for each restaurant
     const restaurantCarousels: Record<string, string[]> = {
@@ -126,6 +133,10 @@ export function RestaurantPage() {
         '/images/sørhellinga-background1.jpg',
         '/images/sørhellinga-background2.jpg',
         // Add more images here: '/images/sørhellinga-background-2.jpg', etc.
+      ],
+      'hjerterommet': [
+        '/images/hjerterommet-background.jpg',
+        // Add more images here: '/images/hjerterommet-background1.jpg', etc.
       ],
     }
 
@@ -149,6 +160,15 @@ export function RestaurantPage() {
     
     if (isSorhellinga) {
       const images = restaurantCarousels['sørhellinga'].filter(img => img) // Filter out empty strings
+      if (images.length > 0) {
+        setBackgroundImages(images)
+        setCurrentImageIndex(0)
+        return
+      }
+    }
+    
+    if (isHjerterommet) {
+      const images = restaurantCarousels['hjerterommet'].filter(img => img) // Filter out empty strings
       if (images.length > 0) {
         setBackgroundImages(images)
         setCurrentImageIndex(0)
@@ -871,7 +891,7 @@ export function RestaurantPage() {
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
                     <span className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      {formatTime(deal.start_time)}–{formatTime(deal.end_time)} {deal.dine_in && deal.takeaway ? 'Begge' : deal.takeaway ? 'Takeaway' : 'Spise på stedet'}
+                      {formatTime(deal.start_time)}–{formatTime(deal.end_time)} {deal.available_for?.includes('dine_in') && deal.available_for?.includes('takeaway') ? 'Begge' : deal.available_for?.includes('takeaway') ? 'Takeaway' : 'Spise på stedet'}
                     </span>
                   </div>
 
@@ -915,8 +935,8 @@ export function RestaurantPage() {
           ) : (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📋</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Menyinformasjon kommer snart!</h3>
-              <p className="text-gray-600">Restauranten jobber med å legge til menyen sin.</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Ingen aktive tilbud i dag</h3>
+              <p className="text-gray-600">Det er ingen aktive tilbud for denne restauranten akkurat nå.</p>
             </div>
           )}
         </div>
@@ -928,8 +948,8 @@ export function RestaurantPage() {
         <ClaimFlowModal
           deal={selectedDeal}
           userLimits={getUserLimits(selectedDeal.id, selectedDeal.per_user_limit)}
-          hasDineIn={selectedDeal.available_for?.includes('dine_in') || false}
-          hasTakeaway={selectedDeal.available_for?.includes('takeaway') || false}
+          hasDineIn={(selectedDeal as any).dine_in}
+          hasTakeaway={(selectedDeal as any).takeaway}
           timeWindow={{
             start: selectedDeal.start_time,
             end: selectedDeal.end_time,
