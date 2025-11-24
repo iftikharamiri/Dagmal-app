@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
 import { BottomNavigation } from '@/components/BottomNavigation'
+import { Analytics } from '@vercel/analytics/react'
 import React from 'react'
 
 // Pages
@@ -92,6 +93,8 @@ function AppContent() {
           },
         }}
       />
+      
+      <Analytics />
     </div>
   )
 }
