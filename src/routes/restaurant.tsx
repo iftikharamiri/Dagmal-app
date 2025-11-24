@@ -891,7 +891,7 @@ export function RestaurantPage() {
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
                     <span className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      {formatTime(deal.start_time)}–{formatTime(deal.end_time)} {deal.available_for?.includes('dine_in') && deal.available_for?.includes('takeaway') ? 'Begge' : deal.available_for?.includes('takeaway') ? 'Takeaway' : 'Spise på stedet'}
+                      {formatTime(deal.start_time)}–{formatTime(deal.end_time)}
                     </span>
                   </div>
 
