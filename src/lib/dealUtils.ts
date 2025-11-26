@@ -143,6 +143,85 @@ export function isDealUpcomingToday(deal: DealWithRestaurant, referenceDate: Dat
 }
 
 /**
+ * Check if a deal is active on any day within the next 7 days (including today)
+ */
+export function isDealActiveWithinNextWeek(deal: DealWithRestaurant, referenceDate: Date = new Date()): boolean {
+  if (!deal.is_active) return false
+
+  const availableDays = deal.available_days || []
+  
+  // Check if deal is active on any day in the next 7 days
+  for (let i = 0; i < 7; i++) {
+    const checkDate = new Date(referenceDate)
+    checkDate.setDate(checkDate.getDate() + i)
+    
+    // Check if this future day is within the deal's date range
+    if (!isDealWithinActiveDateRange(deal, checkDate)) continue
+    
+    // If no specific days are set, assume available all days (within date range)
+    if (availableDays.length === 0) return true
+    
+    // Check if deal is active on this specific day
+    if (isDealActiveOnReferenceDay(deal, checkDate)) {
+      return true
+    }
+  }
+
+  return false
+}
+
+/**
+ * Check if a deal is upcoming within the next 7 days (for "Planlegg henting")
+ * Returns true if the deal starts on any day within the next 7 days but hasn't started yet
+ */
+export function isDealUpcomingWithinWeek(deal: DealWithRestaurant, referenceDate: Date = new Date()): boolean {
+  if (!deal.is_active) return false
+
+  // If deal is currently available, it's not upcoming
+  if (isDealCurrentlyAvailable(deal, referenceDate)) return false
+
+  // Check if deal is upcoming on any day in the next 7 days
+  for (let i = 0; i < 7; i++) {
+    const checkDate = new Date(referenceDate)
+    checkDate.setDate(checkDate.getDate() + i)
+    
+    // Check if deal is within date range for this future day
+    if (!isDealWithinActiveDateRange(deal, checkDate)) continue
+    
+    // Check if deal is active on this day
+    const availableDays = deal.available_days || []
+    if (availableDays.length > 0 && !isDealActiveOnReferenceDay(deal, checkDate)) continue
+
+    // If checking today, use the existing upcoming logic
+    if (i === 0) {
+      if (isDealUpcomingToday(deal, referenceDate)) {
+        return true
+      }
+    } else {
+      // For future days, if the deal is active on that day and within date range, it's upcoming
+      // We consider it upcoming if it's not currently available and will be available in the future
+      return true
+    }
+  }
+
+  return false
+}
+
+/**
+ * Filter deals that are active within the next 7 days (including today)
+ */
+export function filterDealsWithinNextWeek(
+  deals: DealWithRestaurant[],
+  referenceDate: Date = new Date()
+): DealWithRestaurant[] {
+  return deals.filter(
+    (deal) =>
+      deal.is_active &&
+      isDealActiveWithinNextWeek(deal, referenceDate)
+  )
+}
+
+/**
  * Get the number of available deals
  */
 export function getAvailableDealsCount(deals: DealWithRestaurant[]): number {
