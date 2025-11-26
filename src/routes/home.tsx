@@ -18,8 +18,10 @@ import {
   getAvailableDealsCount,
   getPopularDeals,
   filterDealsWithinActiveDateRange,
+  filterDealsWithinNextWeek,
   isDealCurrentlyAvailable,
   isDealUpcomingToday,
+  isDealUpcomingWithinWeek,
 } from '@/lib/dealUtils'
 import type { DealWithRestaurant } from '@/lib/database.types'
 
@@ -265,7 +267,7 @@ export function HomePage() {
         
         // Sort deals by restaurant availability first, then by highest discount
         const sortedDeals = sortDealsByRestaurantAvailability(filteredDeals)
-        const activeDeals = filterDealsWithinActiveDateRange(sortedDeals)
+        const activeDeals = filterDealsWithinNextWeek(sortedDeals)
         
         return activeDeals
       }
@@ -435,9 +437,9 @@ export function HomePage() {
       
       // Sort deals by restaurant availability first, then by highest discount
       const sortedDeals = sortDealsByRestaurantAvailability(dealsWithPricing)
-      const activeDeals = filterDealsWithinActiveDateRange(sortedDeals)
+      const activeDeals = filterDealsWithinNextWeek(sortedDeals)
       console.log('📊 Sorted deals:', sortedDeals.length, 'deals')
-      console.log('🗓️ Active within date range:', activeDeals.length)
+      console.log('🗓️ Active within next week:', activeDeals.length)
       
       return activeDeals as DealWithRestaurant[]
     },
@@ -542,8 +544,8 @@ export function HomePage() {
   const { popularDeals, regularDeals } = useMemo(() => {
     const basePopular = getPopularDeals(deals, 3)
     const popularSorted = [
-      ...basePopular.filter((deal) => isDealCurrentlyAvailable(deal) || isDealUpcomingToday(deal)),
-      ...basePopular.filter((deal) => !isDealCurrentlyAvailable(deal) && !isDealUpcomingToday(deal)),
+      ...basePopular.filter((deal) => isDealCurrentlyAvailable(deal) || isDealUpcomingWithinWeek(deal)),
+      ...basePopular.filter((deal) => !isDealCurrentlyAvailable(deal) && !isDealUpcomingWithinWeek(deal)),
     ]
     const popularIds = new Set(popularSorted.map((deal) => deal.id))
     const regular = deals.filter((deal) => !popularIds.has(deal.id))

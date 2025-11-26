@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import { DealCard } from './DealCard'
 import { norwegianText } from '@/i18n/no'
 import type { DealWithRestaurant } from '@/lib/database.types'
-import { isDealCurrentlyAvailable, isDealUpcomingToday } from '@/lib/dealUtils'
+import { isDealCurrentlyAvailable, isDealUpcomingWithinWeek } from '@/lib/dealUtils'
 
 const DEFAULT_DAY_NUMBERS = [1, 2, 3, 4, 5, 6, 7] as const
 
@@ -103,9 +103,9 @@ export function DealsList({
         const isLast = index === deals.length - 1
         const dayNumbers = getDayNumbers(deal.available_days)
         const isCurrentlyAvailable = isDealCurrentlyAvailable(deal)
-        const isUpcomingToday = isDealUpcomingToday(deal)
-        const ctaLabel = isUpcomingToday ? 'Planlegg henting' : norwegianText.actions.claimDeal
-        const isActionDisabled = isUpcomingToday ? false : !isCurrentlyAvailable
+        const isUpcomingWithinWeek = isDealUpcomingWithinWeek(deal)
+        const ctaLabel = isUpcomingWithinWeek ? 'Planlegg henting' : norwegianText.actions.claimDeal
+        const isActionDisabled = isUpcomingWithinWeek ? false : !isCurrentlyAvailable
         
         return (
           <div

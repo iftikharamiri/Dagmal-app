@@ -1,6 +1,6 @@
 import { Heart, TrendingUp, Users, MapPin, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { isDealCurrentlyAvailable, calculatePopularityScore, isDealUpcomingToday } from '@/lib/dealUtils'
+import { isDealCurrentlyAvailable, calculatePopularityScore, isDealUpcomingWithinWeek } from '@/lib/dealUtils'
 import type { DealWithRestaurant } from '@/lib/database.types'
 
 interface PopularDealsProps {
@@ -30,10 +30,10 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
         <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {deals.map((deal) => {
             const isAvailable = isDealCurrentlyAvailable(deal)
-            const isUpcomingToday = isDealUpcomingToday(deal)
+            const isUpcomingWithinWeek = isDealUpcomingWithinWeek(deal)
             const popularityScore = calculatePopularityScore(deal)
             const isFavorite = favoriteDeals.includes(deal.id)
-            const buttonLabel = isUpcomingToday ? 'Planlegg henting' : isAvailable ? 'Hent tilbud' : 'Utløpt'
+            const buttonLabel = isUpcomingWithinWeek ? 'Planlegg henting' : isAvailable ? 'Hent tilbud' : 'Utløpt'
 
             return (
               <div key={deal.id} className="flex-shrink-0 w-80">
@@ -173,9 +173,9 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                       {/* Claim Button */}
                       <button
                         onClick={() => onClaimDeal(deal)}
-                        disabled={!isAvailable && !isUpcomingToday}
+                        disabled={!isAvailable && !isUpcomingWithinWeek}
                         className={`w-full py-2 px-4 rounded-xl font-medium transition-colors ${
-                          isAvailable || isUpcomingToday
+                          isAvailable || isUpcomingWithinWeek
                             ? 'bg-primary text-primary-fg hover:bg-primary/90'
                             : 'bg-muted text-muted-fg cursor-not-allowed'
                         }`}
