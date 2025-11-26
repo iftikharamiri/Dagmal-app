@@ -148,6 +148,16 @@ A production-ready, mobile-first web app for discovering restaurant deals in Nor
    from public.restaurants limit 1;
    ```
 
+### Keep `claimed_count` in sync
+
+Row Level Security prevents anonymous/app users from updating `deals.claimed_count` directly, so you must install the secure trigger provided in `update-claimed-count-trigger.sql` (or the superset `fix-claimed-count-null-issue.sql`). Run the script in the Supabase SQL editor **after** enabling RLS to ensure it is recreated with `SECURITY DEFINER`, then re-run it whenever the table definition changes. The script will:
+
+1. Recreate the `update_claimed_count` trigger function with elevated privileges so it can update `deals` even when called by end users.
+2. Reinstall the triggers for INSERT/UPDATE/DELETE on `claims`.
+3. Recalculate all existing `claimed_count` values so cards immediately reflect how many offers have been collected.
+
+If you skip this step, every deal card will continue to show `0 hentet` even after users claim offers.
+
 ### Development
 
 ```bash

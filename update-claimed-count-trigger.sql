@@ -2,13 +2,18 @@
 -- Run this in your Supabase SQL Editor
 
 -- Function to update claimed count
-CREATE OR REPLACE FUNCTION update_claimed_count()
-RETURNS TRIGGER AS $$
+-- Fixed to handle NULL values properly (works for deals with or without total_limit)
+CREATE OR REPLACE FUNCTION public.update_claimed_count()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
   -- Handle INSERT (new claim)
   IF TG_OP = 'INSERT' THEN
     UPDATE deals 
-    SET claimed_count = claimed_count + NEW.quantity
+    SET claimed_count = COALESCE(claimed_count, 0) + NEW.quantity
     WHERE id = NEW.deal_id;
     RETURN NEW;
   END IF;
@@ -16,7 +21,7 @@ BEGIN
   -- Handle DELETE (claim cancelled/deleted)
   IF TG_OP = 'DELETE' THEN
     UPDATE deals 
-    SET claimed_count = GREATEST(0, claimed_count - OLD.quantity)
+    SET claimed_count = GREATEST(0, COALESCE(claimed_count, 0) - OLD.quantity)
     WHERE id = OLD.deal_id;
     RETURN OLD;
   END IF;
@@ -26,7 +31,7 @@ BEGIN
     -- Only update if quantity changed
     IF NEW.quantity != OLD.quantity THEN
       UPDATE deals 
-      SET claimed_count = claimed_count - OLD.quantity + NEW.quantity
+      SET claimed_count = COALESCE(claimed_count, 0) - OLD.quantity + NEW.quantity
       WHERE id = NEW.deal_id;
     END IF;
     RETURN NEW;
@@ -34,7 +39,7 @@ BEGIN
   
   RETURN NULL;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- Create triggers for all claim operations
 DROP TRIGGER IF EXISTS update_claimed_count_insert ON claims;
@@ -60,6 +65,8 @@ SET claimed_count = (
   FROM claims 
   WHERE claims.deal_id = deals.id
 );
+
+
 
 
 

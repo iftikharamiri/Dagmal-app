@@ -4,6 +4,102 @@ import { norwegianText } from '@/i18n/no'
 import { formatPrice, formatTime, calcSavings, cn } from '@/lib/utils'
 import type { DealWithRestaurant } from '@/lib/database.types'
 
+const DEFAULT_DAY_NUMBERS = [1, 2, 3, 4, 5, 6, 7] as const
+
+const DAY_TO_NUMBER_MAP: Record<string, number> = {
+  sunday: 7,
+  '0': 7,
+  monday: 1,
+  '1': 1,
+  tuesday: 2,
+  '2': 2,
+  wednesday: 3,
+  '3': 3,
+  thursday: 4,
+  '4': 4,
+  friday: 5,
+  '5': 5,
+  saturday: 6,
+  '6': 6,
+  '7': 7,
+}
+
+const MAX_LOOKAHEAD_DAYS = 30
+
+const toDateOnly = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
+
+const formatDateLocalISO = (date: Date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const parseDateOnly = (value?: string | null) => {
+  if (!value) return null
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) return null
+  return toDateOnly(parsed)
+}
+
+const normalizeDayNumbers = (days: string[] | null | undefined): number[] => {
+  if (!days || days.length === 0) return [...DEFAULT_DAY_NUMBERS]
+
+  const mapped = days
+    .map((day) => {
+      const normalizedKey = day?.toString().trim().toLowerCase()
+      return normalizedKey ? DAY_TO_NUMBER_MAP[normalizedKey] : undefined
+    })
+    .filter((value): value is number => typeof value === 'number')
+
+  return mapped.length > 0 ? mapped : [...DEFAULT_DAY_NUMBERS]
+}
+
+const getDayNumber = (date: Date) => {
+  const jsDay = date.getDay() // 0 (Sunday) ... 6 (Saturday)
+  return jsDay === 0 ? 7 : jsDay
+}
+
+const timeToMinutes = (time: string) => {
+  const [hour = '0', minute = '0'] = time.split(':')
+  return Number(hour) * 60 + Number(minute)
+}
+
+const getNextAvailableDateString = (
+  deal: DealWithRestaurant,
+  timeWindow: { start: string; end: string },
+  referenceDate: Date = new Date()
+): string => {
+  const startDate = parseDateOnly(deal.start_date)
+  const endDate = parseDateOnly(deal.end_date)
+  const allowedDays = new Set(normalizeDayNumbers(deal.available_days))
+  const now = referenceDate
+  const startOfToday = toDateOnly(now)
+  const startMinutes = timeToMinutes(timeWindow.start)
+  const endMinutes = timeToMinutes(timeWindow.end)
+  const currentMinutes = now.getHours() * 60 + now.getMinutes()
+
+  for (let offset = 0; offset < MAX_LOOKAHEAD_DAYS; offset++) {
+    const candidate = new Date(startOfToday)
+    candidate.setDate(candidate.getDate() + offset)
+
+    if (startDate && candidate < startDate) continue
+    if (endDate && candidate > endDate) continue
+
+    const dayNumber = getDayNumber(candidate)
+    if (!allowedDays.has(dayNumber)) continue
+
+    if (offset === 0 && currentMinutes > endMinutes) {
+      continue
+    }
+
+    return formatDateLocalISO(candidate)
+  }
+
+  // Fallback to today's date if no future slot is found
+  return formatDateLocalISO(now)
+}
+
 interface ClaimFlowModalProps {
   deal: DealWithRestaurant
   userLimits: {
@@ -48,33 +144,7 @@ export function ClaimFlowModal({
   const needsServiceTypeSelection = hasDineIn && hasTakeaway
   const needsPhone = serviceType === 'takeaway'
   const maxQuantity = Math.min(userLimits.remainingToday, userLimits.maxPerUser)
-
-  // Calculate claim date based on deal time window
-  const getClaimDate = () => {
-    const now = new Date()
-    const currentTime = now.getHours() * 60 + now.getMinutes()
-    const [startHour, startMinute] = timeWindow.start.split(':').map(Number)
-    const [endHour, endMinute] = timeWindow.end.split(':').map(Number)
-    const startTime = startHour * 60 + startMinute
-    const endTime = endHour * 60 + endMinute
-
-    // If current time is before the deal starts today, use today
-    if (currentTime < startTime) {
-      return now.toISOString().split('T')[0]
-    }
-    
-    // If current time is within the deal window today, use today
-    if (currentTime >= startTime && currentTime <= endTime) {
-      return now.toISOString().split('T')[0]
-    }
-    
-    // If current time is after the deal ends today, use tomorrow
-    const tomorrow = new Date(now)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    return tomorrow.toISOString().split('T')[0]
-  }
-
-  const claimDate = getClaimDate()
+  const claimDate = getNextAvailableDateString(deal, timeWindow)
 
   useEffect(() => {
     // Clear phone when switching to dine_in

@@ -128,28 +128,33 @@ BEGIN
 END $$;
 
 -- Function to update claimed_count when claims are made
-CREATE OR REPLACE FUNCTION update_claimed_count()
-RETURNS TRIGGER AS $$
+-- Fixed to handle NULL values properly (works for deals with or without total_limit)
+CREATE OR REPLACE FUNCTION public.update_claimed_count()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
     IF TG_OP = 'INSERT' THEN
         UPDATE deals 
-        SET claimed_count = claimed_count + NEW.quantity
+        SET claimed_count = COALESCE(claimed_count, 0) + NEW.quantity
         WHERE id = NEW.deal_id;
         RETURN NEW;
     ELSIF TG_OP = 'DELETE' THEN
         UPDATE deals 
-        SET claimed_count = claimed_count - OLD.quantity
+        SET claimed_count = GREATEST(0, COALESCE(claimed_count, 0) - OLD.quantity)
         WHERE id = OLD.deal_id;
         RETURN OLD;
     ELSIF TG_OP = 'UPDATE' THEN
         UPDATE deals 
-        SET claimed_count = claimed_count - OLD.quantity + NEW.quantity
+        SET claimed_count = COALESCE(claimed_count, 0) - OLD.quantity + NEW.quantity
         WHERE id = NEW.deal_id;
         RETURN NEW;
     END IF;
     RETURN NULL;
 END;
-$$ language 'plpgsql';
+$$;
 
 -- Add trigger for claimed_count (only if it doesn't exist)
 DO $$
@@ -275,6 +280,8 @@ AND tablename IN ('profiles', 'restaurants', 'deals', 'claims', 'notifications')
 ORDER BY tablename;
 
 SELECT 'Incremental database update completed successfully!' as status;
+
+
 
 
 

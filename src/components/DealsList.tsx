@@ -104,8 +104,9 @@ export function DealsList({
         const dayNumbers = getDayNumbers(deal.available_days)
         const isCurrentlyAvailable = isDealCurrentlyAvailable(deal)
         const isUpcomingWithinWeek = isDealUpcomingWithinWeek(deal)
-        const ctaLabel = isUpcomingWithinWeek ? 'Planlegg henting' : norwegianText.actions.claimDeal
-        const isActionDisabled = isUpcomingWithinWeek ? false : !isCurrentlyAvailable
+        const isPlanAhead = !isCurrentlyAvailable && isUpcomingWithinWeek
+        const ctaLabel = isPlanAhead ? 'Planlegg henting' : norwegianText.actions.claimDeal
+        const isActionDisabled = isPlanAhead ? false : !isCurrentlyAvailable
         
         return (
           <div
