@@ -543,16 +543,19 @@ export function HomePage() {
 
   const { popularDeals, regularDeals } = useMemo(() => {
     const basePopular = getPopularDeals(deals, 3)
-    const popularSorted = [
-      ...basePopular.filter((deal) => isDealCurrentlyAvailable(deal) || isDealUpcomingWithinWeek(deal)),
-      ...basePopular.filter((deal) => !isDealCurrentlyAvailable(deal) && !isDealUpcomingWithinWeek(deal)),
-    ]
+    
+    // Sort popular deals: available/upcoming first, then by highest discount + most claimed
+    const popularSorted = sortDealsByRestaurantAvailability(basePopular)
+    
     const popularIds = new Set(popularSorted.map((deal) => deal.id))
     const regular = deals.filter((deal) => !popularIds.has(deal.id))
+    
+    // Sort regular deals by availability, then by highest discount + most claimed
+    const regularSorted = sortDealsByRestaurantAvailability(regular)
 
     return {
       popularDeals: popularSorted,
-      regularDeals: regular,
+      regularDeals: regularSorted,
     }
   }, [deals])
 

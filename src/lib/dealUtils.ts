@@ -251,20 +251,39 @@ export function sortDealsByAvailabilityAndDiscount(deals: DealWithRestaurant[]):
 }
 
 /**
- * Simple sorting: Available deals first, then by highest discount
- * Expired deals (utløpt) go to the bottom
+ * Simple sorting: Highest discount + most claimed first, then prioritize available/upcoming deals
+ * Expired deals (utløpt) go to the bottom only if they have lower scores
  */
 export function sortDealsByRestaurantAvailability(deals: DealWithRestaurant[]): DealWithRestaurant[] {
   return [...deals].sort((a, b) => {
+    // Calculate combined score: highest discount percentage + highest claimed count
+    const aScore = a.discount_percentage + (a.claimed_count || 0)
+    const bScore = b.discount_percentage + (b.claimed_count || 0)
+    
+    // Primary sort: by score (highest first)
+    if (bScore !== aScore) {
+      return bScore - aScore
+    }
+    
+    // If scores are equal, prioritize highest discount
+    if (b.discount_percentage !== a.discount_percentage) {
+      return b.discount_percentage - a.discount_percentage
+    }
+    
+    // If discount is also equal, prioritize available/upcoming deals
     const aAvailable = isDealCurrentlyAvailable(a)
     const bAvailable = isDealCurrentlyAvailable(b)
-
-    // Available deals (tilgjengelig) come first
-    if (aAvailable && !bAvailable) return -1
-    if (!aAvailable && bAvailable) return 1
-
-    // If both are available or both are expired, sort by highest discount
-    return b.discount_percentage - a.discount_percentage
+    const aUpcoming = isDealUpcomingWithinWeek(a)
+    const bUpcoming = isDealUpcomingWithinWeek(b)
+    
+    const aPriority = aAvailable || aUpcoming
+    const bPriority = bAvailable || bUpcoming
+    
+    if (aPriority && !bPriority) return -1
+    if (!aPriority && bPriority) return 1
+    
+    // If still equal, prioritize most claimed
+    return (b.claimed_count || 0) - (a.claimed_count || 0)
   })
 }
 
@@ -336,10 +355,33 @@ export function calculatePopularityScore(deal: DealWithRestaurant): number {
 }
 
 /**
- * Get the most popular deals (top 3)
+ * Calculate simple score: discount percentage + claimed count (same as sortDealsByRestaurantAvailability)
+ */
+function calculateSimpleScore(deal: DealWithRestaurant): number {
+  return deal.discount_percentage + (deal.claimed_count || 0)
+}
+
+/**
+ * Get the most popular deals (top 3) based on highest discount + most claimed
  */
 export function getPopularDeals(deals: DealWithRestaurant[], count: number = 3): DealWithRestaurant[] {
   return [...deals]
-    .sort((a, b) => calculatePopularityScore(b) - calculatePopularityScore(a))
+    .sort((a, b) => {
+      // Sort by simple score: discount + claimed count
+      const aScore = calculateSimpleScore(a)
+      const bScore = calculateSimpleScore(b)
+      
+      if (bScore !== aScore) {
+        return bScore - aScore
+      }
+      
+      // If scores are equal, prioritize highest discount
+      if (b.discount_percentage !== a.discount_percentage) {
+        return b.discount_percentage - a.discount_percentage
+      }
+      
+      // If discount is also equal, prioritize most claimed
+      return (b.claimed_count || 0) - (a.claimed_count || 0)
+    })
     .slice(0, count)
 }
