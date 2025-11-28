@@ -8,7 +8,11 @@ import { ClaimFlowModal } from '@/components/ClaimFlowModal'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { cn, isTimeInRange, isDealActiveToday, formatTime, formatPrice } from '@/lib/utils'
-import { filterDealsWithinActiveDateRange } from '@/lib/dealUtils'
+import {
+  filterDealsWithinActiveDateRange,
+  isDealCurrentlyAvailable,
+  isDealUpcomingWithinWeek
+} from '@/lib/dealUtils'
 import type { DealWithRestaurant } from '@/lib/database.types'
 
 export function RestaurantPage() {
@@ -63,7 +67,12 @@ export function RestaurantPage() {
 
   // Filter deals to only show those active today (same as home page)
   const deals = React.useMemo(() => {
-    return filterDealsWithinActiveDateRange(allDeals)
+    const filtered = filterDealsWithinActiveDateRange(allDeals)
+    return filtered.filter((deal) => {
+      const available = isDealCurrentlyAvailable(deal)
+      const upcoming = isDealUpcomingWithinWeek(deal)
+      return available || upcoming
+    })
   }, [allDeals])
 
   // Fetch user profile for favorites
@@ -270,6 +279,26 @@ export function RestaurantPage() {
 
       if (error) throw error
 
+      console.log('✅ Claim created successfully!')
+
+      // Optimistically update claimed_count in cache immediately for all deals queries
+      queryClient.getQueryCache().getAll().forEach((query) => {
+        if ((query.queryKey[0] === 'deals' || query.queryKey[0] === 'restaurant-deals') && Array.isArray(query.state.data)) {
+          queryClient.setQueryData(query.queryKey, (oldData: any) => {
+            if (!oldData) return oldData
+            return oldData.map((deal: any) => {
+              if (deal.id === selectedDeal.id) {
+                return {
+                  ...deal,
+                  claimed_count: (deal.claimed_count || 0) + claimData.quantity
+                }
+              }
+              return deal
+            })
+          })
+        }
+      })
+
       // Create notification for restaurant owner
       try {
         const notificationPayload = {
@@ -298,20 +327,17 @@ export function RestaurantPage() {
         console.warn('⚠️ Notification creation failed:', notificationErr)
       }
 
-      // Fallback: manually bump claimed_count in case trigger isn't present
-      try {
-        await supabase
-          .from('deals')
-          .update({ claimed_count: (selectedDeal as any).claimed_count + claimData.quantity })
-          .eq('id', selectedDeal.id)
-      } catch {}
-
-      // Refresh daily claims and user claims
-      queryClient.invalidateQueries({ queryKey: ['daily-claims'] })
-      queryClient.invalidateQueries({ queryKey: ['user-claims'] })
-      // Also refresh deals on home and this restaurant's deals list
-      queryClient.invalidateQueries({ queryKey: ['deals'] })
-      queryClient.invalidateQueries({ queryKey: ['restaurant-deals', id] })
+      // Refresh daily claims, user claims, and deals list to update claimed_count
+      // Use refetchQueries with prefix matching to ensure all deals queries are refetched
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: ['daily-claims'] }),
+        queryClient.refetchQueries({ queryKey: ['user-claims'] }),
+        queryClient.refetchQueries({ 
+          queryKey: ['deals'],
+          exact: false // Match all queries that start with 'deals'
+        }),
+        queryClient.refetchQueries({ queryKey: ['restaurant-deals', id] }),
+      ])
       
       toast.success(norwegianText.success.dealClaimed, {
         action: {
@@ -921,12 +947,36 @@ export function RestaurantPage() {
                         )}
                       </div>
 
-                      <button
-                        onClick={() => setSelectedDeal(deal)}
-                        className="bg-red-500 text-white px-6 py-2 rounded-xl text-sm font-medium hover:bg-red-600 transition-colors"
-                      >
-                        Hent tilbud
-                      </button>
+                      {(() => {
+                        const isCurrentlyAvailable = isDealCurrentlyAvailable(deal)
+                        const isPlanAhead = !isCurrentlyAvailable && isDealUpcomingWithinWeek(deal)
+                        const buttonLabel = isCurrentlyAvailable
+                          ? 'Hent tilbud'
+                          : isPlanAhead
+                            ? 'Planlegg henting'
+                            : 'Utløpt'
+                        const disabled = !isCurrentlyAvailable && !isPlanAhead
+
+                        return (
+                          <button
+                            onClick={() => {
+                              if (disabled) return
+                              setSelectedDeal(deal)
+                            }}
+                            disabled={disabled}
+                            className={cn(
+                              'px-6 py-2 rounded-xl text-sm font-medium transition-colors',
+                              disabled
+                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                : isPlanAhead
+                                  ? 'bg-orange-500 text-white hover:bg-orange-600'
+                                  : 'bg-red-500 text-white hover:bg-red-600'
+                            )}
+                          >
+                            {buttonLabel}
+                          </button>
+                        )
+                      })()}
                     </div>
                   </div>
                 </div>
