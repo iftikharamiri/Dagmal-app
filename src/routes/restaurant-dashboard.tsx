@@ -12,6 +12,7 @@ import { CompleteMenu, parseMenuToDatabase } from '@/lib/menuUtils'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { getActiveRestaurantId, removeActiveRestaurantId } from '@/lib/storage'
 
 interface RestaurantDeal {
   id: string
@@ -581,13 +582,13 @@ export function RestaurantDashboardPage() {
     })
   }
 
-  // Sync activeRestaurantId from localStorage to state so queryKey updates
+  // Sync activeRestaurantId from cookie storage to state so queryKey updates
   const [activeId, setActiveId] = React.useState<string | null>(null)
   React.useEffect(() => {
-    const id = typeof window !== 'undefined' ? localStorage.getItem('activeRestaurantId') : null
+    const id = getActiveRestaurantId()
     setActiveId(id)
     const handleStorage = () => {
-      const newId = typeof window !== 'undefined' ? localStorage.getItem('activeRestaurantId') : null
+      const newId = getActiveRestaurantId()
       setActiveId(newId)
     }
     window.addEventListener('storage', handleStorage)
@@ -617,7 +618,7 @@ export function RestaurantDashboardPage() {
         if (error) {
           // If not found or not owned, clear selection and fall through
           if (typeof window !== 'undefined') {
-            localStorage.removeItem('activeRestaurantId')
+            removeActiveRestaurantId()
             setActiveId(null)
           }
           throw error

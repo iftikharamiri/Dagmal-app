@@ -1,0 +1,75 @@
+warning: in the working copy of 'incremental-database-update.sql', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'production-database-setup.sql', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'restaurant-owner-schema.sql', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/DealsList.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/PopularDeals.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/routes/home.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/routes/rewards.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'update-babylon-burger-opening-hours.sql', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'update-charlies-diner-opening-hours.sql', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'update-claimed-count-trigger.sql', LF will be replaced by CRLF the next time Git touches it
+.gitignore
+DATABASE_SETUP.md
+IMPLEMENTATION_SUMMARY.md
+MENU_FEATURES_SUMMARY.md
+MENU_JSON_SYSTEM.md
+PDF_FIX_SUMMARY.md
+PDF_MENU_GUIDE.md
+PHONE_AUTH_TROUBLESHOOTING.md
+SERVER_STATUS.md
+START_SERVER.md
+TROUBLESHOOTING_GUIDE.md
+add-background-image-url.sql
+add-claim-date-to-claims.sql
+add-deal-favorites.sql
+add-menu-items-table.sql
+add-menu-pdf-column.sql
+add-name-fields-to-claims.sql
+add-notifications-table.sql
+add-opening-hours-to-restaurants.sql
+add-special-requests-to-notifications.sql
+add-unique-constraint.sql
+babylon-burger-menu.json
+check-and-fix-storage.sql
+cleanup-verification-code.sql
+create_menu_items_table.sql
+fix-database-schema.sql
+fix-deals-schema.sql
+fix-notifications-rls.sql
+fix-rls.sql
+incremental-database-update.sql
+menu-schema.json
+production-database-setup.sql
+production-deployment-checklist.md
+production-environment-setup.md
+production-security-setup.sql
+public/icon-192.png
+public/icon-512.png
+safe-menu-items-migration.sql
+sample-complete-menu.json
+sample-menu.json
+setup-supabase.md
+setup.md
+sias-complete-menu.priced.json
+simple-claims-fix.sql
+src/components/DealsList.tsx
+src/components/FilterSheet.tsx
+src/components/MenuDisplay.tsx
+src/components/PopularDeals.tsx
+src/components/ProfileForm.tsx
+src/lib/dealUtils.ts
+src/main.tsx
+src/routes/home.tsx
+src/styles/tokens.css
+src/test/setup.ts
+test-database-setup.sql
+test-database.js
+test-menu-upload.js
+test-menu.json
+test-notifications.js
+test-pdf-api.js
+tests/utils.test.ts
+update-bikkuben-sorhellinga-opening-hours.sql
+update-claimed-count-trigger.sql
+update-deals-total-limit.sql
+update-hjerterommet-opening-hours.sql

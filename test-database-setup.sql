@@ -95,3 +95,8 @@ INSERT INTO deals (
 
 
 
+
+
+
+
+

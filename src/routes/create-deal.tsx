@@ -103,7 +103,7 @@ export function CreateDealPage() {
       if (!user) throw new Error('Not authenticated')
 
       // If a specific restaurant was selected earlier, use that
-      const activeId = localStorage.getItem('activeRestaurantId')
+      const activeId = getActiveRestaurantId()
       if (activeId) {
         const { data, error } = await supabase
           .from('restaurants')

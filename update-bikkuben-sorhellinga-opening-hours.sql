@@ -22,3 +22,4 @@ WHERE LOWER(name) LIKE '%bikkuben%'
    OR LOWER(name) LIKE '%sørhellinga%'
    OR LOWER(name) LIKE '%sorhellinga%';
 
+

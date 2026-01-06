@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { setWelcomeSeen } from '@/lib/storage'
 
 export function WelcomePage() {
   const navigate = useNavigate()
@@ -19,7 +20,7 @@ export function WelcomePage() {
             className="btn-primary px-6 py-3 text-base"
             aria-label="Kom i gang"
             onClick={() => {
-              try { localStorage.setItem('welcomeSeen', '1') } catch {}
+              setWelcomeSeen()
               navigate('/')
             }}
           >

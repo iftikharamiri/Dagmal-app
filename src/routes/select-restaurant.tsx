@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Building2, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { setActiveRestaurantId } from '@/lib/storage'
 
 export function SelectRestaurantPage() {
   const navigate = useNavigate()
@@ -23,7 +24,7 @@ export function SelectRestaurantPage() {
   })
 
   const choose = (id: string) => {
-    localStorage.setItem('activeRestaurantId', id)
+    setActiveRestaurantId(id)
     // Dispatch event so dashboard can react immediately
     window.dispatchEvent(new Event('restaurant-selected'))
     navigate('/business/dashboard')

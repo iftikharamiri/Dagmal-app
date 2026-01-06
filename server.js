@@ -14,6 +14,10 @@ const PORT = process.env.PORT || 3001
 app.use(cors())
 app.use(express.json())
 
+// Note: For future server-side cookie tracking, check cookie consent
+// The frontend stores consent in 'dagmal_consent' cookie
+// Use the consent utilities from src/lib/consent.ts to check user preferences
+
 // Configure multer for file uploads
 const storage = multer.memoryStorage()
 const upload = multer({ 

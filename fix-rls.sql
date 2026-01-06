@@ -47,3 +47,8 @@ ALTER TABLE deals ENABLE ROW LEVEL SECURITY;
 
 
 
+
+
+
+
+

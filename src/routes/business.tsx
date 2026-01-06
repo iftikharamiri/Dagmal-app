@@ -9,6 +9,7 @@ import {
 import { norwegianText } from '@/i18n/no'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
+import { setActiveRestaurantId } from '@/lib/storage'
 
 const DynamicPricingIcon = () => (
   <svg
@@ -87,7 +88,7 @@ export function BusinessPage() {
     if (ownedRestaurants.length === 1) {
       // Ensure selection is stored
       const only = ownedRestaurants[0]
-      try { localStorage.setItem('activeRestaurantId', only.id) } catch {}
+      setActiveRestaurantId(only.id)
       navigate('/business/dashboard')
     } else if (ownedRestaurants.length > 1) {
       navigate('/business/select')

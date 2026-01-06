@@ -19,3 +19,4 @@ SET opening_hours = '{
 WHERE LOWER(name) LIKE '%hjerterommet%'
    OR LOWER(name) LIKE '%hjerterommet kaffebar%';
 
+

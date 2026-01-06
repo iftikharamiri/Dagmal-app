@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
 import { BottomNavigation } from '@/components/BottomNavigation'
+import { CookieConsentBanner } from '@/components/CookieConsentBanner'
 import { Analytics } from '@vercel/analytics/react'
 import React from 'react'
 
@@ -41,15 +42,14 @@ function AppContent() {
   // First-visit redirect to welcome page
   React.useEffect(() => {
     if (location.pathname === '/') {
-      try {
-        const seen = localStorage.getItem('welcomeSeen')
-        if (!seen) {
+      import('@/lib/storage').then(({ hasWelcomeSeen }) => {
+        if (!hasWelcomeSeen()) {
           window.history.replaceState(null, '', '/welcome')
         }
-      } catch {
-        // If localStorage blocked, still show welcome
+      }).catch(() => {
+        // If storage blocked, still show welcome
         window.history.replaceState(null, '', '/welcome')
-      }
+      })
     }
   }, [location.pathname])
 
@@ -81,6 +81,8 @@ function AppContent() {
       </Routes>
 
       {showBottomNav && <BottomNavigation />}
+      
+      <CookieConsentBanner />
       
       <Toaster 
         position="top-center"

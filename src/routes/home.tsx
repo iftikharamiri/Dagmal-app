@@ -707,6 +707,43 @@ export function HomePage() {
 
       console.log('✅ Claim created successfully!')
 
+      // Update claimed_count in database (fallback if trigger doesn't work)
+      try {
+        const { data: currentDeal } = await supabase
+          .from('deals')
+          .select('claimed_count')
+          .eq('id', selectedDeal.id)
+          .single()
+
+        if (currentDeal) {
+          await supabase
+            .from('deals')
+            .update({ claimed_count: (currentDeal.claimed_count || 0) + claimData.quantity })
+            .eq('id', selectedDeal.id)
+          console.log('✅ Updated claimed_count in database')
+        }
+      } catch (updateErr) {
+        console.warn('⚠️ Could not update claimed_count in database:', updateErr)
+      }
+
+      // Optimistically update claimed_count in cache immediately
+      // Update the specific deals query that's currently being used
+      queryClient.setQueryData(
+        ['deals', searchQuery, filters],
+        (oldData: any) => {
+          if (!oldData || !Array.isArray(oldData)) return oldData
+          return oldData.map((deal: any) => {
+            if (deal.id === selectedDeal.id) {
+              return {
+                ...deal,
+                claimed_count: (deal.claimed_count || 0) + claimData.quantity
+              }
+            }
+            return deal
+          })
+        }
+      )
+
       // Create notification for restaurant owner
       try {
         const notificationPayload = {
@@ -735,31 +772,16 @@ export function HomePage() {
         console.warn('⚠️ Notification creation failed:', notificationErr)
       }
 
-      // Manually update claimed_count if trigger doesn't work
-      try {
-        const { error: updateError } = await supabase
-          .from('deals')
-          .update({
-            claimed_count: (selectedDeal as any).claimed_count + claimData.quantity  
-          } as any)
-          .eq('id', selectedDeal.id)
-        
-        if (updateError) {
-          console.warn('⚠️ Could not update claimed_count manually:', updateError)
-        } else {
-          console.log('✅ Manually updated claimed_count')
-        }
-      } catch (updateErr) {
-        console.warn('⚠️ Manual claimed_count update failed:', updateErr)
-      }
-
       // Close the modal
       setSelectedDeal(null)
 
       // Refresh daily claims, user claims, and deals list to update availability
-      queryClient.invalidateQueries({ queryKey: ['daily-claims'] })
-      queryClient.invalidateQueries({ queryKey: ['user-claims'] })
-      queryClient.invalidateQueries({ queryKey: ['deals'] })
+      // Refetch the specific deals query to sync with database
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: ['daily-claims'] }),
+        queryClient.refetchQueries({ queryKey: ['user-claims'] }),
+        queryClient.refetchQueries({ queryKey: ['deals', searchQuery, filters] }),
+      ])
       
       toast.success('Tilbud hentet! Du kan se det under "Mine tilbud".', {
         action: {

@@ -21,3 +21,8 @@ COMMENT ON COLUMN restaurants.menu_pdf_url IS 'URL to the restaurant menu PDF fi
 
 
 
+
+
+
+
+

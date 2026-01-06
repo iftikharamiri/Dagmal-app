@@ -62,3 +62,8 @@ CREATE TRIGGER update_menu_items_updated_at
 
 
 
+
+
+
+
+

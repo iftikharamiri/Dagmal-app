@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { setActiveRestaurantId } from '@/lib/storage'
 
 export function AuthPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
@@ -168,7 +169,7 @@ export function AuthPage() {
           }
 
           if (owned && owned.length === 1) {
-            localStorage.setItem('activeRestaurantId', owned[0].id)
+            setActiveRestaurantId(owned[0].id)
           }
 
           toast.success('Logget inn!')
