@@ -59,12 +59,10 @@ export function CookieConsentBanner() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-fg mb-2">
-                    Vi bruker informasjonskapsler (cookies)
+                    Cookies
                   </h3>
                   <p className="text-sm text-muted-fg leading-relaxed">
-                    Vi bruker informasjonskapsler for å forbedre opplevelsen din, analysere hvordan du bruker appen, 
-                    og for å tilby deg personlig tilpasset innhold. Du kan velge hvilke typer informasjonskapsler du 
-                    godtar nedenfor.
+                    Vi bruker cookies for at appen skal fungere og for å forbedre tjenesten. Du kan endre innstillingene dine.
                   </p>
                 </div>
                 <button
@@ -87,7 +85,7 @@ export function CookieConsentBanner() {
                   onClick={handleRejectOptional}
                   className="btn-ghost flex-1"
                 >
-                  Kun nødvendige
+                  Avslå alt unødvendig
                 </button>
                 <button
                   onClick={() => setShowSettings(true)}
@@ -103,7 +101,7 @@ export function CookieConsentBanner() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-fg">
-                  Informasjonskapsel-innstillinger
+                  Cookies-innstillinger
                 </h3>
                 <button
                   onClick={() => setShowSettings(false)}
@@ -113,6 +111,12 @@ export function CookieConsentBanner() {
                   <X className="h-5 w-5" />
                 </button>
               </div>
+
+              <p className="text-sm text-muted-fg leading-relaxed">
+                Vi bruker cookies for å få appen til å fungere, og for å forbedre tjenesten vår. 
+                Du kan når som helst velge om vi bare skal bruke nødvendige cookies, eller også bruke data 
+                til analyse og tilpasset innhold.
+              </p>
 
               <div className="space-y-4">
                 {/* Necessary cookies */}
@@ -212,13 +216,10 @@ export function CookieConsentBanner() {
                   Lagre innstillinger
                 </button>
                 <button
-                  onClick={() => {
-                    setShowSettings(false)
-                    setPreferences(getConsentPreferences())
-                  }}
-                  className="btn-ghost"
+                  onClick={handleRejectOptional}
+                  className="btn-ghost flex-1"
                 >
-                  Avbryt
+                  Avslå alt unødvendig (kun nødvendige)
                 </button>
               </div>
             </div>
