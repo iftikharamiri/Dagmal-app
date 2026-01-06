@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { DishSelectionModal } from '@/components/DishSelectionModal'
 import { MenuItem } from '@/lib/database.types'
 import { formatPrice } from '@/lib/utils'
+import { getActiveRestaurantId } from '@/lib/storage'
 
 // Generate unique verification code
 const generateVerificationCode = (): string => {
