@@ -61,10 +61,10 @@ export function AIPage() {
   const hasConversation = messages.length > 0
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col items-center">
       {/* Sticky Header */}
       <div className="fixed top-0 left-0 right-0 px-3 py-2 border-b border-border/60 bg-bg/90 backdrop-blur z-40">
-        <div className="max-w-4xl mx-auto">
+        <div className="w-full max-w-2xl mx-auto">
           <div className="flex items-center justify-between gap-3">
             {/* Back button */}
             <div className="flex items-center gap-2">
@@ -131,11 +131,11 @@ export function AIPage() {
       </div>
 
       {/* Content Area (scrolls under header) */}
-      <div className="flex-1 pt-16">
+      <div className="flex-1 w-full max-w-2xl pt-16 px-4 sm:px-0">
         {!hasConversation ? (
           // Initial state: Centered input
-          <div className="w-full px-4 pt-4">
-            <div className="max-w-3xl mx-auto text-center">
+          <div className="w-full pt-4">
+            <div className="mx-auto text-center">
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight mb-6">
                 Hva har du lyst på i dag?
               </h1>
@@ -175,8 +175,8 @@ export function AIPage() {
           </div>
         ) : (
           // Conversation state: Scrollable messages
-          <div className="h-full overflow-y-auto px-4 pb-28">
-            <div className="max-w-3xl mx-auto">
+          <div className="h-full overflow-y-auto pb-28">
+            <div className="mx-auto">
               <div className="space-y-4 py-4">
                 {messages.map((m, i) => (
                   <div key={i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
