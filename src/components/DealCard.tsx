@@ -124,7 +124,7 @@ export function DealCard({
           className="absolute top-4 left-4"
           onClick={(e) => e.stopPropagation()}
         >
-          <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+          <span className="bg-red-500 text-white px-5 py-2.5 rounded-full text-lg font-bold shadow-lg">
 {Math.abs(discountValue)}{discountType === 'percent' ? '%' : ''} off
           </span>
         </div>

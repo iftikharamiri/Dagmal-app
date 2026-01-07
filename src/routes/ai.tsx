@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState, useEffect, useRef } from 'react'
-import { ChevronDown, Mic, Home, Check } from 'lucide-react'
+import { ChevronDown, Mic, ArrowLeft, Check, ArrowUp, MoreHorizontal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 export function AIPage() {
@@ -62,86 +62,94 @@ export function AIPage() {
 
   return (
     <div className="min-h-screen bg-bg flex flex-col">
-      {/* Fixed home icon - top left */}
-      <button
-        onClick={() => navigate('/')}
-        className="fixed top-2 left-3 z-50 p-2 rounded-lg bg-card/80 backdrop-blur hover:bg-card transition-colors border border-border"
-        aria-label="Hjem"
-        title="Hjem"
-      >
-        <Home className="h-4 w-4 text-black" />
-      </button>
-
-      {/* Sofie 1 will be part of the scrollable header below (not fixed) */}
-
-      {/* Header */}
-      <div className="px-4 pt-12 pb-4 flex-shrink-0">
+      {/* Sticky Header */}
+      <div className="fixed top-0 left-0 right-0 px-3 py-2 border-b border-border/60 bg-bg/90 backdrop-blur z-40">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="relative" ref={dropdownRef}>
+          <div className="flex items-center justify-between gap-3">
+            {/* Back button */}
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => setShowSofieDropdown(!showSofieDropdown)}
-                className="inline-flex items-center gap-2 text-sm text-black hover:bg-muted px-3 py-1.5 rounded-lg transition-colors"
+                onClick={() => navigate(-1)}
+                className="inline-flex items-center justify-center rounded-full border border-border bg-card h-8 w-8 hover:bg-muted transition-colors"
+                aria-label="Tilbake"
               >
-                <span className="font-semibold">Sofie 0</span>
-                <ChevronDown className={`h-4 w-4 transition-transform ${showSofieDropdown ? 'rotate-180' : ''}`} />
+                <ArrowLeft className="h-3 w-3 text-fg" />
               </button>
-              
-              {/* Dropdown Menu */}
-              {showSofieDropdown && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-bg rounded-lg shadow-xl border border-border z-50 overflow-hidden">
-                  {/* Sofie 0 - Selected */}
-                  <div className="px-4 py-3 border-b border-border bg-card">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm font-medium text-fg">Sofie 0</div>
-                      </div>
-                      <Check className="h-4 w-4 text-primary" />
-                    </div>
-                  </div>
-                  
-                  {/* Sofie 1 - Coming Soon */}
-                  <div className="px-4 py-3 bg-card/70">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm font-medium text-muted-fg">Sofie 1</div>
-                        <div className="text-xs text-muted-fg mt-0.5">Kommer snart</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
-          <div className="mt-3 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">S</div>
-            <div className="inline-block bg-muted px-4 py-3 rounded-2xl rounded-tl-sm text-sm leading-relaxed text-left">
-              Hei, jeg er Sofie. Jeg finner tilbud, reserverer bord og hjelper med allergier.
+
+            {/* Center group: Sofie 0 selector */}
+            <div className="flex-1 flex items-center justify-center">
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setShowSofieDropdown(!showSofieDropdown)}
+                  className="inline-flex items-center gap-1.5 text-sm sm:text-base font-semibold text-fg px-0 py-0 hover:text-fg transition-colors"
+                >
+                  <span>Sofie 0</span>
+                  <ChevronDown className={`h-3 w-3 transition-transform ${showSofieDropdown ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {/* Dropdown Menu */}
+                {showSofieDropdown && (
+                  <div className="absolute top-full right-0 mt-2 w-60 bg-bg rounded-xl shadow-xl border border-border z-50 overflow-hidden">
+                    {/* Sofie 0 - Selected (no special background) */}
+                    <div className="px-4 py-3 border-b border-border">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm font-medium text-fg">Sofie 0</div>
+                          <div className="text-xs text-muted-fg mt-0.5">Nåværende versjon</div>
+                        </div>
+                        <Check className="h-4 w-4 text-primary" />
+                      </div>
+                    </div>
+                    
+                    {/* Sofie 1 - Coming Soon (keeps background) */}
+                    <div className="px-4 py-3 bg-card/70">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm font-medium text-muted-fg">Sofie 1</div>
+                          <div className="text-xs text-muted-fg mt-0.5">Kommer snart</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right-side menu (three dots) */}
+            <div className="flex items-center justify-end w-8">
+              <button
+                type="button"
+                className="inline-flex items-center justify-center h-7 w-7 rounded-full hover:bg-muted transition-colors text-muted-fg"
+                aria-label="Meny"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Content Area */}
-      {!hasConversation ? (
-        // Initial state: Centered input
-        <div className="flex-1 flex items-start">
-          <div className="w-full px-4 pt-8">
+      {/* Content Area (scrolls under header) */}
+      <div className="flex-1 pt-16">
+        {!hasConversation ? (
+          // Initial state: Centered input
+          <div className="w-full px-4 pt-4">
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight mb-6">
                 Hva har du lyst på i dag?
               </h1>
               <div className="bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/50 border border-border rounded-2xl shadow-sm overflow-hidden">
-                <form className="flex items-center" onSubmit={handleSubmit}>
+                <form className="flex items-center gap-2 pr-2" onSubmit={handleSubmit}>
                   <input
                     type="text"
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder="Skriv hva som helst"
-                    className="w-full bg-transparent px-4 sm:px-6 py-4 text-left outline-none placeholder:text-muted-fg/70"
+                    className="w-full bg-transparent px-4 sm:px-6 py-4 text-left outline-none placeholder:text-muted-fg/70 text-sm sm:text-base"
                     aria-label="Sofie AI søk"
                   />
-                  <div className="flex items-center gap-2 pr-2 sm:pr-3">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     <button
                       type="button"
                       onClick={handleMicClick}
@@ -150,38 +158,48 @@ export function AIPage() {
                     >
                       <Mic className="h-5 w-5" />
                     </button>
+                    <button
+                      type="submit"
+                      className="inline-flex items-center justify-center rounded-full bg-primary text-primary-fg px-3 py-2 hover:bg-primary/90 transition-colors"
+                      aria-label="Send"
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </button>
                   </div>
                 </form>
               </div>
+              <p className="mt-3 text-xs text-muted-fg">
+               Sofie hjelper deg med restauranter, tilbud og allergihensyn.
+              </p>
             </div>
           </div>
-        </div>
-      ) : (
-        // Conversation state: Scrollable messages
-        <div className="flex-1 overflow-y-auto px-4 pb-28">
-          <div className="max-w-3xl mx-auto">
-            <div className="space-y-4 py-4">
-              {messages.map((m, i) => (
-                <div key={i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
-                  {m.role === 'sofie' ? (
-                    <div className="inline-flex items-start gap-3">
-                      <div className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0">S</div>
-                      <div className="inline-block bg-muted px-4 py-3 rounded-2xl rounded-tl-sm text-base leading-relaxed text-left max-w-[85%]">
+        ) : (
+          // Conversation state: Scrollable messages
+          <div className="h-full overflow-y-auto px-4 pb-28">
+            <div className="max-w-3xl mx-auto">
+              <div className="space-y-4 py-4">
+                {messages.map((m, i) => (
+                  <div key={i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
+                    {m.role === 'sofie' ? (
+                      <div className="inline-flex items-start gap-3">
+                        <div className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0">S</div>
+                        <div className="inline-block bg-muted px-4 py-3 rounded-2xl rounded-tl-sm text-base leading-relaxed text-left max-w-[85%]">
+                          {m.text}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="inline-block bg-primary text-primary-fg px-4 py-3 rounded-2xl rounded-tr-sm text-base leading-relaxed max-w-[85%]">
                         {m.text}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="inline-block bg-primary text-primary-fg px-4 py-3 rounded-2xl rounded-tr-sm text-base leading-relaxed max-w-[85%]">
-                      {m.text}
-                    </div>
-                  )}
-                </div>
-              ))}
-              <div ref={endRef} />
+                    )}
+                  </div>
+                ))}
+                <div ref={endRef} />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Sticky Footer Input - Only shown when conversation has started */}
       {hasConversation && (
@@ -194,17 +212,24 @@ export function AIPage() {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Skriv hva som helst"
-                  className="w-full bg-transparent px-4 sm:px-6 py-3 text-left outline-none placeholder:text-muted-fg/70"
+                  className="w-full bg-transparent px-4 sm:px-6 py-3 text-left outline-none placeholder:text-muted-fg/70 text-sm sm:text-base"
                   aria-label="Sofie AI søk"
                 />
               </div>
               <button
                 type="button"
                 onClick={handleMicClick}
+                className="p-2.5 rounded-full border border-border bg-card hover:bg-muted transition-colors flex-shrink-0 text-muted-fg"
+                aria-label="Snakk"
+              >
+                <Mic className="h-5 w-5" />
+              </button>
+              <button
+                type="submit"
                 className="p-3 rounded-full bg-primary text-primary-fg hover:bg-primary/90 transition-colors flex-shrink-0"
                 aria-label="Send"
               >
-                <Mic className="h-5 w-5" />
+                <ArrowUp className="h-5 w-5" />
               </button>
             </form>
           </div>

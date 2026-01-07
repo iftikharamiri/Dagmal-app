@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { norwegianText } from '@/i18n/no'
@@ -24,17 +24,30 @@ export function AuthPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const urlMode = searchParams.get('mode') as 'signin' | 'signup' | null
 
   useEffect(() => {
+    // Set mode from URL if present
+    if (urlMode === 'signin' || urlMode === 'signup') {
+      setMode(urlMode)
+    }
+
     // Check if user is already logged in
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        navigate('/')
+        // If there's a pending deal, go to home (which will open it)
+        const pendingDealId = localStorage.getItem('pendingDealId')
+        if (pendingDealId) {
+          navigate('/')
+        } else {
+          navigate('/')
+        }
       }
     }
     checkAuth()
-  }, [navigate])
+  }, [navigate, urlMode])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -116,6 +129,13 @@ export function AuthPage() {
           }
 
           toast.success('Konto opprettet! Sjekk e-posten din for bekreftelse.')
+          
+          // Check if there's a pending deal to return to
+          const pendingDealId = localStorage.getItem('pendingDealId')
+          if (pendingDealId) {
+            // Don't navigate yet, wait for email confirmation
+            // The user will be redirected after confirming email
+          }
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -178,7 +198,15 @@ export function AuthPage() {
         }
 
         toast.success('Logget inn!')
-        navigate('/')
+        
+        // Check if there's a pending deal to return to
+        const pendingDealId = localStorage.getItem('pendingDealId')
+        if (pendingDealId) {
+          // Navigate to home, which will automatically open the deal
+          navigate('/')
+        } else {
+          navigate('/')
+        }
       }
     } catch (error: any) {
       console.error('Auth error:', error)

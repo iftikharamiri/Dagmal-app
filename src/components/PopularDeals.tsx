@@ -43,7 +43,7 @@ export function PopularDeals({ deals, favorites, favoriteDeals, onFavoriteToggle
                     className="absolute top-3 left-3 z-10"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="bg-gradient-to-r from-danger to-danger/80 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    <div className="bg-gradient-to-r from-danger to-danger/80 text-white px-4 py-2 rounded-full text-lg font-bold">
 {deal.discount_percentage}%
                     </div>
                   </div>

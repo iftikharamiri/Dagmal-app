@@ -7,6 +7,7 @@ import { DealsList } from '@/components/DealsList'
 import { PopularDeals } from '@/components/PopularDeals'
 import { FilterSheet } from '@/components/FilterSheet'
 import { ClaimFlowModal } from '@/components/ClaimFlowModal'
+import { LoginRequiredModal } from '@/components/LoginRequiredModal'
 import { NavigationMenu } from '@/components/NavigationMenu'
 import { useGeolocation, useReverseGeocoding } from '@/hooks/useGeolocation'
 // import { useAuthGuard } from '@/hooks/useAuthGuard'
@@ -42,6 +43,8 @@ export function HomePage() {
   })
   const [showFilters, setShowFilters] = useState(false)
   const [selectedDeal, setSelectedDeal] = useState<DealWithRestaurant | null>(null)
+  const [showLoginRequired, setShowLoginRequired] = useState(false)
+  const [pendingDealForLogin, setPendingDealForLogin] = useState<DealWithRestaurant | null>(null)
   const queryClient = useQueryClient()
 
   // Get user's current location
@@ -453,7 +456,41 @@ export function HomePage() {
       setUser(user)
     }
     fetchUser()
-  }, [])
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const newUser = session?.user ?? null
+      setUser(newUser)
+      
+      // If user just logged in and there's a pending deal, open it
+      if (newUser && pendingDealForLogin) {
+        setSelectedDeal(pendingDealForLogin)
+        setPendingDealForLogin(null)
+        setShowLoginRequired(false)
+        // Clear from localStorage
+        localStorage.removeItem('pendingDealId')
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [pendingDealForLogin])
+
+  // Check for pending deal on mount or when deals are loaded
+  useEffect(() => {
+    if (user && deals.length > 0) {
+      const pendingDealId = localStorage.getItem('pendingDealId')
+      if (pendingDealId && !selectedDeal && !pendingDealForLogin) {
+        // Find the deal in the current deals list
+        const deal = deals.find(d => d.id === pendingDealId)
+        if (deal) {
+          setSelectedDeal(deal)
+          localStorage.removeItem('pendingDealId')
+        }
+      }
+    }
+  }, [user, deals, selectedDeal, pendingDealForLogin])
 
   // Fetch user profile for favorites
   const { data: profile } = useQuery({
@@ -903,7 +940,14 @@ export function HomePage() {
           favoriteDeals={profile?.favorite_deals || []}
           onFavoriteToggle={handleFavoriteToggle}
           onFavoriteDealToggle={handleFavoriteDealToggle}
-          onClaimDeal={setSelectedDeal}
+          onClaimDeal={(deal) => {
+            if (!user) {
+              setPendingDealForLogin(deal)
+              setShowLoginRequired(true)
+            } else {
+              setSelectedDeal(deal)
+            }
+          }}
         />
 
         {/* Deals Section */}
@@ -920,7 +964,14 @@ export function HomePage() {
             favoriteDeals={profile?.favorite_deals || []}
             onFavoriteToggle={handleFavoriteToggle}
             onFavoriteDealToggle={handleFavoriteDealToggle}
-            onClaimDeal={setSelectedDeal}
+            onClaimDeal={(deal) => {
+              if (!user) {
+                setPendingDealForLogin(deal)
+                setShowLoginRequired(true)
+              } else {
+                setSelectedDeal(deal)
+              }
+            }}
             isLoading={dealsLoading}
           />
 
@@ -962,6 +1013,16 @@ export function HomePage() {
         distance={filters.distance}
         sort={filters.sort}
         onFiltersChange={setFilters}
+      />
+
+      {/* Login Required Modal */}
+      <LoginRequiredModal
+        isOpen={showLoginRequired}
+        onClose={() => {
+          setShowLoginRequired(false)
+          setPendingDealForLogin(null)
+        }}
+        dealId={pendingDealForLogin?.id}
       />
 
       {/* Claim Flow Modal */}
