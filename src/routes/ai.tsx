@@ -66,18 +66,16 @@ export function AIPage() {
       <div className="fixed top-0 left-0 right-0 px-3 py-2 border-b border-border/60 bg-bg/90 backdrop-blur z-40">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between gap-3">
-            {/* Back button */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => navigate(-1)}
-                className="inline-flex items-center justify-center rounded-full border border-border bg-card h-8 w-8 hover:bg-muted transition-colors"
-                aria-label="Tilbake"
-              >
-                <ArrowLeft className="h-3 w-3 text-fg" />
-              </button>
-            </div>
+            {/* Back button on the far left */}
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center justify-center rounded-full border border-border bg-card h-9 w-9 hover:bg-muted transition-colors"
+              aria-label="Tilbake"
+            >
+              <ArrowLeft className="h-4 w-4 text-fg" />
+            </button>
 
-            {/* Center group: Sofie 0 selector */}
+            {/* Center: Sofie 0 selector */}
             <div className="flex-1 flex items-center justify-center">
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -85,7 +83,7 @@ export function AIPage() {
                   className="inline-flex items-center gap-1.5 text-sm sm:text-base font-semibold text-fg px-0 py-0 hover:text-fg transition-colors"
                 >
                   <span>Sofie 0</span>
-                  <ChevronDown className={`h-3 w-3 transition-transform ${showSofieDropdown ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-4 w-4 transition-transform ${showSofieDropdown ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {/* Dropdown Menu */}
@@ -116,16 +114,14 @@ export function AIPage() {
               </div>
             </div>
 
-            {/* Right-side menu (three dots) */}
-            <div className="flex items-center justify-end w-8">
-              <button
-                type="button"
-                className="inline-flex items-center justify-center h-7 w-7 rounded-full hover:bg-muted transition-colors text-muted-fg"
-                aria-label="Meny"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </button>
-            </div>
+            {/* Three dots on the far right */}
+            <button
+              type="button"
+              className="inline-flex items-center justify-center h-9 w-9 rounded-full hover:bg-muted transition-colors text-muted-fg"
+              aria-label="Meny"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </div>
