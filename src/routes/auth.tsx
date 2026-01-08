@@ -42,7 +42,7 @@ export function AuthPage() {
         if (pendingDealId) {
           navigate('/')
         } else {
-          navigate('/')
+        navigate('/')
         }
       }
     }
@@ -205,7 +205,7 @@ export function AuthPage() {
           // Navigate to home, which will automatically open the deal
           navigate('/')
         } else {
-          navigate('/')
+        navigate('/')
         }
       }
     } catch (error: any) {
