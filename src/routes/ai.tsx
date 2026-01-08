@@ -400,7 +400,7 @@ export function AIPage() {
                               {/* Deal Cards Grid */}
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {m.deals.slice(0, 4).map((deal, index) => {
-                                  const restaurant = deal.restaurant || deal.restaurants
+                                  const restaurant = deal.restaurant || (deal as any).restaurants
                                   const isAvailable = isDealCurrentlyAvailable(deal)
                                   const distance = (deal as any).distance
                                   const distanceText = distance ? `${(distance * 1000).toFixed(0)}m` : ''
@@ -582,12 +582,7 @@ export function AIPage() {
           setShowLoginRequired(false)
           setPendingDealForLogin(null)
         }}
-        onLogin={() => {
-          navigate(`/auth?mode=signin&redirect=/ai&dealId=${pendingDealForLogin?.id}`)
-        }}
-        onRegister={() => {
-          navigate(`/auth?mode=signup&redirect=/ai&dealId=${pendingDealForLogin?.id}`)
-        }}
+        dealId={pendingDealForLogin?.id}
       />
 
       {/* Claim Flow Modal */}
@@ -595,8 +590,8 @@ export function AIPage() {
         <ClaimFlowModal
           deal={selectedDeal}
           userLimits={getUserLimits(selectedDeal.id, selectedDeal.per_user_limit)}
-          hasDineIn={selectedDeal.restaurants?.dine_in ?? true}
-          hasTakeaway={selectedDeal.restaurants?.takeaway ?? true}
+          hasDineIn={selectedDeal.restaurant?.dine_in ?? true}
+          hasTakeaway={selectedDeal.restaurant?.takeaway ?? true}
           timeWindow={{
             start: selectedDeal.start_time,
             end: selectedDeal.end_time,
