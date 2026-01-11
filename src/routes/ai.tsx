@@ -155,6 +155,43 @@ export function AIPage() {
     handleSubmit()
   }
 
+  function handleSuggestionClick(suggestion: string) {
+    setInputText(suggestion)
+    // Trigger submit after setting input
+    setTimeout(() => {
+      const trimmed = suggestion.trim()
+      if (!trimmed) return
+      setMessages(prev => [...prev, { role: 'user', text: trimmed }])
+      setInputText('')
+      setIsLoading(true)
+
+      supabase.functions.invoke('sofie-chat', {
+        body: {
+          message: trimmed,
+          userId: userId || undefined,
+          location: latitude && longitude ? { lat: latitude, lng: longitude } : undefined,
+          city: cityName || undefined,
+        },
+      }).then(({ data, error }) => {
+        if (error) {
+          console.error('Chat error:', error)
+          setMessages(prev => [...prev, { 
+            role: 'sofie', 
+            text: 'Beklager, noe gikk galt. Prøv igjen!' 
+          }])
+        } else if (data) {
+          setMessages(prev => [...prev, { 
+            role: 'sofie', 
+            text: data.reply || 'Her er det jeg fant!',
+            deals: data.deals || [],
+            searchQuery: trimmed
+          }])
+        }
+        setIsLoading(false)
+      })
+    }, 0)
+  }
+
   function handleClaimDealClick(deal: DealWithRestaurant) {
     if (!user) {
       setPendingDealForLogin(deal)
@@ -362,9 +399,22 @@ export function AIPage() {
                   </div>
                 </form>
               </div>
-              <p className="mt-2 text-xs text-muted-fg">
-               Sofie hjelper deg med restauranter, tilbud og allergihensyn.
-              </p>
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSuggestionClick('Hamburger i Ås')}
+                  className="px-4 py-2 rounded-full border border-border bg-card hover:bg-muted transition-colors text-sm text-fg"
+                >
+                  Hamburger i Ås
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSuggestionClick('Pizza i Ås')}
+                  className="px-4 py-2 rounded-full border border-border bg-card hover:bg-muted transition-colors text-sm text-fg"
+                >
+                  Pizza i Ås
+                </button>
+              </div>
             </div>
           </div>
         ) : (
